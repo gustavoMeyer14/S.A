@@ -46,39 +46,36 @@
 
         <!-- Grupo 1: Campos de informações pessoais -->
         <fieldset class="login">
-                <label for="email">Email: </label>
-                <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
+            <label for="email">Email: </label>
+            <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
 
-                <label for="senha">Senha: </label>
-                <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
-        </fieldset>
+            <label for="senha">Senha: </label>
+            <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
+            
+            <div class="buttonreset">
+                <button type="reset" onclick="verificaMotivo(null)">Limpar</button>
+            </div>
+            <div class="buttonsubmit">
+                <button type="submit">Enviar</button>
+            </div>
+        </fieldset> 
+    </form> 
 
-                 <div class="buttonreset">
-                    <button type="reset" onclick="verificaMotivo(null)">Limpar</button>
-                </div>
-                    <div class="buttonsubmit">
-                        <button type="submit">Enviar</button>
-                    </div>
+    <footer>
+        <br><br>&copy; Copyright. Artech 2026. Todos os direitos reservados.
+        <br><br><br>
+    </footer>
 
-            </fieldset>
-    </form>
-</section>
-<footer>
-    <br><br>&copy; Copyright. Artech 2026. Todos os direitos reservados.
-    <br><br><br>
-</footer>
-
-<!-- Janela Modal que abre para exibir a confirmação de dados da Newsletter -->
-<div id="modalDadosLogin" class="modal">
-    <div class="modal-conteudo">
-        <h2>Confira seus dados</h2>
-        <!-- Lista onde os dados preenchidos são inseridos dinamicamente -->
-        <ul id="listaDadosLogin"></ul>
-        <div class="modal-botoes">
-            <button type="button" onclick="fechaModalLogin()">Corrigir</button>
-            <button type="button" onclick="confirmaLogin()">Confirmar Envio</button>
+    <!-- Janela Modal -->
+    <div id="modalDadosLogin" class="modal">
+        <div class="modal-conteudo">
+            <h2>Confira seus dados de Login</h2>
+            <ul id="listaDadosLogin"></ul>
+            <div class="modal-botoes">
+                <button type="button" onclick="fechaModalLogin()">Corrigir Login</button>
+                <button type="button" onclick="confirmaLogin()">Confirmar Login</button>
+            </div>
         </div>
     </div>
-</div>
 </body>
 </html>
