@@ -1,9 +1,10 @@
+@charset "UTF-8";
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-@charset "UTF-8";
 
 body {
     background-color: #151515;
@@ -97,7 +98,7 @@ header h1 {
   min-width: 100px; 
   margin: 10px auto 0 auto; 
   display: block; 
-  background-color: #b1ccf5; 
+  background-color: #ec7878; 
   font-weight: bold; 
   font-size: 16px;
   padding: 5px;
@@ -189,12 +190,12 @@ header h1 {
 
 /* Estilo do botão "Confirmar Envio" (Último botão do grupo) */
 .modal-botoes button:last-child {
-  background-color: #2154B5; 
+  background-color: #b52121; 
   color: white; 
 }
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
-  background-color: #1a4392; 
+  background-color: #921a1a; 
 }
 
 #modalDadosLogin {
