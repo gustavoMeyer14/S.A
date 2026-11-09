@@ -115,7 +115,7 @@ header h1 {
   width: 180px;
   height: 45px;
   float: left;
-margin-top: 15px;
+  margin-top: 15px;
 }
 
 .login button:first-of-type, .cadastro button:first-of-type{
@@ -206,12 +206,12 @@ margin-top: 15px;
 
 /* Estilo do botão "Confirmar Envio" (Último botão do grupo) */
 .modal-botoes button:last-child {
-  background-color: #2154B5; 
+  background-color: #b52121; 
   color: white; 
 }
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
-  background-color: #1a4392; 
+  background-color: #921a1a; 
 }
 
 #modalDadosLogin {
@@ -232,6 +232,7 @@ margin-top: 15px;
   display: block; 
 }
 
+<<<<<<< HEAD
 .formLogin {
   width: 500px;
   height: 500px;
@@ -241,4 +242,9 @@ margin-top: 15px;
   border: 2px solid #C62828;
   margin-top: 50px;
   font-size: 30px;
+=======
+.linkcadastro {
+  color: red;
+  text-decoration: underline;
+>>>>>>> db3c42ffafc06c756151c68abcb2dae555bc9ffb
 }
