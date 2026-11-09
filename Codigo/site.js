@@ -1,5 +1,4 @@
 function validaLogin() {
-
   var email = document.frmlogin.txtemail.value;
   var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   
@@ -9,43 +8,59 @@ function validaLogin() {
       return false;                                        
   }
 
-  var login = document.frmlogin.txtcidade.value;
-
-  if (senha === "") {
-      alert("Preencha o Campo Senha ou formato inválido !!!")
+  var senha = document.frmlogin.txtsenha.value;
+  var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  
+  if (senha.trim() === "" || !expRegsenha.test(senha)) {
+      alert("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.");
       document.frmlogin.txtsenha.focus();
       return false;
   }
 
+  // Se passou nas validações, abre o modal
   abreModalLogin();
-  return false;
+  return false; // Impede o envio real para a página não recarregar antes do modal
 }
 
-  function abreModalLogin() {
+// 2. Abre o Modal e puxa a função para desenhar os dados
+function abreModalLogin() {
   var f = document.frmlogin;
 
-
-  // Monta uma matriz/array com os dados a serem mostrados no resumo
   var dados = [
       ["Email", f.txtemail.value],
-      ["Senha", f.txtsenha.value],
+      ["Senha", f.txtsenha.value]
   ];
 
-
-  // Chama a função auxiliar para desenhar/inserir esses dados na tela
   renderizarListaModal("listaDadosLogin", dados);
-  // Adiciona a classe CSS "aberto" para exibir visualmente a caixa modal
   document.getElementById("modalDadosLogin").classList.add("aberto");
 }
 
-// Esconde o modal removendo a classe "aberto"
+// 3. FUNÇÃO AUXILIAR: Desenha os dados corrigindo os índices [0] e [1]
+function renderizarListaModal(idElemento, dados) {
+  var elemento = document.getElementById(idElemento);
+  if (elemento) {
+      elemento.innerHTML = ""; 
+      dados.forEach(function(item) {
+          var li = document.createElement("li");
+          li.innerHTML = "<strong>" + item[0] + ":</strong> " + item[1];
+          elemento.appendChild(li);
+      });
+  }
+}
+
+// 4. Fecha o Modal
 function fechaModalLogin() {
   document.getElementById("modalDadosLogin").classList.remove("aberto");
 }
 
-// Ação de confirmação e envio final do formulário
+// 5. Confirmação Final dentro do Modal
 function confirmaLogin() {
   alert("Mensagem enviada com sucesso!");
-  fechaModalLogin();                   // Fecha o modal
-  document.frmlogin.reset(); // Limpa todos os campos do formulário
+  fechaModalLogin();                   
+  document.frmlogin.reset(); 
+}
+
+// 6. EVITA O ERRO DO BOTÃO LIMPAR: Criação da função que faltava
+function verificaMotivo(valor) {
+  console.log("Formulário limpo");
 }
