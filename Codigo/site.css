@@ -232,7 +232,6 @@ header h1 {
   display: block; 
 }
 
-<<<<<<< HEAD
 .formLogin {
   width: 500px;
   height: 500px;
@@ -242,9 +241,4 @@ header h1 {
   border: 2px solid #C62828;
   margin-top: 50px;
   font-size: 30px;
-=======
-.linkcadastro {
-  color: red;
-  text-decoration: underline;
->>>>>>> db3c42ffafc06c756151c68abcb2dae555bc9ffb
 }
