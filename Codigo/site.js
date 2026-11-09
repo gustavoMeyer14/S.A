@@ -65,17 +65,6 @@ function verificaMotivo(valor) {
   console.log("Formulário limpo");
 }
 
-
-
-
-
-
-
-
-
-
-
-
 function validaCadastro() {
   var email = document.frmcadastro.txtemail.value;
   var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -128,13 +117,13 @@ function renderizarListaModal(idElemento, dados) {
 
 // 4. Fecha o Modal
 function fechaModalCadastro() {
-  document.getElementById("modalDadosLogin").classList.remove("aberto");
+  document.getElementById("modalDadosCadastro").classList.remove("aberto");
 }
 
 // 5. Confirmação Final dentro do Modal
 function confirmaCadastro() {
   alert("Mensagem enviada com sucesso!");
-  fechaModalLogin();                   
+  fechaModalCadastro();                   
   document.frmcadastro.reset(); 
 }
 
