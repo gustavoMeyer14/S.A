@@ -65,6 +65,8 @@ function verificaMotivo(valor) {
   console.log("Formulário limpo");  
 }
 
+//---------------------- CADASTRO  -------------------------//
+
 function validaCadastro() {
   var nome = document.frmcad'
   var email = document.frmcadastro.txtemail.value;
@@ -95,8 +97,9 @@ function abreModalCadastro() {
   var f = document.frmcadastro;
 
   var dados = [
+      ["Nome Completo:", f.txtnome.value],
       ["Email", f.txtemail.value],
-      ["Senha", f.txtsenha.value]
+      ["Senha", f.txtsenha.value],
   ];
 
   renderizarListaModal("listaDadosCadastro", dados);
