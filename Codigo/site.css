@@ -41,7 +41,7 @@ body {
 }
 
 /* Código de Estilização principal do Login e Cadastro */
-.login {
+.login , .cadastro {
   width: 320px; 
   margin: 20px auto; 
   font-weight: bold; 
@@ -52,7 +52,7 @@ body {
 
 
 /* Botões do formulário */
-.login button {
+.login button, .cadastro button {
   width: 40px;
   min-width: 100px; 
   margin: 10px auto 0 auto; 
