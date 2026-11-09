@@ -68,7 +68,15 @@ function verificaMotivo(valor) {
 //---------------------- CADASTRO  -------------------------//
 
 function validaCadastro() {
-  var nome = document.frmcad'
+
+  var nome = document.frmcadastro.txtnome.value;
+  var expRegnome = /^[A-ZÀ-Ú][a-zà-ú]+(\s+[A-ZÀ-Ú][a-zà-ú]+)+$/i;
+  if (!expRegnome.test(nome.trim())) {
+    alert("Preencha o Campo Nome completo!!!"); 
+    document.frmcadastro.txtnome.focus();    
+    return false;                            
+}
+
   var email = document.frmcadastro.txtemail.value;
   var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   
