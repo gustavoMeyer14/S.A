@@ -215,3 +215,8 @@ header h1 {
 #modalDadosCadastro.aberto {
   display: block; 
 }
+
+.linkcadastro {
+  color: red;
+  text-decoration: underline;
+}
