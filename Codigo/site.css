@@ -1,0 +1,25 @@
+body {
+    background-color: #151515;
+    color: #ffffff;
+    text-align: center;
+}
+
+header {
+    background-color: #C62828;
+    height: 100px;
+    width: auto;
+}
+
+header h1 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 25px;
+    width: auto;
+    text-align: center;
+    font-size: 30px;
+}
+
+.logo {
+    float: left;
+    width: 100px;
+    height: 100px;
+}
