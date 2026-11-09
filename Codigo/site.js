@@ -65,7 +65,19 @@ function verificaMotivo(valor) {
   console.log("Formulário limpo");
 }
 
+//---------------------- CADASTRO  -------------------------//
+
 function validaCadastro() {
+
+  var nome = document.frmcadastro.txtnome.value;
+  var expRegnome = /^[A-ZÀ-Ú][a-zà-ú]+(\s+[A-ZÀ-Ú][a-zà-ú]+)+$/i;
+  if (!expRegnome.test(nome.trim())) {
+    alert("Preencha o Campo Nome completo!!!"); 
+    document.frmfaleconosco.txtnome.focus();    
+    return false;                              
+}
+
+
   var email = document.frmcadastro.txtemail.value;
   var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
   
@@ -94,8 +106,9 @@ function abreModalCadastro() {
   var f = document.frmcadastro;
 
   var dados = [
+      ["Nome Completo:", f.txtnome.value],
       ["Email", f.txtemail.value],
-      ["Senha", f.txtsenha.value]
+      ["Senha", f.txtsenha.value],
   ];
 
   renderizarListaModal("listaDadosCadastro", dados);

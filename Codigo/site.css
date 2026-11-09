@@ -165,3 +165,12 @@ body {
 #modalDadosLogin.aberto {
   display: block; 
 }
+
+#modalDadosCadastro {
+  display: none; 
+}
+
+/* Quando o JavaScript adiciona a classe "aberto", ele aparece */
+#modalDadosCadastro.aberto {
+  display: block; 
+}
