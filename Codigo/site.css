@@ -1,14 +1,16 @@
+@charset "UTF-8";
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-@charset "UTF-8";
 
 body {
     background-color: #151515;
     color: #ffffff;
     text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 header {
@@ -86,24 +88,39 @@ header h1 {
   margin: 20px auto; 
   font-weight: bold; 
   margin-bottom: 10px;
-  border: 2px solid #000000; 
-  padding: 15px; 
+  border: 2px solid #000000;
+  padding: 30px; 
 }
+
+.login input {
+  width: 400px;
+  height: 50px;
+  border-radius: 20px;
+  background-color: #151515;
+  border: 1px solid #C62828;
+  text-align: center;
+  color: #ffffff;
+}
+
+.login input:hover {
+  scale: 110%;
+  transition: 0.3s;
+  border: 1px solid #ffffff;
+}
+
 
 
 /* Botões do formulário */
 .login button, .cadastro button {
-  width: 40px;
-  min-width: 100px; 
-  margin: 10px auto 0 auto; 
-  display: block; 
-  background-color: #b1ccf5; 
-  font-weight: bold; 
-  font-size: 16px;
-  padding: 5px;
-  cursor: pointer;
+  width: 180px;
+  height: 45px;
+  float: left;
+margin-top: 15px;
 }
 
+.login button:first-of-type, .cadastro button:first-of-type{
+  margin-right: 4%;
+}
 .modal {
   display: none !important;
   position: fixed !important; 
@@ -213,4 +230,15 @@ header h1 {
 /* Quando o JavaScript adiciona a classe "aberto", ele aparece */
 #modalDadosCadastro.aberto {
   display: block; 
+}
+
+.formLogin {
+  width: 500px;
+  height: 500px;
+  background-color: #000000;
+  border-radius: 20px;
+  border: #C62828;
+  border: 2px solid #C62828;
+  margin-top: 50px;
+  font-size: 30px;
 }
