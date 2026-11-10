@@ -242,3 +242,13 @@ header h1 {
   margin-top: 50px;
   font-size: 30px;
 }
+
+.linkcadastro {
+  color: red;
+  text-decoration: underline;
+}
+
+.linklogin {
+  color: red;
+  text-decoration: underline;
+}
