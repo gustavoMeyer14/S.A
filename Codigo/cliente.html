@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
 </head>
+
 <body>
     <header>
         <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
@@ -21,7 +23,8 @@
         </nav>
     </header>
 
-    <form name="frmlogin" method="post" action="#" onsubmit="return validaLogin()" class="formLogin" style="height: 500px;">
+    <form name="frmlogin" method="post" action="#" onsubmit="return validaLogin()" class="formLogin"
+        style="height: 500px;">
 
         <!-- Grupo 1: Campos de informações pessoais -->
         <fieldset class="login">
@@ -30,11 +33,11 @@
 
             <label for="senha">Senha: </label>
             <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
-            
+
             <button type="reset" onclick="verificaMotivo(null)">Limpar</button><button type="submit">Enviar</button>
 
-        </fieldset> 
-    </form> 
+        </fieldset>
+    </form>
 
     <p class="cadastrar-se">Não tem Login? <a class="linkcadastro" href="cadastro.html">Cadastre-se</a></p>
 
@@ -54,4 +57,5 @@
         </div>
     </div>
 </body>
+
 </html>
