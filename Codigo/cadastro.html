@@ -3,59 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
     <meta name="author" content="Shadow Realm">
     <title>Shadow Realm Store - Inicio</title>
     <link rel="stylesheet" href="site.css">
-=======
-    <meta name="author" content="Shadow Realm Store">
-    
-    <title>Cadastro</title>
-    
-    <link rel="stylesheet" type="text/css" href="site.css">
->>>>>>> 2f444ee105b12ef17e302e337c7de0e5aaade811
     <script src="site.js"></script>
 </head>
 <body>
     <header>
-    <div class="logo">
-     
-            <h1>Cadastro</h1>
-        </div> 
+        <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <nav class="nav">
+            <a href="" class="link">Carrinho</a>
+            <a href="" class="link">Contato</a>
+            <a href="cliente.html" class="link">Login</a>
+        </nav>
     </header>
 
-
-    <!-- NAVEGAÇÃO PRINCIPAL: Menu de links do site -->
-    <nav class="nav">
-        <a href="index.html" rel="next" target="_self">
-            <div class="option">Menu</div>
-        </a>
-
-        <a href="produtos.html" rel="next" target="_self">
-            <div class="option">Produtos</div>
-        </a>
-
-        <a href="" rel="next" target="_self">
-            <div class="option">....</div>
-        </a>
-
-        <a href="" rel="next" target="_self">
-            <div class="option">....</div>
-        </a>
-
-        <a href="" rel="next" target="_self">
-            <div class="option">....</div>
-        </a>
-    </nav>
-
-    <form name="frmcadastro" method="post" action="#" onsubmit="return validaCadastro()">
+    <form name="frmcadastro" method="post" class="formLogin" action="#" onsubmit="return validaCadastro()">
 
         <!-- Grupo 1: Campos de informações pessoais -->
-        <fieldset class="cadastro">
+        <fieldset class="login">
 
-          <label for="nome">Nome Completo: </label>
-          <input type="text" name="txtnome" id="nome" placeholder="Digite seu Nome Completo: ">
+            <label for="nome">Nome Completo: </label>
+            <input type="text" name="txtnome" id="nome" class="" placeholder="Digite seu Nome Completo: ">
 
             <label for="email">Email: </label>
             <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
@@ -66,20 +37,14 @@
             <label for="cpf">CPF: </label>
             <input type="text" name="txtcpf" id="cpf" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
             
-            <div class="buttonreset">
-                <button type="reset" onclick="verificaMotivo(null)">Limpar</button>
-            </div>
-            <div class="buttonsubmit">
-                <button type="submit">Enviar</button>
-            </div>
+            <button type="reset" onclick="verificaMotivo(null)">Limpar</button><button type="submit">Enviar</button>
         </fieldset> 
     </form> 
 
-     <p>Já tem Login? <a class="linklogin" href="cliente.html">Logar-se</a></p>
+     <p class="cadastrar-se">Já tem Login? <a class="linklogin" href="cliente.html">Logar-se</a></p>
 
     <footer>
-        <br><br>&copy; Copyright. Shadow Realm Store 2026. Todos os direitos reservados.
-        <br><br><br>
+        &copy; Copyright. Shadow Realm Store 2026. Todos os direitos reservados.
     </footer>
 
     <!-- Janela Modal -->

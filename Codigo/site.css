@@ -174,6 +174,7 @@ footer {
 
 /* Código de Estilização principal do Login e Cadastro */
 .login , .cadastro {
+  align-items: center ;
   width: 320px; 
   margin: 20px auto; 
   font-weight: bold; 
@@ -190,6 +191,7 @@ footer {
   border: 1px solid #C62828;
   text-align: center;
   color: #ffffff;
+  margin: 20px;
 }
 
 .login input:hover {
@@ -198,14 +200,27 @@ footer {
   border: 1px solid #ffffff;
 }
 
-
+.cadastrar-se {
+  margin: 20px;
+}
 
 /* Botões do formulário */
 .login button, .cadastro button {
   width: 180px;
   height: 45px;
-  float: left;
-  margin-top: 15px;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  background-color: #C62828;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 50px;
+}
+
+.login button:hover, .cadastro button:hover {
+  scale: 110%;
+  transition: 0.3s;
+  background-color: #151515;
+  box-shadow: 0 10px 25px #C62828;
 }
 
 .login button:first-of-type, .cadastro button:first-of-type{
@@ -324,7 +339,7 @@ footer {
 
 .formLogin {
   width: 500px;
-  height: 500px;
+  height: 700px;
   background-color: #000000;
   border-radius: 20px;
   border: #C62828;
