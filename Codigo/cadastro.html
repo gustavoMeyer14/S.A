@@ -4,48 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
-    <meta name="author" content="Shadow Realm Company">
+    <meta name="author" content="Shadow Realm">
     <title>Shadow Realm Store - Inicio</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
+    <!--bomdia sou shannell -->
 </head>
 <body>
     <header>
         <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
         <h1>- Shadow Realm Store -</h1>
         <nav class="nav">
-            <a href="" class="link">Carrinho</a>
+            <a href="carrinho.html" class="link">Carrinho</a>
             <a href="" class="link">Contato</a>
             <a href="cliente.html" class="link">Login</a>
+            <a href="cadastro.html" class="link">Cadastro</a>
         </nav>
     </header>
 
-    <form name="frmcadastro" method="post" action="#" onsubmit="return validaCadastro()">
+    <form name="frmcadastro" method="post" class="formLogin" action="#" onsubmit="return validaCadastro()">
 
         <!-- Grupo 1: Campos de informações pessoais -->
-        <fieldset class="cadastro">
+        <fieldset class="login">
 
-          <label for="nome">Nome Completo: </label>
-          <input type="text" name="txtnome" id="nome" placeholder="Digite seu Nome Completo: ">
+            <label for="nome">Nome Completo: </label>
+            <input type="text" name="txtnome" id="nome" class="" placeholder="Digite seu Nome Completo: ">
 
             <label for="email">Email: </label>
             <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
 
             <label for="senha">Senha: </label>
             <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
+
+            <label for="cpf">CPF: </label>
+            <input type="text" name="txtcpf" id="cpf" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
             
-            <div class="buttonreset">
-                <button type="reset" onclick="verificaMotivo(null)">Limpar</button>
-            </div>
-            <div class="buttonsubmit">
-                <button type="submit">Enviar</button>
-            </div>
+            <button type="reset" onclick="verificaMotivo(null)">Limpar</button><button type="submit">Enviar</button>
         </fieldset> 
     </form> 
 
+     <p class="cadastrar-se">Já tem Login? <a class="linklogin" href="cliente.html">Logar-se</a></p>
+
     <footer>
-        <br><br>&copy; Copyright. Artech 2026. Todos os direitos reservados.
-        <br><br><br>
+        &copy; Copyright. Shadow Realm Store 2026. Todos os direitos reservados.
     </footer>
 
     <!-- Janela Modal -->
@@ -55,177 +56,9 @@
             <ul id="listaDadosCadastro"></ul>
             <div class="modal-botoes">
                 <button type="button" onclick="fechaModalCadastro()">Corrigir Cadastro</button>
-                <button type="button" onclick="confirmaCadastro()">Confirmar Cadastro</button>
+                <button type="button" onclick="confirmaCadastro()">Confirmar Cadastrinho</button>
             </div>
         </div>
     </div>
 </body>
 </html>
-
-<!-- @charset "UTF-8" ;
-
-body {
-    background-color: #151515;
-    color: #ffffff;
-    text-align: center;
-}
-
-.logo {
-    float: left;
-    width: 100px;
-    height: 100px;
-}
-
-.responsivo1 {
-    width: 500px; 
-    margin: 0 auto; 
-    height: 500px; 
-}
-
-.responsivo2 {
-    width: 1000px; 
-    margin: 0 auto; 
-    height: 500px; 
-}
-
-
-.responsivo3 {
-    width: 1350px; 
-    margin: 0 auto; 
-    height: 500px; 
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-
-/* Seletor Universal (*): Aplica regras básicas a TODOS os elementos da página */
-* {
-    padding: 0; 
-    margin: 0 auto; 
-    box-sizing: border-box; 
-}
-
-/* Código de Estilização principal do Login e Cadastro */
-.login , .cadastro {
-  width: 320px; 
-  margin: 20px auto; 
-  font-weight: bold; 
-  margin-bottom: 10px;
-  border: 2px solid #000000; 
-  padding: 15px; 
-}
-
-
-/* Botões do formulário */
-.login button, .cadastro button {
-  width: 40px;
-  min-width: 100px; 
-  margin: 10px auto 0 auto; 
-  display: block; 
-  background-color: #b1ccf5; 
-  font-weight: bold; 
-  font-size: 16px;
-  padding: 5px;
-  cursor: pointer;
-}
-
-.modal {
-  display: none !important;
-  position: fixed !important; 
-  z-index: 99999 !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important; 
-  height: 100% !important; 
-  background-color: rgba(0, 0, 0, 0.6) !important; 
-}
-
-/* Classe ativada via JavaScript para abrir o modal */
-.modal.aberto {
-  display: flex !important; 
-  justify-content: center; 
-  align-items: center; 
-}
-
-/* A caixinha branca centralizada que contém o conteúdo da modal */
-.modal-conteudo {
-  background-color: #ffffff; 
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-  width: 90%; 
-  max-width: 450px; 
-  text-align: left; 
-  font-family: Arial, sans-serif;
-}
-
-/* Título dentro do modal */
-.modal-conteudo h2 {
-  margin-top: 0;
-  color: #333; 
-  border-bottom: 2px solid #f0f0f0; 
-  padding-bottom: 10px;
-}
-
-/* Lista de dados mostrada dentro do modal */
-.modal-conteudo ul {
-  list-style-type: none; 
-  padding: 0;
-  margin: 20px 0;
-}
-
-/* Itens individuais da lista no modal */
-.modal-conteudo li {
-  margin-bottom: 12px;
-  font-size: 15px;
-  color: #444;
-}
-
-/* Container flexbox para alinhar os botões do modal lado a lado */
-.modal-botoes {
-  display: flex;
-  justify-content: flex-end; 
-  gap: 15px; 
-  margin-top: 25px;
-}
-
-/* Estilo padrão para todos os botões no modal */
-.modal-botoes button {
-  padding: 10px 20px;
-  border: none; 
-  border-radius: 6px; 
-  font-weight: bold;
-  cursor: pointer; 
-  font-size: 14px;
-  transition: background-color 0.2s; 
-}
-
-/* Estilo do botão "Corrigir" (Primeiro botão do grupo) */
-.modal-botoes button:first-child {
-  background-color: #e0e0e0; 
-  color: #333;
-}
-/* Efeito de hover para o botão "Corrigir" */
-.modal-botoes button:first-child:hover {
-  background-color: #d0d0d0; 
-}
-
-/* Estilo do botão "Confirmar Envio" (Último botão do grupo) */
-.modal-botoes button:last-child {
-  background-color: #2154B5; 
-  color: white; 
-}
-/* Efeito de hover para o botão "Confirmar Envio" */
-.modal-botoes button:last-child:hover {
-  background-color: #1a4392; 
-}
-
-#modalDadosLogin {
-  display: none; 
-}
-
-/* Quando o JavaScript adiciona a classe "aberto", ele aparece */
-#modalDadosLogin.aberto {
-  display: block; 
-}-->
