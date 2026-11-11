@@ -173,49 +173,90 @@ function verificaMotivo(valor) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // === MAPEAMENTO DOS COMPONENTES ===
-    const productCards = document.querySelectorAll('.product-card');
+    const productsList = document.getElementById('products-list');
     const priceBreakdown = document.querySelector('.price-breakdown');
     const modalTotalValue = document.querySelector('.modal-total-value');
     const addressForm = document.querySelector('.address-column');
+    const btnBuy = document.querySelector('.btn-buy');
 
-    // Tabela de Preços Base das Figures (valores reais das imagens)
-    const productPrices = {
-        'Figure Renji': 287.99,
-        'Figure Kisuke': 591.90,
-        'Figure Maomao': 496.50
-    };
+    // 1. Busca os produtos salvos no localStorage (ou inicia lista vazia)
+    let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
 
-    // === FUNÇÃO DE RECALCULAR TUDO ===
-    function updateTotals() {
-        let activeItems = [];
+    // === BLOQUEIO DE COMPRA SE O CARRINHO ESTIVER VAZIO ===
+    if (btnBuy) {
+        btnBuy.onclick = (e) => {
+            if (carrinho.length === 0) {
+                e.preventDefault(); // Impede a alteração da URL e bloqueia o modal do CSS
+                alert('Seu carrinho está vazio! Adicione produtos antes de prosseguir.');
+            }
+        };
+    }
+
+    // 2. Função para desenhar os produtos na tela e calcular totais
+    function renderizarCarrinho() {
+        if (!productsList) return;
+
+        // Caso o carrinho esteja vazio
+        if (carrinho.length === 0) {
+            productsList.innerHTML = '<p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>';
+            atualizarResumo(0, []);
+            return;
+        }
+
+        // Limpa o container para desenhar a lista atualizada
+        productsList.innerHTML = '';
         let grandTotal = 0;
 
-        // Vasculha cada produto na primeira tela
-        productCards.forEach(card => {
-            const productName = card.querySelector('.product-name').textContent.trim();
-            const qtyValue = parseInt(card.querySelector('.qty-value').textContent);
-            const unitPrice = productPrices[productName] || 0;
+        carrinho.forEach((item, index) => {
+            const subtotal = item.preco * item.quantidade;
+            grandTotal += subtotal;
 
-            // Só considera no cálculo se a quantidade for maior que zero
-            if (qtyValue > 0) {
-                const itemTotalPrice = unitPrice * qtyValue;
-                activeItems.push({ name: productName, price: itemTotalPrice });
-                grandTotal += itemTotalPrice;
-            }
+            const card = document.createElement('article');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-thumb">
+                    <img src="${item.imagem || 'imagens/logo.png'}" alt="${item.nome}">
+                </div>
+                <h3 class="product-name">${item.nome}</h3>
+                <div class="quantity-controls">
+                    <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)">+</button>
+                    <span class="qty-value">${item.quantidade}</span>
+                    <button type="button" class="btn-minus" onclick="alterarQuantidade(${index}, -1)">-</button>
+                </div>
+            `;
+            productsList.appendChild(card);
         });
 
-        // 1. Atualiza o painel lateral com os novos valores baseados nas quantidades
+        atualizarResumo(grandTotal, carrinho);
+    }
+
+    // 3. Altera a quantidade ou remove o item se chegar a zero
+    window.alterarQuantidade = function(index, delta) {
+        carrinho[index].quantidade += delta;
+
+        if (carrinho[index].quantidade <= 0) {
+            carrinho.splice(index, 1); // Remove o produto da lista
+        }
+
+        // Salva a alteração no navegador e redesenha a tela
+        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+        renderizarCarrinho();
+    };
+
+    // 4. Atualiza os painéis de valor total (Lateral e Modal)
+    function atualizarResumo(grandTotal, itens) {
+        if (!priceBreakdown) return;
+
         let breakdownHTML = '';
-        activeItems.forEach((item, index) => {
-            // Insere o sinal de "+" a partir da segunda linha conforme o print original
-            const mathPrefix = index === 0 ? '  ' : '+ ';
-            breakdownHTML += `<p class="price-item">${mathPrefix}R$ ${item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
-        });
 
-        // Se o carrinho for zerado por completo
-        if (activeItems.length === 0) {
-            breakdownHTML = `<p class="price-item">R$ 0,00</p>`;
+        if (itens.length === 0) {
+            breakdownHTML = '<p class="price-item">R$ 0,00</p>';
+        } else {
+            itens.forEach((item, index) => {
+                const mathPrefix = index === 0 ? '' : '+ ';
+                const subtotal = item.preco * item.quantidade;
+                breakdownHTML += `<p class="price-item">${mathPrefix}R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
+            });
         }
 
         breakdownHTML += `<hr class="summary-divider">`;
@@ -223,44 +264,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         priceBreakdown.innerHTML = breakdownHTML;
 
-        // 2. Sincroniza o valor final para dentro do texto dinâmico da segunda tela (Tela de Pagamento)
         if (modalTotalValue) {
             modalTotalValue.textContent = `Valor Total: R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     }
 
-    // === OUVINTES DE CLIQUE (+ E -) ===
-    productCards.forEach(card => {
-        const btnPlus = card.querySelector('.btn-plus');
-        const btnMinus = card.querySelector('.btn-minus');
-        const qtyDisplay = card.querySelector('.qty-value');
-
-        // Botão de Adicionar (+)
-        btnPlus.addEventListener('click', () => {
-            let currentQty = parseInt(qtyDisplay.textContent);
-            qtyDisplay.textContent = currentQty + 1;
-            updateTotals(); // Recalcula na hora
-        });
-
-        // Botão de Diminuir (-)
-        btnMinus.addEventListener('click', () => {
-            let currentQty = parseInt(qtyDisplay.textContent);
-            if (currentQty > 0) {
-                qtyDisplay.textContent = currentQty - 1;
-                updateTotals(); // Recalcula na hora
-            }
-        });
-    });
-
-    // === DISPARO DO FORMULÁRIO DE PAGAMENTO ===
+    // 5. Confirmação do Formulário de Pagamento
     if (addressForm) {
-        addressForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Impede o envio padrão da página
+        addressForm.onsubmit = (e) => {
+            e.preventDefault();
+
+            if (carrinho.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
 
             alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
-
-            // Retorna para o carrinho e remove a tag da URL limpando o estado do CSS
-            window.location.hash = 'tela-carrinho';
-        });
+            
+            // Limpa o carrinho após a compra e redireciona
+            localStorage.removeItem('carrinhoShadowRealm');
+            window.location.href = 'index.html';
+        };
     }
+
+    // Executa ao carregar a página
+    renderizarCarrinho();
 });

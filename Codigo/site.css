@@ -181,7 +181,7 @@ footer {
   margin: 20px auto;
   font-weight: bold;
   margin-bottom: 10px;
-  border: 2px solid #000000;
+  border: 0px solid;
   padding: 30px;
 }
 
@@ -769,4 +769,108 @@ footer {
   .vertical-divider {
     display: none;
   }
+}
+
+.contato-container {
+  width: 700px;
+  height: 1400px;
+  margin-top: 50px;
+  background-color: #1e1e1e;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+}
+
+.contato-section h2 {
+  font-size: 35px;
+}
+
+.contato-section p {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.contato-form label {
+  font-size: 20px;
+  margin: 20px;
+}
+
+.contato-form input, select, option {
+  width: 650px;
+  height: 40px;
+  margin: 20px;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  background-color: #151515;
+  padding: 5px;
+  color: #ffffff;
+}
+
+.contato-form input:hover, select:hover, option:hover {
+  scale: 105%;
+  transition: 0.3s;
+  border: 1px solid;
+}
+
+.contato-form textarea {
+  width: 650px;
+  height: 150px;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  background-color: #151515;
+  padding: 10px;
+  color: #ffffff;
+  margin: 20px;
+}
+
+.contato-form textarea:hover {
+  scale: 105%;
+  transition: 0.3s;
+  border: 1px solid;
+}
+
+.contato-form button {
+  width: 300px;
+  height: 50px;
+  background-color: #C62828;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.contato-form button:hover {
+  scale: 110%;
+  transition: 0.3s;
+  box-shadow: 0 10px 25px #C62828;
+  background-color: #151515;
+}
+
+.faq-container { 
+  margin-top: 50px;
+}
+
+.faq-container p {
+  margin: 20px;
+}
+
+.faq-item {
+  width: 300px;
+  height: 170px;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  float: left;
+  margin: 20px;
+  margin-left: 27px;
+}
+
+.faq-item:hover {
+  scale: 110%;
+  transition: 0.3s;
+  border: 1px solid #ffffff;
+  cursor: default;
+}
+.empty-cart-msg {
+  color: #ffffff;
+  text-align: center;
+  font-size: 1.1rem;
 }

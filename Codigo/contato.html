@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
+    <meta name="author" content="Shadow Realm">
+    <title>Shadow Realm Store - Inicio</title>
+    <link rel="stylesheet" href="site.css">
+    <script src="site.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <nav class="nav">
+            <a href="carrinho.html" class="link">Carrinho</a>
+            <a href="contato.html" class="link">Contato</a>
+            <a href="cliente.html" class="link">Login</a>
+            <a href="cadastro.html" class="link">Cadastro</a>
+        </nav>
+    </header>
+
+
+    <main class="contato-container">
+
+        <section class="contato-section">
+            <h2>Entre em Contato</h2>
+
+            <p>
+                Tem alguma dúvida, sugestão ou precisa de ajuda?
+                Entre em contato conosco!
+            </p>
+
+            <form action="#" method="post" class="contato-form">
+
+                <label for="nome">Nome completo:</label>
+                <input type="text" id="nome" name="nome"
+                       placeholder="Digite seu nome" required>
+
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email"
+                       placeholder="Digite seu e-mail" required>
+
+                <label for="assunto">Assunto:</label>
+                <select id="assunto" name="assunto" required>
+                    <option value="">Selecione um assunto</option>
+                    <option value="produtos">Dúvidas sobre produtos</option>
+                    <option value="pedido">Problemas com pedido</option>
+                    <option value="entrega">Entrega</option>
+                    <option value="pagamento">Pagamento</option>
+                    <option value="outros">Outros assuntos</option>
+                </select>
+
+                <label for="mensagem">Mensagem:</label>
+                <textarea id="mensagem" name="mensagem"
+                          placeholder="Escreva sua mensagem..."
+                          rows="5" required></textarea>
+
+                <button type="submit">Enviar Mensagem</button>
+
+            </form>
+        </section>
+
+        <section class="faq-container">
+
+            <h2>Dúvidas Frequentes</h2>
+
+            <div class="faq-item">
+                <h3>Como faço uma compra?</h3>
+                <p>
+                    Escolha os produtos desejados, adicione ao carrinho
+                    e finalize seu pedido.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Quais formas de pagamento são aceitas?</h3>
+                <p>
+                    As formas de pagamento disponíveis serão apresentadas
+                    durante a finalização da compra.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Como funciona a entrega?</h3>
+                <p>
+                    As informações sobre entrega e prazo serão apresentadas
+                    durante o processo de compra.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Posso encontrar produtos de diferentes animes?</h3>
+                <p>
+                    Sim! A loja reúne produtos inspirados em diferentes
+                    universos de animes e cultura geek.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Como posso entrar em contato com a loja?</h3>
+                <p>
+                    Você pode utilizar o formulário de contato desta página
+                    para enviar suas dúvidas e enviaremos nossa reposta por meio de e-mail.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Shadow Realm Store - Todos os direitos reservados.</p>
+    </footer>
+
+</body>
+</html>
