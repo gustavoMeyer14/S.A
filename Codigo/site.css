@@ -869,3 +869,8 @@ footer {
   border: 1px solid #ffffff;
   cursor: default;
 }
+.empty-cart-msg {
+  color: #ffffff;
+  text-align: center;
+  font-size: 1.1rem;
+}

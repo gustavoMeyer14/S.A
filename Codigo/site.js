@@ -177,9 +177,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceBreakdown = document.querySelector('.price-breakdown');
     const modalTotalValue = document.querySelector('.modal-total-value');
     const addressForm = document.querySelector('.address-column');
+    const btnBuy = document.querySelector('.btn-buy');
 
     // 1. Busca os produtos salvos no localStorage (ou inicia lista vazia)
     let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+
+    // === BLOQUEIO DE COMPRA SE O CARRINHO ESTIVER VAZIO ===
+    if (btnBuy) {
+        btnBuy.onclick = (e) => {
+            if (carrinho.length === 0) {
+                e.preventDefault(); // Impede a alteração da URL e bloqueia o modal do CSS
+                alert('Seu carrinho está vazio! Adicione produtos antes de prosseguir.');
+            }
+        };
+    }
 
     // 2. Função para desenhar os produtos na tela e calcular totais
     function renderizarCarrinho() {
