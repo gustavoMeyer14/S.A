@@ -172,38 +172,86 @@ function verificaMotivo(valor) {
 }
 
 
+
+/**=======================================   JAVASCRIPT CARRINHO   =================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
     const productsList = document.getElementById('products-list');
     const priceBreakdown = document.querySelector('.price-breakdown');
     const modalTotalValue = document.querySelector('.modal-total-value');
     const addressForm = document.querySelector('.address-column');
     const btnBuy = document.querySelector('.btn-buy');
+    
+    // Elementos do Cupom
+    const couponInput = document.getElementById('coupon-input');
+    const btnCoupon = document.getElementById('btn-coupon');
+    const couponMessage = document.getElementById('coupon-message');
+
+    // === TABELA DE CUPONS VÁLIDOS (Código : Porcentagem de Desconto) ===
+    const cuponsValidos = {
+        'SHADOW26': 0.10,  // 10% de desconto
+        'GEEK15': 0.15,    // 15% de desconto
+        'SHADOW50': 0.50   // 50% de desconto
+    };
+
+    let descontoAtual = 0; // Inicia em 0%
+    let cupomAtivo = '';
 
     // 1. Busca os produtos salvos no localStorage (ou inicia lista vazia)
     let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
 
-    // === BLOQUEIO DE COMPRA SE O CARRINHO ESTIVER VAZIO ===
+    // Bloqueio de Compra se o carrinho estiver vazio
     if (btnBuy) {
         btnBuy.onclick = (e) => {
             if (carrinho.length === 0) {
-                e.preventDefault(); // Impede a alteração da URL e bloqueia o modal do CSS
+                e.preventDefault();
                 alert('Seu carrinho está vazio! Adicione produtos antes de prosseguir.');
             }
         };
+    }
+
+    // === LÓGICA DE APLICAÇÃO DO CUPOM ===
+    if (btnCoupon && couponInput) {
+        btnCoupon.onclick = () => {
+            const codigoDigitado = couponInput.value.trim().toUpperCase();
+
+            if (codigoDigitado === '') {
+                exibirMensagemCupom('Digite um cupom.', '#ffaa00');
+                return;
+            }
+
+            if (cuponsValidos.hasOwnProperty(codigoDigitado)) {
+                descontoAtual = cuponsValidos[codigoDigitado];
+                cupomAtivo = codigoDigitado;
+                const porcText = (descontoAtual * 100) + '%';
+                exibirMensagemCupom(`Cupom ${codigoDigitado} aplicado! (-${porcText})`, '#00ff88');
+                renderizarCarrinho(); // Recalcular com o novo desconto
+            } else {
+                descontoAtual = 0;
+                cupomAtivo = '';
+                exibirMensagemCupom('Cupom inválido!', '#ff4444');
+                renderizarCarrinho();
+            }
+        };
+    }
+
+    function exibirMensagemCupom(texto, cor) {
+        if (couponMessage) {
+            couponMessage.textContent = texto;
+            couponMessage.style.color = cor;
+        }
     }
 
     // 2. Função para desenhar os produtos na tela e calcular totais
     function renderizarCarrinho() {
         if (!productsList) return;
 
-        // Caso o carrinho esteja vazio
         if (carrinho.length === 0) {
             productsList.innerHTML = '<p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>';
             atualizarResumo(0, []);
             return;
         }
 
-        // Limpa o container para desenhar a lista atualizada
         productsList.innerHTML = '';
         let grandTotal = 0;
 
@@ -235,15 +283,14 @@ document.addEventListener('DOMContentLoaded', () => {
         carrinho[index].quantidade += delta;
 
         if (carrinho[index].quantidade <= 0) {
-            carrinho.splice(index, 1); // Remove o produto da lista
+            carrinho.splice(index, 1);
         }
 
-        // Salva a alteração no navegador e redesenha a tela
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();
     };
 
-    // 4. Atualiza os painéis de valor total (Lateral e Modal)
+    // 4. Atualiza os painéis de valor total (Com aplicação de Cupom)
     function atualizarResumo(grandTotal, itens) {
         if (!priceBreakdown) return;
 
@@ -259,13 +306,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Aplicação do Desconto do Cupom
+        let valorComDesconto = grandTotal;
+        if (descontoAtual > 0 && grandTotal > 0) {
+            const valorDesconto = grandTotal * descontoAtual;
+            valorComDesconto = grandTotal - valorDesconto;
+
+            breakdownHTML += `<p class="price-item" style="color: #00ff88;">- Desconto (${descontoAtual * 100}%): R$ ${valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
+        }
+
         breakdownHTML += `<hr class="summary-divider">`;
-        breakdownHTML += `<p class="total-final">Valor Total: <span>R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>`;
+        breakdownHTML += `<p class="total-final">Valor Total: <span>R$ ${valorComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>`;
 
         priceBreakdown.innerHTML = breakdownHTML;
 
+        // Atualiza o valor final no modal de pagamento
         if (modalTotalValue) {
-            modalTotalValue.textContent = `Valor Total: R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            modalTotalValue.textContent = `Valor Total: R$ ${valorComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     }
 
@@ -281,12 +338,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
             
-            // Limpa o carrinho após a compra e redireciona
             localStorage.removeItem('carrinhoShadowRealm');
             window.location.href = 'index.html';
         };
     }
 
-    // Executa ao carregar a página
     renderizarCarrinho();
 });
