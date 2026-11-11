@@ -1,23 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
-    <meta name="author" content="Shadow Realm Company">
+    <meta name="author" content="Shadow Realm">
     <title>Shadow Realm Store - Inicio</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
 </head>
+
 <body>
     <header>
         <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
         <h1>- Shadow Realm Store -</h1>
         <nav class="nav">
-            <a href="" class="link">Carrinho</a>
+            <a href="carrinho.html" class="link">Carrinho</a>
             <a href="" class="link">Contato</a>
             <a href="cliente.html" class="link">Login</a>
+            <a href="cadastro.html" class="link">Cadastro</a>
         </nav>
     </header>
+    <!-- Área Principal (Fundo Escuro) -->
+    <main class="cart-content">
+
+        <!-- Lista de Produtos (Lado Esquerdo) -->
+        <section class="products-list">
+
+            <!-- Item 1: Figure Renji -->
+            <article class="product-card">
+                <div class="product-thumb">
+                    <img src="renji.jpg" alt="Figure Renji">
+                </div>
+                <h3 class="product-name">Figure Renji</h3>
+                <div class="quantity-controls">
+                    <button type="button" class="btn-plus">+</button>
+                    <span class="qty-value">1</span>
+                    <button type="button" class="btn-minus">-</button>
+                </div>
+            </article>
+
+            <!-- Item 2: Figure Kisuke -->
+            <article class="product-card">
+                <div class="product-thumb">
+                    <img src="kisuke.jpg" alt="Figure Kisuke">
+                </div>
+                <h3 class="product-name">Figure Kisuke</h3>
+                <div class="quantity-controls">
+                    <button type="button" class="btn-plus">+</button>
+                    <span class="qty-value">1</span>
+                    <button type="button" class="btn-minus">-</button>
+                </div>
+            </article>
+
+            <!-- Item 3: Figure Maomao -->
+            <article class="product-card">
+                <div class="product-thumb">
+                    <img src="maomao.jpg" alt="Figure Maomao">
+                </div>
+                <h3 class="product-name">Figure Maomao</h3>
+                <div class="quantity-controls">
+                    <button type="button" class="btn-plus">+</button>
+                    <span class="qty-value">1</span>
+                    <button type="button" class="btn-minus">-</button>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- Resumo de Valores e Checkout (Lado Direito) -->
+        <aside class="checkout-summary">
+            <h2>Total:</h2>
+
+            <div class="price-breakdown">
+                <p class="price-item">R$ 287,99</p>
+                <p class="price-item">+ R$ 591,90</p>
+                <p class="price-item">R$ 496,50</p>
+                <hr class="summary-divider">
+                <p class="total-final">Valor Total: <span>R$ 1.169,80</span></p>
+            </div>
+
+            <div class="coupon-field">
+                <label for="coupon-input">Cupom:</label>
+                <input type="text" id="coupon-input" placeholder="Ex: Shadow26">
+            </div>
+
+            <!-- O botão agora é um link que ativa a Tela 2 via CSS -->
+            <a href="#tela-pagamento" class="btn-buy">Comprar</a>
+        </aside>
+
+    </main>
+    </div>
+
+    <!-- ==========================================
+     TELA 2: PAGAMENTO E FRETE (Abre via CSS)
+     ========================================== -->
+    <div class="payment-screen-container" id="tela-pagamento">
+        <div class="modal-container">
+
+            <!-- Título da Tela -->
+            <header class="modal-header">
+                <h2>Forma de Pagamento e Frete</h2>
+                <!-- Link para fechar a tela e voltar ao carrinho mudando a URL -->
+                <a href="#tela-carrinho" class="btn-close-modal" aria-label="Voltar para o carrinho">&times;</a>
+            </header>
+
+            <!-- Conteúdo Dividido em Dois Lados -->
+            <div class="modal-content">
+
+                <!-- Coluna Esquerda: Opções de Pagamento -->
+                <section class="payment-column">
+                    <p class="modal-total-value">Valor Total: R$ 1.169,80</p>
+
+                    <fieldset class="payment-methods">
+                        <legend>Forma de pagamento:</legend>
+
+                        <label class="method-option">
+                            <input type="radio" name="payment-group" value="pix" checked>
+                            <span>Pix</span>
+                        </label>
+
+                        <label class="method-option">
+                            <input type="radio" name="payment-group" value="debito">
+                            <span>Débito</span>
+                        </label>
+
+                        <label class="method-option">
+                            <input type="radio" name="payment-group" value="parcelado">
+                            <span class="multiline">Parcelado em até<br>12x sem Juros</span>
+                        </label>
+                    </fieldset>
+                </section>
+
+                <!-- Divisor Vertical Visual -->
+                <div class="vertical-divider"></div>
+
+                <!-- Coluna Direita: Inputs de Endereço -->
+                <form class="address-column">
+                    <h3>Informe seu endereço:</h3>
+
+                    <div class="form-group">
+                        <label for="input-rua">Ria:</label>
+                        <input type="text" id="input-rua" placeholder="Ex: Rua Dona Elza Mainertins" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-estado">Estado:</label>
+                        <input type="text" id="input-estado" placeholder="Ex: Santa Catarina" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-cidade">Cidade:</label>
+                        <input type="text" id="input-cidade" placeholder="Ex: Joinville" required>
+                    </div>
+
+                    <button type="submit" class="btn-confirm-payment">Confirmar pagamento</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.
+    </footer>
+
+    <!-- Script JavaScript no final do Body -->
+    <script src="script.js"></script>
 </body>
+</body>
+
 </html>
