@@ -911,3 +911,26 @@ footer {
   text-align: center;
   font-size: 1.1rem;
 }
+
+.coupon-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-apply-coupon {
+  background-color: #5a0d0d;
+  color: #ffffff;
+  border: 1px solid #cc2222;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-apply-coupon:hover {
+  background-color: #cc2222;
+}
