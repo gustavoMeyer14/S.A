@@ -181,7 +181,7 @@ footer {
   margin: 20px auto;
   font-weight: bold;
   margin-bottom: 10px;
-  border: 2px solid #000000;
+  border: 0px solid;
   padding: 30px;
 }
 
