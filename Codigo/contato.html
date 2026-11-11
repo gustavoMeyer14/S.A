@@ -9,6 +9,14 @@
     <title>Shadow Realm Store - Inicio</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
+    <script>
+        function abreMensagem() {
+            
+            const resultado = document.getElementById('resultado');
+
+            resultado.classList.remove('escondida');
+        }
+    </script>
 </head>
 
 <body>
@@ -34,7 +42,7 @@
                 Entre em contato conosco!
             </p>
 
-            <form action="#" method="post" class="contato-form">
+            <form action="#" method="post" class="contato-form" id="contato">
 
                 <label for="nome">Nome completo:</label>
                 <input type="text" id="nome" name="nome"
@@ -59,7 +67,11 @@
                           placeholder="Escreva sua mensagem..."
                           rows="5" required></textarea>
 
-                <button type="submit">Enviar Mensagem</button>
+                <button type="reset" onclick="abreMensagem()">Enviar Mensagem</button>
+
+                <div class="mensagem escondida" id="resultado">
+                    <h3>Mensagem enviada com sucesso!</h3>
+                </div>
 
             </form>
         </section>

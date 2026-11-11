@@ -773,7 +773,7 @@ footer {
 
 .contato-container {
   width: 700px;
-  height: 1400px;
+  height: 1470px;
   margin-top: 50px;
   background-color: #1e1e1e;
   border: 1px solid #C62828;
@@ -843,6 +843,29 @@ footer {
   transition: 0.3s;
   box-shadow: 0 10px 25px #C62828;
   background-color: #151515;
+}
+
+.mensagem {
+  width: 650px;
+  height: 50px;
+  margin: 20px;
+  border: 1px solid rgb(30, 99, 30);
+  border-radius: 20px;
+  background-color: rgb(42, 58, 42);
+}
+
+.mensagem h3 {
+  margin: 10px
+}
+
+.mensagem:hover {
+  scale: 110%;
+  transition: 0.3s;
+  cursor: default;
+}
+
+.escondida {
+ display: none;
 }
 
 .faq-container { 
