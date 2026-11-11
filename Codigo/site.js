@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTotalValue = document.querySelector('.modal-total-value');
     const addressForm = document.querySelector('.address-column');
 
-    // Tabela de Preços Base das Figures (valores reais das imagens)
+    // Tabela de Preços Base das Figures
     const productPrices = {
         'Figure Renji': 287.99,
         'Figure Kisuke': 591.90,
@@ -191,13 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let activeItems = [];
         let grandTotal = 0;
 
-        // Vasculha cada produto na primeira tela
         productCards.forEach(card => {
             const productName = card.querySelector('.product-name').textContent.trim();
-            const qtyValue = parseInt(card.querySelector('.qty-value').textContent);
+            const qtyValue = parseInt(card.querySelector('.qty-value').textContent) || 0;
             const unitPrice = productPrices[productName] || 0;
 
-            // Só considera no cálculo se a quantidade for maior que zero
             if (qtyValue > 0) {
                 const itemTotalPrice = unitPrice * qtyValue;
                 activeItems.push({ name: productName, price: itemTotalPrice });
@@ -205,15 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 1. Atualiza o painel lateral com os novos valores baseados nas quantidades
         let breakdownHTML = '';
         activeItems.forEach((item, index) => {
-            // Insere o sinal de "+" a partir da segunda linha conforme o print original
-            const mathPrefix = index === 0 ? '  ' : '+ ';
+            const mathPrefix = index === 0 ? '' : '+ ';
             breakdownHTML += `<p class="price-item">${mathPrefix}R$ ${item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
         });
 
-        // Se o carrinho for zerado por completo
         if (activeItems.length === 0) {
             breakdownHTML = `<p class="price-item">R$ 0,00</p>`;
         }
@@ -221,46 +216,49 @@ document.addEventListener('DOMContentLoaded', () => {
         breakdownHTML += `<hr class="summary-divider">`;
         breakdownHTML += `<p class="total-final">Valor Total: <span>R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>`;
 
-        priceBreakdown.innerHTML = breakdownHTML;
+        if (priceBreakdown) {
+            priceBreakdown.innerHTML = breakdownHTML;
+        }
 
-        // 2. Sincroniza o valor final para dentro do texto dinâmico da segunda tela (Tela de Pagamento)
         if (modalTotalValue) {
             modalTotalValue.textContent = `Valor Total: R$ ${grandTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     }
 
-    // === OUVINTES DE CLIQUE (+ E -) ===
+    // === EVENTOS (+ E -) COM PROPAGAÇÃO CONTROLADA ===
     productCards.forEach(card => {
         const btnPlus = card.querySelector('.btn-plus');
         const btnMinus = card.querySelector('.btn-minus');
         const qtyDisplay = card.querySelector('.qty-value');
 
-        // Botão de Adicionar (+)
-        btnPlus.addEventListener('click', () => {
-            let currentQty = parseInt(qtyDisplay.textContent);
-            qtyDisplay.textContent = currentQty + 1;
-            updateTotals(); // Recalcula na hora
-        });
+        if (btnPlus) {
+            // Usa .onclick para garantir evento único no botão
+            btnPlus.onclick = (e) => {
+                e.stopPropagation();
+                let currentQty = parseInt(qtyDisplay.textContent) || 0;
+                qtyDisplay.textContent = currentQty + 1;
+                updateTotals();
+            };
+        }
 
-        // Botão de Diminuir (-)
-        btnMinus.addEventListener('click', () => {
-            let currentQty = parseInt(qtyDisplay.textContent);
-            if (currentQty > 0) {
-                qtyDisplay.textContent = currentQty - 1;
-                updateTotals(); // Recalcula na hora
-            }
-        });
+        if (btnMinus) {
+            btnMinus.onclick = (e) => {
+                e.stopPropagation();
+                let currentQty = parseInt(qtyDisplay.textContent) || 0;
+                if (currentQty > 0) {
+                    qtyDisplay.textContent = currentQty - 1;
+                    updateTotals();
+                }
+            };
+        }
     });
 
     // === DISPARO DO FORMULÁRIO DE PAGAMENTO ===
     if (addressForm) {
-        addressForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Impede o envio padrão da página
-
+        addressForm.onsubmit = (e) => {
+            e.preventDefault();
             alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
-
-            // Retorna para o carrinho e remove a tag da URL limpando o estado do CSS
             window.location.hash = 'tela-carrinho';
-        });
+        };
     }
 });
