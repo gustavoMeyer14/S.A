@@ -172,7 +172,6 @@ function verificaMotivo(valor) {
 }
 
 
-
 /**=======================================   JAVASCRIPT CARRINHO   =================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -223,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cuponsValidos.hasOwnProperty(codigoDigitado)) {
                 descontoAtual = cuponsValidos[codigoDigitado];
                 cupomAtivo = codigoDigitado;
-                const porcText = (descontoAtual * 100) + '%';
+                const porcText = Math.round(descontoAtual * 100) + '%';
                 exibirMensagemCupom(`Cupom ${codigoDigitado} aplicado! (-${porcText})`, '#00ff88');
                 renderizarCarrinho(); // Recalcular com o novo desconto
             } else {
@@ -271,6 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="qty-value">${item.quantidade}</span>
                     <button type="button" class="btn-minus" onclick="alterarQuantidade(${index}, -1)">-</button>
                 </div>
+                <button type="button" class="btn-remove" onclick="removerProduto(${index})" title="Remover item" aria-label="Remover ${item.nome}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
             `;
             productsList.appendChild(card);
         });
@@ -286,6 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
             carrinho.splice(index, 1);
         }
 
+        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+        renderizarCarrinho();
+    };
+
+    // 3.1. Remove o produto diretamente do carrinho
+    window.removerProduto = function(index) {
+        carrinho.splice(index, 1);
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();
     };
@@ -312,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const valorDesconto = grandTotal * descontoAtual;
             valorComDesconto = grandTotal - valorDesconto;
 
-            breakdownHTML += `<p class="price-item" style="color: #00ff88;">- Desconto (${descontoAtual * 100}%): R$ ${valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
+            breakdownHTML += `<p class="price-item" style="color: #00ff88;">- Desconto (${Math.round(descontoAtual * 100)}%): R$ ${valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
         }
 
         breakdownHTML += `<hr class="summary-divider">`;

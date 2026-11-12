@@ -1003,3 +1003,25 @@ dialog .btn-fechar{
   box-shadow: 0 10px 25px #C62828;
   border: 1px solid #ffffff;
 }
+/* Botão de Remover Produto */
+.btn-remove {
+  background: none;
+  border: 2px solid #5a0d0d;
+  color: #C62828;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-remove:hover {
+  background-color: #C62828;
+  border-color: #C62828;
+  color: #ffffff;
+  transform: scale(1.08);
+}
