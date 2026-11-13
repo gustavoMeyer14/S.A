@@ -89,7 +89,7 @@ function fechaModalLogin() {
 }
 
 function confirmaLogin() {
-    alert("Login concluído com sucesso!");
+    alert("Mensagem enviada com sucesso!");
     fechaModalLogin();
     document.frmlogin.reset();
 }
@@ -161,7 +161,7 @@ function fechaModalCadastro() {
 }
 
 function confirmaCadastro() {
-    alert("Cadastro feito com sucesso!");
+    alert("Mensagem enviada com sucesso!");
     fechaModalCadastro();
     document.frmcadastro.reset();
 }
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTotalValue = document.querySelector('.modal-total-value');
     const addressForm = document.querySelector('.address-column');
     const btnBuy = document.querySelector('.btn-buy');
-    
+
     // Elementos do Cupom
     const couponInput = document.getElementById('coupon-input');
     const btnCoupon = document.getElementById('btn-coupon');
@@ -246,18 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!productsList) return;
 
         if (carrinho.length === 0) {
-            productsList.innerHTML = `
-                <p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>
-                <p style="text-align: center; margin-top: 10px;">
-                    <a href="index.html" style="color: #ff4d4d; text-decoration: underline; font-weight: bold;">
-                        Clique aqui para voltar à loja
-                    </a>
-                </p>
-            `;
+            productsList.innerHTML = '<p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>';
             atualizarResumo(0, []);
             return;
         }
-
 
         productsList.innerHTML = '';
         let grandTotal = 0;
@@ -357,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
-            
+
             localStorage.removeItem('carrinhoShadowRealm');
             window.location.href = 'index.html';
         };
