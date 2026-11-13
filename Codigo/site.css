@@ -151,6 +151,8 @@ footer {
   color: #ffffff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 20px;
+  background: none;
+  border: none;
 }
 
 .link:hover {
