@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
+    <meta name="author" content="Shadow Realm">
+    <title>Shadow Realm Store - Carrinho</title>
+    <link rel="stylesheet" href="site.css">
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <nav class="nav">
+            <a href="index.html" class="link">Inicio</a>
+            <a href="carrinho.html" class="link">Carrinho</a>
+            <a href="contato.html" class="link">Contato</a>
+            <a href="cliente.html" class="link">Login</a>
+            <a href="cadastro.html" class="link">Cadastro</a>
+            <a href="produtos.html" class="link">Produtos</a>
+            <a href="cadastrocartao.html" class="link">Cartão</a>
+        </nav>
+    </header>
+
+    <main>
+    <h2>Explore este mundo geek apenas se cadastrando!</h2>
+
+        <form id="formCartao">
+            <div>
+                <label for="numero">Número do cartão:</label>
+                <input type="text" id="numero" maxlength="19" placeholder="Os 16 digitos da frente do cartão" required>
+            </div>
+
+            <div>
+                <label for="titular">Nome do titular:</label>
+                <input type="text" id="titular" placeholder="Exatamente como impresso no cartão" required>
+            </div>
+
+            <div>
+                <label for="validade">Data de validade:</label>
+                <input type="text" id="validade" maxlength="5" placeholder="Mês e ano (ex: 08/30)" required>
+            </div>
+
+            <div>
+                <label for="cvv">CVV:</label>
+                <input type="text" id="cvv" maxlength="3" placeholder="3 Dígitos que fica no verso do cartão" required>
+            </div>
+
+            <div>
+                <label for="endereco">Endereço de cobrança:</label>
+                <input type="text" id="endereco" placeholder="Solicitado para confirmar a segurança" required>
+            </div>
+
+            <div>
+                <button type="submit">Cadastrar Cartão</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Modal com os dados preenchidos -->
+    <dialog id="modalDados">
+        <h3>Confira os Dados do Cartão</h3>
+        <div id="conteudoModal">
+            <p><strong>Número do cartão:</strong> <span id="resNumero"></span></p>
+            <p><strong>Nome do titular:</strong> <span id="resTitular"></span></p>
+            <p><strong>Data de validade:</strong> <span id="resValidade"></span></p>
+            <p><strong>CVV:</strong> <span id="resCvv"></span></p>
+            <p><strong>Endereço de cobrança:</strong> <span id="resEndereco"></span></p>
+        </div>
+        <div>
+            <button type="button" id="btnCorrigir">Corrigir</button>
+            <button type="button" id="btnConfirmar">Confirmar Cadastro</button>
+        </div>
+    </dialog>
+
+    <script src="site.js"></script>
+</body>
+</html>

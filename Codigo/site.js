@@ -357,3 +357,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderizarCarrinho();
 });
+
+
+// CADASTRAR CARTÃO //
+
+const inputNumero = document.getElementById('numero');
+const inputTitular = document.getElementById('titular');
+const inputValidade = document.getElementById('validade');
+const inputCvv = document.getElementById('cvv');
+const inputEndereco = document.getElementById('endereco');
+const form = document.getElementById('formCartao');
+
+// Elementos do Modal
+const modal = document.getElementById('modalDados');
+const btnCorrigir = document.getElementById('btnCorrigir');
+const btnConfirmar = document.getElementById('btnConfirmar');
+const resNumero = document.getElementById('resNumero');
+const resTitular = document.getElementById('resTitular');
+const resValidade = document.getElementById('resValidade');
+const resCvv = document.getElementById('resCvv');
+const resEndereco = document.getElementById('resEndereco');
+
+// Formata os 16 dígitos do cartão (0000 0000 0000 0000)
+inputNumero.addEventListener('input', (e) => {
+    let valor = e.target.value.replace(/\D/g, '').substring(0, 16);
+    e.target.value = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
+});
+
+// Deixa o nome do titular em maiúsculas
+inputTitular.addEventListener('input', (e) => {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+// Formata a data de validade (MM/AA)
+inputValidade.addEventListener('input', (e) => {
+    let valor = e.target.value.replace(/\D/g, '').substring(0, 4);
+    if (valor.length >= 3) {
+        e.target.value = valor.slice(0, 2) + '/' + valor.slice(2);
+    } else {
+        e.target.value = valor;
+    }
+});
+
+// Permite apenas 3 números no CVV
+inputCvv.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+});
+
+// Validação e abertura do modal com os dados
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const numeroLimpo = inputNumero.value.replace(/\s/g, '');
+    if (numeroLimpo.length !== 16) {
+        alert('Por favor, insira os 16 dígitos do cartão.');
+        inputNumero.focus();
+        return;
+    }
+
+    if (inputValidade.value.length !== 5) {
+        alert('Insira uma data de validade válida no formato MM/AA.');
+        inputValidade.focus();
+        return;
+    }
+
+    if (inputCvv.value.length !== 3) {
+        alert('O CVV deve conter exatamente 3 dígitos.');
+        inputCvv.focus();
+        return;
+    }
+
+    // Preenche os dados no modal
+    resNumero.textContent = inputNumero.value;
+    resTitular.textContent = inputTitular.value;
+    resValidade.textContent = inputValidade.value;
+    resCvv.textContent = inputCvv.value;
+    resEndereco.textContent = inputEndereco.value;
+
+    // Abre o modal na tela
+    modal.showModal();
+});
+
+// Botão Corrigir: fecha o modal mantendo os dados preenchidos para edição
+btnCorrigir.addEventListener('click', () => {
+    modal.close();
+});
+
+// Botão Confirmar Cadastro: confirma o envio, fecha o modal e limpa o formulário
+btnConfirmar.addEventListener('click', () => {
+    modal.close();
+    alert('Cartão cadastrado com sucesso!');
+    form.reset();
+});
