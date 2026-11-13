@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTotalValue = document.querySelector('.modal-total-value');
     const addressForm = document.querySelector('.address-column');
     const btnBuy = document.querySelector('.btn-buy');
-    
+
     // Elementos do Cupom
     const couponInput = document.getElementById('coupon-input');
     const btnCoupon = document.getElementById('btn-coupon');
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. Altera a quantidade ou remove o item se chegar a zero
-    window.alterarQuantidade = function (index, delta) {
+    window.alterarQuantidade = function(index, delta) {
         carrinho[index].quantidade += delta;
 
         if (carrinho[index].quantidade <= 0) {
@@ -349,11 +349,89 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
-            
+
             localStorage.removeItem('carrinhoShadowRealm');
             window.location.href = 'index.html';
         };
     }
 
     renderizarCarrinho();
+});
+//==========================================================================================================================================
+//                                                      Modal Saiba mais
+//==========================================================================================================================================
+
+// faz o clique funcionar
+const botaoVerMais1 = document.getElementById('card1');
+const modal1 = document.getElementById('modal-card1');
+const botaoFechar1 = document.getElementById('fechar-card1');
+// clicar em ver mais", abre o modal"
+
+botaoVerMais1.addEventListener('click', function () {
+    modal1.showModal();
+});
+
+//clicar em "Fechar", fechar o modal
+botaoFechar1.addEventListener('click', function () {
+    modal1.close();
+});
+
+// faz o clique funcionar
+const botaoVerMais2 = document.getElementById('card2');
+const modal2 = document.getElementById('modal-card2');
+const botaoFechar2 = document.getElementById('fechar-card2');
+// clicar em ver mais", abre o modal"
+
+botaoVerMais2.addEventListener('click', function () {
+    modal2.showModal();
+});
+
+//clicar em "Fechar", fechar o modal
+botaoFechar2.addEventListener('click', function () {
+    modal2.close();
+});
+
+// faz o clique funcionar
+const botaoVerMais3 = document.getElementById('card3');
+const modal3 = document.getElementById('modal-card3');
+const botaoFechar3 = document.getElementById('fechar-card3');
+// clicar em ver mais", abre o modal"
+
+botaoVerMais3.addEventListener('click', function () {
+    modal3.showModal();
+});
+
+//clicar em "Fechar", fechar o modal
+botaoFechar3.addEventListener('click', function () {
+    modal3.close();
+});
+
+// faz o clique funcionar
+const botaoVerMais4 = document.getElementById('card4');
+const modal4 = document.getElementById('modal-card4');
+const botaoFechar4 = document.getElementById('fechar-card4');
+// clicar em ver mais", abre o modal"
+
+botaoVerMais4.addEventListener('click', function () {
+    modal4.showModal();
+});
+
+//clicar em "Fechar", fechar o modal
+botaoFechar4.addEventListener('click', function () {
+    modal4.close();
+});
+
+// faz o clique funcionar
+const botaoVerMais5 = document.getElementById('card5');
+const modal5 = document.getElementById('modal-card5');
+const botaoFechar5 = document.getElementById('fechar-card5');
+// clicar em ver mais", abre o modal"
+
+botaoVerMais5.addEventListener('click', function () {
+    modal5.showModal();
+});
+
+//clicar em "Fechar", fechar o modal
+botaoFechar5.addEventListener('click', function () {
+    modal5.close();
 });
