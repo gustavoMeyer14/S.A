@@ -142,7 +142,7 @@ footer {
 }
 
 .link {
-  float: right;
+  float: left;
   padding: 35px;
   color: #ffffff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -153,6 +153,10 @@ footer {
   transition: 0.3s;
   scale: 120%;
   color: black;
+}
+
+.link img {
+  
 }
 
 .responsivo1 {
