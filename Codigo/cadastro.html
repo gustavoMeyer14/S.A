@@ -25,24 +25,34 @@
         </nav>
     </header>
 
+    <h2 style="font-size: 35px; margin: 20px;">Cadastro</h2>
+
     <form name="frmcadastro" method="post" class="formLogin" action="#" onsubmit="return validaCadastro()">
 
         <!-- Grupo 1: Campos de informações pessoais -->
         <fieldset class="login">
+            <div class="colunas">
+                <label for="nome">Nome Completo: </label>
+                <input type="text" name="txtnome" id="nome" class="" placeholder="Digite seu Nome Completo: ">
 
-            <label for="nome">Nome Completo: </label>
-            <input type="text" name="txtnome" id="nome" class="" placeholder="Digite seu Nome Completo: ">
+                <label for="email">Email: </label>
+                <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
+            </div>
 
-            <label for="email">Email: </label>
-            <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
+            <div class="colunas">
+                <label for="senha">Senha: </label>
+                <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
 
-            <label for="senha">Senha: </label>
-            <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
+                <label for="cpf">CPF: </label>
+                <input type="text" name="txtcpf" id="cpf" maxlength="14" placeholder="000.000.000-00"
+                    autocomplete="off">
+            </div>
 
-            <label for="cpf">CPF: </label>
-            <input type="text" name="txtcpf" id="cpf" maxlength="14" placeholder="000.000.000-00" autocomplete="off">
+            <div class="colunasBotao">
+                <button type="reset" onclick="verificaMotivo(null)">Limpar</button>
+                <button type="submit">Enviar</button>
+            </div>
 
-            <button type="reset" onclick="verificaMotivo(null)">Limpar</button><button type="submit">Enviar</button>
         </fieldset>
     </form>
 

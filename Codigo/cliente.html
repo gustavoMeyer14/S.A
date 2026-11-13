@@ -25,19 +25,22 @@
         </nav>
     </header>
 
+    <h2 style="font-size: 35px; margin: 20px;">Login</h2>
+
     <form name="frmlogin" method="post" action="#" onsubmit="return validaLogin()" class="formLogin"
-        style="height: 500px;">
-
-        <!-- Grupo 1: Campos de informações pessoais -->
+        style="height: 360px; width: 925px;">
         <fieldset class="login">
-            <label for="email">Email: </label>
-            <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
+            <div class="colunas">
+                <label for="email">Email: </label>
+                <input type="email" name="txtemail" id="email" placeholder="Digite seu email:">
 
-            <label for="senha">Senha: </label>
-            <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
+                <label for="senha">Senha: </label>
+                <input type="password" name="txtsenha" id="senha" placeholder="Digite sua Senha:">
+            </div>
 
-            <button type="reset" onclick="verificaMotivo(null)">Limpar</button><button type="submit">Enviar</button>
-
+            <div class="colunasBotao">
+                <button type="reset" onclick="verificaMotivo(null)">Limpar</button><button type="submit">Enviar</button>
+            </div>
         </fieldset>
     </form>
 
