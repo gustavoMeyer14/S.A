@@ -785,8 +785,8 @@ footer {
   width: 700px;
   height: 1470px;
   margin-top: 50px;
-  background-color: #1e1e1e;
-  border: 1px solid #C62828;
+  background-color: #000000;
+  border: 2px solid;
   border-radius: 20px;
 }
 
@@ -818,7 +818,7 @@ footer {
 .contato-form input:hover, select:hover, option:hover {
   scale: 105%;
   transition: 0.3s;
-  border: 1px solid;
+  border: 2px solid #ff0000;
 }
 
 .contato-form textarea {
@@ -835,7 +835,7 @@ footer {
 .contato-form textarea:hover {
   scale: 105%;
   transition: 0.3s;
-  border: 1px solid;
+  border: 2px solid #ff0000;
 }
 
 .contato-form button {
@@ -894,6 +894,7 @@ footer {
   float: left;
   margin: 20px;
   margin-left: 27px;
+  background-color: #151515;
 }
 
 .faq-item:hover {
@@ -907,8 +908,6 @@ footer {
   text-align: center;
   font-size: 1.1rem;
 }
-<<<<<<< HEAD
-=======
 
 .modalProduto {
   width: 750px;
@@ -1022,4 +1021,3 @@ dialog .btn-fechar{
   color: #ffffff;
   transform: scale(1.08);
 }
->>>>>>> 538b843133b14939398ec4202a7837e2334bc185

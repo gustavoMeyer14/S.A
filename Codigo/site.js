@@ -89,7 +89,7 @@ function fechaModalLogin() {
 }
 
 function confirmaLogin() {
-    alert("Mensagem enviada com sucesso!");
+    alert("Login concluído com sucesso!");
     fechaModalLogin();
     document.frmlogin.reset();
 }
@@ -161,7 +161,7 @@ function fechaModalCadastro() {
 }
 
 function confirmaCadastro() {
-    alert("Mensagem enviada com sucesso!");
+    alert("Cadastro feito com sucesso!");
     fechaModalCadastro();
     document.frmcadastro.reset();
 }
