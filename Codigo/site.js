@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             productsList.innerHTML = `
                 <p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>
                 <p style="text-align: center; margin-top: 10px;">
-                    <a href="produtos.html" style="color: #ff4d4d; text-decoration: underline; font-weight: bold;">
+                    <a href="index.html" style="color: #ff4d4d; text-decoration: underline; font-weight: bold;">
                         Clique aqui para voltar à loja
                     </a>
                 </p>
