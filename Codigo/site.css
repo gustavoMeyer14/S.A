@@ -27,13 +27,7 @@ h1 {
   margin-top: 20px;
   font-size: 40px;
   color: #ffffff;
-}
-
-h1:hover {
-  scale: 110%;
-  transition: 0.2s;
-  color: #000000;
-  text-shadow: 0 10px 25px #000000  ;
+  cursor: default;
 }
 
 footer {
@@ -548,21 +542,22 @@ footer {
 
 /* Botão Vermelho Redondo (Pílula) */
 .btn-buy {
-  display: block;
-  width: 100%;
-  background-color: #cc2222;
+  width: 250px;
+  height: 50px;
+  background-color: #C62828;
+  border-radius: 20px;
+  border: 1px solid #C62828;
   color: #ffffff;
-  text-align: center;
-  padding: 12px;
-  border-radius: 25px;
+  padding: 10px;
   text-decoration: none;
-  font-weight: bold;
-  font-size: 1.1rem;
-  transition: background-color 0.2s;
 }
 
 .btn-buy:hover {
-  background-color: #aa1111;
+  transition: 0.3s;
+  scale: 110%;
+  background-color: #000000;
+  box-shadow: 0 10px 25px #C62828;
+  border: 1px solid #ffffff;
 }
 
 /* ==========================================================================
@@ -912,3 +907,119 @@ footer {
   text-align: center;
   font-size: 1.1rem;
 }
+<<<<<<< HEAD
+=======
+
+.modalProduto {
+  width: 750px;
+  height: 500px;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  background-color: #151515; 
+}
+
+dialog[open]{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+
+  background-color: #ffffff;
+  color: #000000;
+  padding: 25px;
+  border: none;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  min-width: 250px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  text-align: center;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+dialog .modal-footer{
+  margin-top: auto;
+  padding-top:15px 0 0 0;
+  border-top: 1px solid #dddddd;
+  justify-content: flex-end;
+  width: 100%;
+
+}
+
+dialog .modal-footer button{
+  margin: 0 auto;
+  width: auto;
+  flex: 1;
+  white-space: nowrap;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 150px;
+}
+
+dialog .btn-carrinho{
+  background-color: #28a745;
+  color:  #ffffff;
+}
+
+dialog .btn-fechar{
+  background-color: #dc3535;
+  color: #ffffff;
+}
+
+.coupon-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.coupon-field button {
+  width: 100px;
+  height: 40px;
+  background-color: #C62828;
+  border-radius: 20px;
+  border: 1px solid #C62828;
+  color: #ffffff;
+}
+
+.coupon-field button:hover {
+  transition: 0.3s;
+  scale: 110%;
+  background-color: #000000;
+  box-shadow: 0 10px 25px #C62828;
+  border: 1px solid #ffffff;
+}
+/* Botão de Remover Produto */
+.btn-remove {
+  background: none;
+  border: 2px solid #5a0d0d;
+  color: #C62828;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-remove:hover {
+  background-color: #C62828;
+  border-color: #C62828;
+  color: #ffffff;
+  transform: scale(1.08);
+}
+>>>>>>> 538b843133b14939398ec4202a7837e2334bc185

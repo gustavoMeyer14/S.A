@@ -12,9 +12,10 @@
 
 <body>
     <header>
-        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
-        <h1>Shadow Realm Store</h1>
+        <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
+        <h1>- Shadow Realm Store -</h1>
         <nav class="nav">
+            <a href="index.html" class="link">Inicio</a>
             <a href="carrinho.html" class="link">Carrinho</a>
             <a href="contato.html" class="link">Contato</a>
             <a href="cliente.html" class="link">Login</a>
@@ -44,7 +45,9 @@
             <div class="coupon-field">
                 <label for="coupon-input">Cupom:</label>
                 <input type="text" id="coupon-input" placeholder="Ex: Shadow26">
+                <button type="button" id="btn-coupon">Aplicar</button>
             </div>
+            <small id="coupon-message" style="display: block; text-align: center; margin-bottom: 10px; font-size: 0.85rem;"></small>
 
             <a href="#tela-pagamento" class="btn-buy">Comprar</a>
         </aside>

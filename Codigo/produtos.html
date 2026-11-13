@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
     <meta name="author" content="Shadow Realm">
-    <title>Shadow Realm Store - produtos</title>
+    <title>Shadow Realm Store - Inicio</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
 </head>
@@ -16,6 +16,7 @@
         <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
         <h1>- Shadow Realm Store -</h1>
         <nav class="nav">
+            <a href="index.html" class="link">Inicio</a>
             <a href="carrinho.html" class="link">Carrinho</a>
             <a href="contato.html" class="link">Contato</a>
             <a href="cliente.html" class="link">Login</a>
@@ -31,7 +32,7 @@
     </div>
 
     <section class="destaques">
-        <h2> - Destaques - </h2>
+        <h2> - Produtos - </h2>
         <!-- card 1 -->
         <div>
             <img src="imagens/bleach.png" alt="Produto 1" style="width:200px;height:200px;">
@@ -39,10 +40,13 @@
             <h3><strong>preço</strong></h3>
             <button type="button" id="card1">Ver mais</button>
         </div>
-        <dialog id="modal-card1">
+        <dialog id="modal-card1" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-            <button type="button" id="fechar-card1">Fechar</button>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card1">Fechar</button>
+                <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
+            </footer>
         </dialog>
 
         <!-- card 2 -->
@@ -52,10 +56,13 @@
             <h3><strong>preço</strong></h3>
             <button type="button" id="card2">Ver mais</button>
         </div>
-  <dialog id="modal-card2">
+        <dialog id="modal-card2" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-            <button type="button" id="fechar-card2">Fechar</button>
+             <footer class="modal-footer">
+                <button type="button" id="fechar-card2">Fechar</button>
+                <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
+            </footer>
         </dialog>
 
         <!-- card 3 -->
@@ -65,10 +72,13 @@
             <h3><strong>preço</strong></h3>
             <button type="button" id="card3">Ver mais</button>
         </div>
-  <dialog id="modal-card3">
+        <dialog id="modal-card3" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-            <button type="button" id="fechar-card3">Fechar</button>
+             <footer class="modal-footer">
+                <button type="button" id="fechar-card3">Fechar</button>
+                <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
+            </footer>
         </dialog>
 
         <!-- card 4 -->
@@ -78,10 +88,13 @@
             <h3><strong>preço</strong></h3>
             <button type="button" id="card4">Ver mais</button>
         </div>
-  <dialog id="modal-card4">
+        <dialog id="modal-card4" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-            <button type="button" id="fechar-card4">Fechar</button>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card4">Fechar</button>
+                <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
+            </footer>
         </dialog>
 
         <!-- card 5 -->
@@ -91,10 +104,13 @@
             <h3><strong>preço</strong></h3>
             <button type="button" id="card5">Ver mais</button>
         </div>
-          <dialog id="modal-card5">
+        <dialog id="modal-card5" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-            <button type="button" id="fechar-card5">Fechar</button>
+              <footer class="modal-footer">
+                <button type="button" id="fechar-card5">Fechar</button>
+                <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
+            </footer>
         </dialog>
 
     </section>
@@ -110,72 +126,72 @@
         const botaoFechar1 = document.getElementById('fechar-card1');
         // clicar em ver mais", abre o modal"
 
-        botaoVerMais1.addEventListener('click', function(){
+        botaoVerMais1.addEventListener('click', function () {
             modal1.showModal();
         });
 
         //clicar em "Fechar", fechar o modal
-        botaoFechar1.addEventListener('click', function(){
+        botaoFechar1.addEventListener('click', function () {
             modal1.close();
         });
 
-           // faz o clique funcionar
+        // faz o clique funcionar
         const botaoVerMais2 = document.getElementById('card2');
         const modal2 = document.getElementById('modal-card2');
         const botaoFechar2 = document.getElementById('fechar-card2');
         // clicar em ver mais", abre o modal"
 
-        botaoVerMais2.addEventListener('click', function(){
+        botaoVerMais2.addEventListener('click', function () {
             modal2.showModal();
         });
 
         //clicar em "Fechar", fechar o modal
-        botaoFechar2.addEventListener('click', function(){
+        botaoFechar2.addEventListener('click', function () {
             modal2.close();
         });
 
-           // faz o clique funcionar
+        // faz o clique funcionar
         const botaoVerMais3 = document.getElementById('card3');
         const modal3 = document.getElementById('modal-card3');
         const botaoFechar3 = document.getElementById('fechar-card3');
         // clicar em ver mais", abre o modal"
 
-        botaoVerMais3.addEventListener('click', function(){
+        botaoVerMais3.addEventListener('click', function () {
             modal3.showModal();
         });
 
         //clicar em "Fechar", fechar o modal
-        botaoFechar3.addEventListener('click', function(){
+        botaoFechar3.addEventListener('click', function () {
             modal3.close();
         });
 
-           // faz o clique funcionar
+        // faz o clique funcionar
         const botaoVerMais4 = document.getElementById('card4');
         const modal4 = document.getElementById('modal-card4');
         const botaoFechar4 = document.getElementById('fechar-card4');
         // clicar em ver mais", abre o modal"
 
-        botaoVerMais4.addEventListener('click', function(){
+        botaoVerMais4.addEventListener('click', function () {
             modal4.showModal();
         });
 
         //clicar em "Fechar", fechar o modal
-        botaoFechar4.addEventListener('click', function(){
+        botaoFechar4.addEventListener('click', function () {
             modal4.close();
         });
 
-           // faz o clique funcionar
+        // faz o clique funcionar
         const botaoVerMais5 = document.getElementById('card5');
         const modal5 = document.getElementById('modal-card5');
         const botaoFechar5 = document.getElementById('fechar-card5');
         // clicar em ver mais", abre o modal"
 
-        botaoVerMais5.addEventListener('click', function(){
+        botaoVerMais5.addEventListener('click', function () {
             modal5.showModal();
         });
 
         //clicar em "Fechar", fechar o modal
-        botaoFechar5.addEventListener('click', function(){
+        botaoFechar5.addEventListener('click', function () {
             modal5.close();
         });
     </script>
