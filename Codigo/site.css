@@ -883,14 +883,10 @@ footer {
 .mensagem {
   width: 650px;
   height: 50px;
-  margin: 20px;
+  margin-top: 10px;
   border: 1px solid rgb(30, 99, 30);
   border-radius: 20px;
   background-color: rgb(42, 58, 42);
-}
-
-.mensagem h3 {
-  margin: 10px
 }
 
 .mensagem:hover {
