@@ -32,6 +32,8 @@ h1 {
 
 footer {
   margin: 20px;
+  border-top: 1px solid #C62828;
+  padding: 20px;  
 }
 
 .destaques {
@@ -182,15 +184,42 @@ footer {
 }
 
 /* Código de Estilização principal do Login e Cadastro */
-.login,
-.cadastro {
-  align-items: center;
-  width: 320px;
-  margin: 20px auto;
-  font-weight: bold;
-  margin-bottom: 10px;
-  border: 0px solid;
-  padding: 30px;
+
+.formLogin {
+  width: 1470px;
+  height: 350px;
+  background-color: #000000;
+  border-radius: 20px;
+  border: #C62828;
+  border: 2px solid #C62828;
+  margin-top: 50px;
+  font-size: 30px;
+}
+
+.colunas {
+  float: left;
+  width: 500px;
+  height: 275px;
+  background-color: #262626;
+  border: 1px solid #C62828;
+  margin: 20px;
+  border-radius: 20px;
+}
+
+.colunasBotao {
+  height: 275px;
+  width: 300px;
+  background-color: #262626;
+  float: left;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  margin: 20px;
+  padding: 20px;
+}
+
+.login {
+  border: none;
+  margin: 20px;
 }
 
 .login input {
@@ -215,16 +244,17 @@ footer {
 }
 
 /* Botões do formulário */
-.login button,
-.cadastro button {
-  width: 180px;
-  height: 45px;
+.login button {
+  width: 200px;
+  height: 50px;
   border: 1px solid #C62828;
   border-radius: 20px;
   background-color: #C62828;
   color: #ffffff;
   cursor: pointer;
-  margin-top: 50px;
+  margin:30px;
+  float: left;
+  font-size: 20px;
 }
 
 .login button:hover,
@@ -330,6 +360,7 @@ footer {
   color: white;
 }
 
+
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
   background-color: #921a1a;
@@ -351,17 +382,6 @@ footer {
 /* Quando o JavaScript adiciona a classe "aberto", ele aparece */
 #modalDadosCadastro.aberto {
   display: block;
-}
-
-.formLogin {
-  width: 500px;
-  height: 700px;
-  background-color: #000000;
-  border-radius: 20px;
-  border: #C62828;
-  border: 2px solid #C62828;
-  margin-top: 50px;
-  font-size: 30px;
 }
 
 .linkcadastro {
@@ -784,8 +804,8 @@ footer {
   width: 700px;
   height: 1470px;
   margin-top: 50px;
-  background-color: #1e1e1e;
-  border: 1px solid #C62828;
+  background-color: #000000;
+  border: 2px solid;
   border-radius: 20px;
 }
 
@@ -817,7 +837,7 @@ footer {
 .contato-form input:hover, select:hover, option:hover {
   scale: 105%;
   transition: 0.3s;
-  border: 1px solid;
+  border: 2px solid #ff0000;
 }
 
 .contato-form textarea {
@@ -834,7 +854,7 @@ footer {
 .contato-form textarea:hover {
   scale: 105%;
   transition: 0.3s;
-  border: 1px solid;
+  border: 2px solid #ff0000;
 }
 
 .contato-form button {
@@ -893,6 +913,7 @@ footer {
   float: left;
   margin: 20px;
   margin-left: 27px;
+  background-color: #151515;
 }
 
 .faq-item:hover {
@@ -926,13 +947,12 @@ dialog[open]{
   transform: translate(-50%, -50%);
   margin: 0;
 
-  background-color: #ffffff;
-  color: #000000;
-  padding: 25px;
-  border: none;
-  border-radius: 10px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  border: 1px solid #C62828;
+  border-radius: 20px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
   min-width: 250px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   text-align: center;
@@ -942,16 +962,15 @@ dialog[open]{
 }
 
 dialog .modal-footer{
-  margin-top: auto;
-  padding-top:15px 0 0 0;
-  border-top: 1px solid #dddddd;
-  justify-content: flex-end;
-  width: 100%;
+  margin: 10px;
+  border-top: 1px solid #C62828;
+  padding: 10px;
+  width: 475px;
 
 }
 
 dialog .modal-footer button{
-  margin: 0 auto;
+  margin: 5px;
   width: auto;
   flex: 1;
   white-space: nowrap;

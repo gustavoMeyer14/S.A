@@ -27,7 +27,7 @@
 
     <div class="pesquisa">
         <h2>Pesquise produtos aqui.</h2>
-        <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Digite algo...">
+        <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Bleach">
         <button type="button" id="enviarPesquisa">Pesquisar</button>
     </div>
 
@@ -58,8 +58,19 @@
         </div>
         <dialog id="modal-card2" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
-            <p>Exemplo: llllllllllll</p>
-             <footer class="modal-footer">
+
+            <p>Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.</p>
+
+                <p>Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do
+                chapéu listrado (inclui cabeça extra com expressão séria).</p>
+
+               <p>Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta. Vem com a bengala no
+                ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha.</p> 
+
+                <p>Base Diorama: Telhas de Karakura com uma lanterna apagada, a Yoruichi em forma de gato preto observando
+                na ponta e um frasco de Mod-Soul escondido como easter egg.</p>
+
+            <footer class="modal-footer">
                 <button type="button" id="fechar-card2">Fechar</button>
                 <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
             </footer>
@@ -75,7 +86,7 @@
         <dialog id="modal-card3" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-             <footer class="modal-footer">
+            <footer class="modal-footer">
                 <button type="button" id="fechar-card3">Fechar</button>
                 <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
             </footer>
@@ -107,7 +118,7 @@
         <dialog id="modal-card5" class="modalProduto">
             <h2>Produto 1 - Bleach</h2>
             <p>Exemplo: llllllllllll</p>
-              <footer class="modal-footer">
+            <footer class="modal-footer">
                 <button type="button" id="fechar-card5">Fechar</button>
                 <button type="button" id="adicioneAoCarrinho">+ Carrinho</button>
             </footer>
@@ -139,7 +150,7 @@
         const botaoVerMais2 = document.getElementById('card2');
         const modal2 = document.getElementById('modal-card2');
         const botaoFechar2 = document.getElementById('fechar-card2');
-        // clicar em ver mais", abre o modal"
+        // clicar em "Ver Mais", abre o modal"
 
         botaoVerMais2.addEventListener('click', function () {
             modal2.showModal();
