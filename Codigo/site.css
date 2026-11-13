@@ -360,6 +360,7 @@ footer {
   color: white;
 }
 
+
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
   background-color: #921a1a;
@@ -803,8 +804,8 @@ footer {
   width: 700px;
   height: 1470px;
   margin-top: 50px;
-  background-color: #1e1e1e;
-  border: 1px solid #C62828;
+  background-color: #000000;
+  border: 2px solid;
   border-radius: 20px;
 }
 
@@ -836,7 +837,7 @@ footer {
 .contato-form input:hover, select:hover, option:hover {
   scale: 105%;
   transition: 0.3s;
-  border: 1px solid;
+  border: 2px solid #ff0000;
 }
 
 .contato-form textarea {
@@ -853,7 +854,7 @@ footer {
 .contato-form textarea:hover {
   scale: 105%;
   transition: 0.3s;
-  border: 1px solid;
+  border: 2px solid #ff0000;
 }
 
 .contato-form button {
@@ -912,6 +913,7 @@ footer {
   float: left;
   margin: 20px;
   margin-left: 27px;
+  background-color: #151515;
 }
 
 .faq-item:hover {
@@ -1013,4 +1015,26 @@ dialog .btn-fechar{
   background-color: #000000;
   box-shadow: 0 10px 25px #C62828;
   border: 1px solid #ffffff;
+}
+/* Botão de Remover Produto */
+.btn-remove {
+  background: none;
+  border: 2px solid #5a0d0d;
+  color: #C62828;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-remove:hover {
+  background-color: #C62828;
+  border-color: #C62828;
+  color: #ffffff;
+  transform: scale(1.08);
 }
