@@ -330,6 +330,7 @@ footer {
   color: white;
 }
 
+
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
   background-color: #921a1a;
@@ -906,6 +907,8 @@ footer {
   text-align: center;
   font-size: 1.1rem;
 }
+<<<<<<< HEAD
+=======
 
 .modalProduto {
   width: 750px;
@@ -1019,3 +1022,4 @@ dialog .btn-fechar{
   color: #ffffff;
   transform: scale(1.08);
 }
+>>>>>>> 538b843133b14939398ec4202a7837e2334bc185
