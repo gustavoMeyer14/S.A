@@ -336,6 +336,7 @@ footer {
   color: white;
 }
 
+
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
   background-color: #921a1a;
