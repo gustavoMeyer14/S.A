@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. Altera a quantidade ou remove o item se chegar a zero
-    window.alterarQuantidade = function(index, delta) {
+    window.alterarQuantidade = function (index, delta) {
         carrinho[index].quantidade += delta;
 
         if (carrinho[index].quantidade <= 0) {
