@@ -1,3 +1,11 @@
+function abreModalCliente() {
+    document.getElementById('modalCliente').classList.add('aberto');
+}
+
+function fechaModalCliente() {
+    document.getElementById('modalCliente').classList.remove('aberto');
+}
+
 // ==================== CONFIGURAÇÃO DA MÁSCARA DO CPF ====================
 window.addEventListener("DOMContentLoaded", function () {
     var inputCpf = document.getElementById('cpf');
@@ -284,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. Altera a quantidade ou remove o item se chegar a zero
-    window.alterarQuantidade = function(index, delta) {
+    window.alterarQuantidade = function (index, delta) {
         carrinho[index].quantidade += delta;
 
         if (carrinho[index].quantidade <= 0) {
@@ -296,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 3.1. Remove o produto diretamente do carrinho
-    window.removerProduto = function(index) {
+    window.removerProduto = function (index) {
         carrinho.splice(index, 1);
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();

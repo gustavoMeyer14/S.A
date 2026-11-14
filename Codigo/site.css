@@ -33,7 +33,7 @@ h1 {
 footer {
   margin: 20px;
   border-top: 1px solid #C62828;
-  padding: 20px;  
+  padding: 20px;
 }
 
 .destaques {
@@ -161,9 +161,113 @@ footer {
   color: black;
 }
 
+.botaoUsuario {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.botaoUsuario:hover {
+  scale: 120%;
+  transition: 0.3S;
+}
+
+.botaoUsuario img {
+  width: 100px;
+  height: 100px;
+}
+
 .link img {
   width: 50px;
   height: 50px;
+}
+
+.modalCliente {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.modalCliente-conteudo {
+  background-color: #000000;
+  color: #ffffff;
+  width: 700px;
+  height: 600px;
+  overflow-y: auto;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  border: 1px solid #C62828;
+}
+
+.aberto {
+  display: flex;
+}
+
+.nav-usuario {
+  width: 350px;
+  height: 300px;
+}
+
+.nav-usuario a {
+  width: 250px;
+  height: 70px;
+  color: #ffffff;
+  float: left;
+  text-decoration: none;
+  background-color: #C62828;
+  border-radius: 20px;
+  border: 1px solid #C62828;
+  margin: 30px;
+  margin-left: 50px;
+  padding: 5px;
+  font-size: 30px;
+}
+
+.nav-usuario a:hover {
+  scale: 110%;
+  transition: 0.3s;
+  background-color: #151515;
+  box-shadow: 0 10px 25px #C62828;
+}
+
+.botaoFecharCliente {
+  width: 300px;
+  height: 70px;
+  border-radius: 20px;
+  background-color: #C62828;
+  border: 1px solid #C62828;
+  color: #ffffff;
+  margin-top: 20px;
+  font-size: 30px;
+}
+
+.botaoFecharCliente:hover {
+  scale: 110%;
+  transition: 0.3s;
+  background-color: #151515;
+  box-shadow: 0 10px 25px #C62828;
+}
+
+.mensagem {
+  width: 500px;
+  height: 75px;
+  background-color: #28a745;
+  border: 1px solid greenyellow;
+  border-radius: 20px;
+  font-size: 20px;
+}
+
+.escondida {
+  display: none;
 }
 
 .responsivo1 {
@@ -263,7 +367,7 @@ footer {
   background-color: #C62828;
   color: #ffffff;
   cursor: pointer;
-  margin:30px;
+  margin: 30px;
   float: left;
   font-size: 20px;
 }
@@ -292,6 +396,7 @@ footer {
   width: 100% !important;
   height: 100% !important;
   background-color: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(4px);
 }
 
 /* Classe ativada via JavaScript para abrir o modal */
@@ -303,9 +408,11 @@ footer {
 
 /* A caixinha branca centralizada que contém o conteúdo da modal */
 .modal-conteudo {
-  background-color: #ffffff;
+  background-color: #000000;
+  border: 1px solid #C62828;
+  color: #ffffff;
   padding: 30px;
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 450px;
@@ -316,7 +423,7 @@ footer {
 /* Título dentro do modal */
 .modal-conteudo h2 {
   margin-top: 0;
-  color: #333;
+  color: #ffffff;
   border-bottom: 2px solid #f0f0f0;
   padding-bottom: 10px;
 }
@@ -332,7 +439,7 @@ footer {
 .modal-conteudo li {
   margin-bottom: 12px;
   font-size: 15px;
-  color: #444;
+  color: #ffffff;
 }
 
 /* Container flexbox para alinhar os botões do modal lado a lado */
@@ -346,7 +453,7 @@ footer {
 /* Estilo padrão para todos os botões no modal */
 .modal-botoes button {
   padding: 10px 20px;
-  border: none;
+  border: 1px solid #C62828;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
@@ -356,13 +463,16 @@ footer {
 
 /* Estilo do botão "Corrigir" (Primeiro botão do grupo) */
 .modal-botoes button:first-child {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: #C62828;
+  color: #ffffff;
 }
 
 /* Efeito de hover para o botão "Corrigir" */
 .modal-botoes button:first-child:hover {
-  background-color: #d0d0d0;
+  background-color: #151515;
+  scale: 110%;
+  transition: 0.3s;
+  box-shadow: 0 10px 25px #C62828;
 }
 
 /* Estilo do botão "Confirmar Envio" (Último botão do grupo) */
@@ -374,7 +484,10 @@ footer {
 
 /* Efeito de hover para o botão "Confirmar Envio" */
 .modal-botoes button:last-child:hover {
-  background-color: #921a1a;
+  background-color: #151515;
+  scale: 110%;
+  transition: 0.3s;
+  box-shadow: 0 10px 25px #C62828;
 }
 
 #modalDadosLogin {
@@ -409,9 +522,9 @@ footer {
    3. CONTAINER PRINCIPAL DO CARRINHO (BORDA GROSSA VERMELHA)
    ========================================================================== */
 .cart-content {
-  background-color: #262626;
+  background-color: #000000;
   /* Fundo interno do carrinho */
-  border: 5px solid #5a0d0d;
+  border: 1px solid #C62828;
   /* Borda grossa escura */
   border-radius: 25px;
   max-width: 900px;
@@ -434,10 +547,10 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #1e1e1e;
+  background-color: #262626;
   padding: 12px 20px;
   border-radius: 12px;
-  border: 2px solid #5a0d0d;
+  border: 1px solid #C62828;
 }
 
 .product-thumb img {
@@ -465,7 +578,7 @@ footer {
 
 .quantity-controls button {
   background: none;
-  border: 2px solid #5a0d0d;
+  border: 1px solid #C62828;
   color: #5a0d0d;
   font-size: 1.3rem;
   font-weight: bold;
@@ -827,7 +940,9 @@ footer {
   margin: 20px;
 }
 
-.contato-form input, select, option {
+.contato-form input,
+select,
+option {
   width: 450px;
   height: 40px;
   margin: 20px;
@@ -839,7 +954,9 @@ footer {
   text-align: center;
 }
 
-.contato-form input:hover, select:hover, option:hover {
+.contato-form input:hover,
+select:hover,
+option:hover {
   scale: 105%;
   transition: 0.3s;
   border: 1px solid #ffffff;
@@ -870,7 +987,7 @@ footer {
   background-color: #C62828;
   color: #ffffff;
   cursor: pointer;
-  margin:30px;
+  margin: 30px;
   float: left;
   font-size: 20px;
 }
@@ -882,26 +999,7 @@ footer {
   background-color: #151515;
 }
 
-.mensagem {
-  width: 650px;
-  height: 50px;
-  margin-top: 10px;
-  border: 1px solid rgb(30, 99, 30);
-  border-radius: 20px;
-  background-color: rgb(42, 58, 42);
-}
-
-.mensagem:hover {
-  scale: 110%;
-  transition: 0.3s;
-  cursor: default;
-}
-
-.escondida {
- display: none;
-}
-
-.faq-container { 
+.faq-container {
   margin-top: 50px;
   padding: 90px;
 }
@@ -933,6 +1031,7 @@ footer {
   cursor: default;
   box-shadow: 0 10px 25px #ffffff;
 }
+
 .empty-cart-msg {
   color: #ffffff;
   text-align: center;
@@ -940,14 +1039,14 @@ footer {
 }
 
 .modalProduto {
-  width: 750px;
-  height: 500px;
+  width: 1500px;
+  height: 1000px;
   border: 1px solid #C62828;
   border-radius: 20px;
-  background-color: #151515; 
+  background-color: #151515;
 }
 
-dialog[open]{
+dialog[open] {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -962,17 +1061,36 @@ dialog[open]{
   color: #ffffff;
   border: 1px solid #C62828;
   border-radius: 20px;
-  width: 90%;
-  max-width: 500px;
-  min-width: 250px;
+  width: 500px;
+  height: 350px;
+
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  text-align: center;
+  text-align: left;
 
   overflow: hidden;
   box-sizing: border-box;
+  font-size: 25px;
 }
 
-dialog .modal-footer{
+.btnCartão {
+  width: 200px;
+  height: 50px;
+  border-radius: 20px;
+  border: 1px solid #C62828;
+  background-color: #C62828;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.btnCartão:hover {
+  transition: 0.3s;
+  background-color: #000000;
+  box-shadow: 0 10px 25px #C62828;
+  scale: 110%;
+}
+
+dialog .modal-footer {
   margin: 10px;
   border-top: 1px solid #C62828;
   padding: 10px;
@@ -980,9 +1098,8 @@ dialog .modal-footer{
 
 }
 
-dialog .modal-footer button{
+dialog .modal-footer button {
   margin: 5px;
-  width: auto;
   flex: 1;
   white-space: nowrap;
   padding: 10px 12px;
@@ -993,12 +1110,12 @@ dialog .modal-footer button{
   width: 150px;
 }
 
-dialog .btn-carrinho{
+dialog .btn-carrinho {
   background-color: #28a745;
-  color:  #ffffff;
+  color: #ffffff;
 }
 
-dialog .btn-fechar{
+dialog .btn-fechar {
   background-color: #dc3535;
   color: #ffffff;
 }
@@ -1027,6 +1144,7 @@ dialog .btn-fechar{
   box-shadow: 0 10px 25px #C62828;
   border: 1px solid #ffffff;
 }
+
 /* Botão de Remover Produto */
 .btn-remove {
   background: none;
@@ -1049,4 +1167,3 @@ dialog .btn-fechar{
   color: #ffffff;
   transform: scale(1.08);
 }
-

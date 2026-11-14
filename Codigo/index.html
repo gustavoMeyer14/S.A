@@ -21,10 +21,22 @@
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
                 <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <button type="button" class="botaoUsuario"><img src="imagens/Usuario.png"></button>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png"></button>
             </nav>
         </div>
     </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2 style="font-size: 30px;">- Menu do usuário -</h2>
+            <nav class="nav-usuario">
+                <a href="cadastro.html">cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+                <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+            </nav>
+        </div>
+    </div>
 
     <div class="pesquisa">
         <h2>Pesquise produtos aqui.</h2>

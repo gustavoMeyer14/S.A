@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
     <meta name="author" content="Shadow Realm">
-    <title>Shadow Realm Store - Inicio</title>
+    <title>Shadow Realm Store - Produtos</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
 </head>
@@ -15,16 +15,29 @@
     <header>
         <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
         <h1>- Shadow Realm Store -</h1>
-        <nav class="nav">
-            <a href="index.html" class="link">Inicio</a>
-            <a href="carrinho.html" class="link">Carrinho</a>
-            <a href="contato.html" class="link">Contato</a>
-            <a href="cliente.html" class="link">Login</a>
-            <a href="cadastro.html" class="link">Cadastro</a>
-            <a href="produtos.html" class="link">Produtos</a>
-            <a href="cadastrocartao.html" class="link">Cartão</a>
-        </nav>
+        <div class="nav">
+            <nav>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
+                        src="imagens/Usuario.png"></button>
+            </nav>
+        </div>
     </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2 style="font-size: 30px;">Usuário</h2>
+            <nav class="nav-usuario">
+                <a href="cadastro.html">cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+                <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+            </nav>
+        </div>
+    </div>
 
     <div class="pesquisa">
         <h2>Pesquise produtos aqui.</h2>
@@ -36,7 +49,7 @@
         <h2> - Produtos - </h2>
         <!-- card 1 -->
         <div>
-            <img src="imagens/bleach.png" alt="Produto 1" style="width:200px;height:200px;">
+            <img src="imagens/bleach.png" alt="Produto 1">
             <p>Descrição aqui</p>
             <h3><strong>preço</strong></h3>
             <button type="button" id="card1">Ver mais</button>
@@ -52,7 +65,7 @@
 
         <!-- card 2 -->
         <div>
-            <img src="imagens/kisuke.png" alt="Produto 2" style="width:200px;height:200px;">
+            <img src="imagens/kisuke.png" alt="Produto 2">
             <p>Descrição aqui</p>
             <h3><strong>preço</strong></h3>
             <button type="button" id="card2">Ver mais</button>
@@ -62,13 +75,13 @@
 
             <p>Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.</p>
 
-                <p>Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do
+            <p>Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do
                 chapéu listrado (inclui cabeça extra com expressão séria).</p>
 
-               <p>Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta. Vem com a bengala no
-                ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha.</p> 
+            <p>Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta. Vem com a bengala no
+                ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha.</p>
 
-                <p>Base Diorama: Telhas de Karakura com uma lanterna apagada, a Yoruichi em forma de gato preto observando
+            <p>Base Diorama: Telhas de Karakura com uma lanterna apagada, a Yoruichi em forma de gato preto observando
                 na ponta e um frasco de Mod-Soul escondido como easter egg.</p>
 
             <footer class="modal-footer">
@@ -79,7 +92,7 @@
 
         <!-- card 3 -->
         <div>
-            <img src="imagens/renje.png" alt="Produto 3" style="width:200px;height:200px;">
+            <img src="imagens/renje.png" alt="Produto 3">
             <p>Descrição aqui</p>
             <h3><strong>preço</strong></h3>
             <button type="button" id="card3">Ver mais</button>
@@ -95,7 +108,7 @@
 
         <!-- card 4 -->
         <div>
-            <img src="imagens/rukia.png " alt="Produto 4" style="width:200px;height:200px;">
+            <img src="imagens/rukia.png " alt="Produto 4">
             <p>Descrição aqui</p>
             <h3><strong>preço</strong></h3>
             <button type="button" id="card4">Ver mais</button>
@@ -111,7 +124,7 @@
 
         <!-- card 5 -->
         <div>
-            <img src="imagens/toshiro.png" alt="Produto 5" style="width:200px;height:200px;">
+            <img src="imagens/toshiro.png" alt="Produto 5">
             <p>Descrição aqui</p>
             <h3><strong>preço</strong></h3>
             <button type="button" id="card5">Ver mais</button>
