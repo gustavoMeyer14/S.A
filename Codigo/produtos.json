@@ -1,110 +1,100 @@
-[
-    {
+   [     {
         "id": "1",
-        "nome": "ichigo Kurosaki",
+        "nome": "Ichigo Kurosaki",
         "preco": 340.00,
         "categoria": "Bleach",
         "pagina": "produtos.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~32 cm), em resina de alto padrão. Pose e Expressão: Avançando em meio a ondas de energia espiritual com olhar determinado e máscara Hollow parcial opcional. Vestes e Armas: Shihakusho preto rasgado em movimento dinâmico, empunhando a Tensa Zangetsu com efeito translúcido de Getsuga Tensho negro e vermelho. Base Diorama: Solo rachado da Soul Society com destroços flutuantes.",
         "destaque": true,
         "imagem": "imagens/bleach.png"
     },
-
     {
         "id": "2",
         "nome": "Kisuke Urahara",
         "preco": 360.00,
         "categoria": "Bleach",
         "pagina": "produtos.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~30 cm), em resina de alto padrão. Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do chapéu listrado (inclui cabeça extra com expressão séria). Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta, acompanhado da bengala no ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha. Base Diorama: Telhas de Karakura com lanterna apagada, Yoruichi em forma de gato preto na ponta e um frasco de Mod-Soul escondido.",
         "destaque": true,
         "imagem": "imagens/kisuke.png"
     },
-
     {
         "id": "3",
         "nome": "Renji Abarai",
         "preco": 400.00,
         "categoria": "Bleach",
         "pagina": "produtos.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~31 cm), em resina de alto padrão. Pose e Expressão: Em postura de ataque intenso com expressão feroz e sobrancelhas tatuadas em destaque. Vestes e Armas: Uniforme de Tenente da 6ª Divisão com faixa branca na testa e a Zabimaru em sua forma Shikai segmentada estendendo-se ao redor da figure. Base Diorama: Rocha esculpida com marcas de impacto e poeira levantada.",
         "destaque": true,
         "imagem": "imagens/renji.png"
     },
-
     {
         "id": "4",
         "nome": "Rukia Kuchiki",
         "preco": 430.00,
         "categoria": "Bleach",
         "pagina": "produtos.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~28 cm), em resina de alto padrão. Pose e Expressão: Postura elegante e serena executando uma dança de gelo. Vestes e Armas: Shihakusho tradicional e a Sode no Shirayuki totalmente branca com fita esvoaçante e cristais de gelo translúcidos em espiral. Base Diorama: Lago congelado com flores de gelo esculpidas e névoa fria ao redor.",
         "destaque": true,
         "imagem": "imagens/rukia.png"
     },
-
     {
         "id": "5",
         "nome": "Toshiro Hitsugaya",
         "preco": 200.00,
         "categoria": "Bleach",
         "pagina": "produtos.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~26 cm), em resina de alto padrão. Pose e Expressão: Flutuando em combate com olhar frio e focado de Capitão da 10ª Divisão. Vestes e Armas: Haori branco de Capitão esvoaçante, empunhando a Hyorinmaru envolta por um dragão de gelo translúcido com detalhes em azul cristalino. Base Diorama: Pilar de gelo pontiagudo emergindo do chão.",
         "destaque": true,
         "imagem": "imagens/toshiro.png"
     },
-
     {
         "id": "6",
         "nome": "Levi Ackerman",
         "preco": 250.00,
         "categoria": "Attack on Titan",
         "pagina": "index.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
-        "destaque":false,
+        "descricao": "Escala: 1/6 (~29 cm), em resina de alto padrão. Pose e Expressão: No ar em pleno giro de ataque com expressão fria e olhar cortante de Capitão da Tropa de Exploração. Vestes e Armas: Capa verde com o brasão das Asas da Liberdade em movimento, equipamento DMT detalhado com cabos metálicos e lâminas duplas empunhadas em pegada invertida. Base Diorama: Telhado europeu quebrado com fumaça de propulsão translúcida.",
+        "destaque": false,
         "imagem": "imagens/Levi.png"
     },
-
     {
         "id": "7",
         "nome": "Maomao",
         "preco": 300.00,
         "categoria": "Diario de uma potecaria",
         "pagina": "index.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~25 cm), em resina de alto padrão. Pose e Expressão: Examinando atentamente um frasco de ervas com sorriso curioso e sardas delicadas (inclui rosto extra empolgado ao encontrar veneno). Vestes e Acessórios: Traje tradicional do Palácio Interno em tons de verde e rosa com acabamento texturizado, acompanhada de pilão, almofariz e caderno de anotações. Base Diorama: Mesa de boticário em madeira esculpida com potes de ervas e flores medicinais.",
         "destaque": false,
         "imagem": "imagens/Maomao.png"
     },
-
     {
         "id": "8",
         "nome": "Satoru Gojo",
         "preco": 350.00,
         "categoria": "Jujutsu Kaisen",
         "pagina": "index.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~33 cm), em resina de alto padrão. Pose e Expressão: Flutuando de forma relaxada e confiante, puxando a venda preta para revelar o brilho intenso dos Seis Olhos azuis. Vestes e Poderes: Uniforme escuro da Escola Jujutsu com textura fosca e esfera translúcida de Energia Amaldiçoada Vazio Roxo flutuando na ponta dos dedos. Base Diorama: Escombros urbanos suspensos no ar por distorção espacial.",
         "destaque": false,
         "imagem": "imagens/Canva - download.png"
     },
-
     {
         "id": "9",
         "nome": "Greninja",
         "preco": 400.00,
         "categoria": "Pokémon",
         "pagina": "index.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~27 cm), em resina de alto padrão. Pose e Expressão: Agachado sobre a superfície da água em postura ágil de ninja, pronto para o bote com olhar focado. Vestes e Poderes: Cachecol longo e fluido esculpido com movimento dinâmico e duas Water Shurikens gigantes em resina azul translúcida com efeito de respingos. Base Diorama: Onda cristalina quebrando sobre rochas submersas.",
         "destaque": false,
         "imagem": "imagens/Canva - download(1).png"
     },
-
     {
         "id": "10",
         "nome": "Snorlax",
         "preco": 450.00,
         "categoria": "Pokémon",
         "pagina": "index.html",
-        "descricao": "Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.",
+        "descricao": "Escala: 1/6 (~28 cm de altura e largura), em resina maciça de alto padrão. Pose e Expressão: Tirando um cochilo profundo de barriga para cima após um banquete, com expressão tranquila e feliz. Detalhes e Acessórios: Pintura fosca com sombreamento suave na pelagem azul-petróleo e creme, acompanhado de uma Poké Flauta dourada e várias Berries espalhadas ao redor. Base Diorama: Gramado florido da Rota 12 com placa de madeira.",
         "destaque": false,
         "imagem": "imagens/Snorlax.png"
     }

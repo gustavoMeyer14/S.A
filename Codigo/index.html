@@ -38,58 +38,240 @@
         </div>
     </div>
 
-    <div class="pesquisa">
+      <div class="pesquisa">
         <h2>Pesquise produtos aqui.</h2>
         <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Ex.: Bleach">
-        <button type="button" id="enviarPesquisa"><a href="produtos.html">Pesquisar</a></button>
+        <button type="button" id="enviarPesquisa">Pesquisar</button>
     </div>
+
 
     <section class="destaques">
         <h2> - Destaques - </h2>
+        
         <!-- card 1 -->
         <div>
             <img src="imagens/Levi.png" alt="Produto 1">
-            <p>Descrição aqui</p>
-            <h3><strong>preço</strong></h3>
+            <p>Levi Ackerman</p>
+            <h3><strong>R$ 250,00</strong></h3>
             <button type="button" id="card1">Ver mais</button>
         </div>
+        <dialog id="modal-card1" class="modalProduto">
+            <h2>- Levi Ackerman</h2>
+            <p>Exemplo: llllllllllll</p>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card1">Fechar</button>
+                <button type="button" class="btn-carrinho" 
+                    data-nome="Levi Ackerman" 
+                    data-preco="250.00" 
+                    data-imagem="imagens/Levi.png">+ Carrinho</button>
+            </footer>
+        </dialog>
 
         <!-- card 2 -->
         <div>
             <img src="imagens/Maomao.png" alt="Produto 2">
-            <p>Descrição aqui</p>
-            <h3><strong>preço</strong></h3>
+            <p>Maomao</p>
+            <h3><strong>R$ 300,00</strong></h3>
             <button type="button" id="card2">Ver mais</button>
         </div>
+        <dialog id="modal-card2" class="modalProduto">
+            <h2>- Maomao</h2>
+            <p>Exemplo: llllllllllll</p>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card2">Fechar</button>
+                <button type="button" class="btn-carrinho" 
+                    data-nome="Maomao" 
+                    data-preco="300.00" 
+                    data-imagem="imagens/Maomao.png">+ Carrinho</button>
+            </footer>
+        </dialog>
 
         <!-- card 3 -->
         <div>
             <img src="imagens/Canva - download.png" alt="Produto 3">
-            <p>Descrição aqui</p>
-            <h3><strong>preço</strong></h3>
+            <p>Satoru Gojo</p>
+            <h3><strong>R$ 200,00</strong></h3>
             <button type="button" id="card3">Ver mais</button>
         </div>
+        <dialog id="modal-card3" class="modalProduto">
+            <h2>- Satoru Gojo</h2>
+            <p>Exemplo: llllllllllll</p>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card3">Fechar</button>
+                <button type="button" class="btn-carrinho" 
+                    data-nome="Satoru Gojo" 
+                    data-preco="200.00" 
+                    data-imagem="imagens/Canva - download.png">+ Carrinho</button>
+            </footer>
+        </dialog>
 
         <!-- card 4 -->
         <div>
             <img src="imagens/Canva - download (1).png" alt="Produto 4">
-            <p>Descrição aqui</p>
-            <h3><strong>preço</strong></h3>
+            <p>Greninja</p>
+            <h3><strong>R$ 400,00</strong></h3>
             <button type="button" id="card4">Ver mais</button>
         </div>
+        <dialog id="modal-card4" class="modalProduto">
+            <h2>- Greninja</h2>
+            <p>Exemplo: llllllllllll</p>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card4">Fechar</button>
+                <button type="button" class="btn-carrinho" 
+                    data-nome="Greninja" 
+                    data-preco="400.00" 
+                    data-imagem="imagens/Canva - download (1).png">+ Carrinho</button>
+            </footer>
+        </dialog>
 
         <!-- card 5 -->
         <div>
             <img src="imagens/Snorlax.png" alt="Produto 5">
-            <p>Descrição aqui</p>
-            <h3><strong>preço</strong></h3>
+            <p>Snorlax</p>
+            <h3><strong>R$ 450,00</strong></h3>
             <button type="button" id="card5">Ver mais</button>
         </div>
+        <dialog id="modal-card5" class="modalProduto">
+            <h2>- Snorlax</h2>
+            <p>Exemplo: llllllllllll</p>
+            <footer class="modal-footer">
+                <button type="button" id="fechar-card5">Fechar</button>
+                <button type="button" class="btn-carrinho" 
+                    data-nome="Snorlax" 
+                    data-preco="450.00" 
+                    data-imagem="imagens/Snorlax.png">+ Carrinho</button>
+            </footer>
+        </dialog>
     </section>
 
     <footer>
         &copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.
     </footer>
+
+    <script>
+        // --- 1. LÓGICA PARA ABRIR E FECHAR OS 5 MODAIS ---
+        for (let i = 1; i <= 5; i++) {
+            const btnVerMais = document.getElementById(`card${i}`);
+            const modal = document.getElementById(`modal-card${i}`);
+            const btnFechar = document.getElementById(`fechar-card${i}`);
+
+            btnVerMais.addEventListener('click', () => modal.showModal());
+            btnFechar.addEventListener('click', () => modal.close());
+        }
+
+        // --- 2. LÓGICA PARA ADICIONAR AO CARRINHO ---
+        const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
+
+        botoesCarrinho.forEach(botao => {
+            botao.addEventListener('click', function () {
+                const nome = this.getAttribute('data-nome');
+                const preco = parseFloat(this.getAttribute('data-preco'));
+                const imagem = this.getAttribute('data-imagem');
+
+                // Busca o carrinho atual no localStorage ou cria um array vazio
+                let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+
+                // Verifica se o produto já está no carrinho
+                const produtoExistente = carrinho.find(item => item.nome === nome);
+
+                if (produtoExistente) {
+                    produtoExistente.quantidade += 1;
+                } else {
+                    carrinho.push({
+                        nome: nome,
+                        preco: preco,
+                        imagem: imagem,
+                        quantidade: 1
+                    });
+                }
+
+                // Salva novamente no localStorage
+                localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+
+                // Fecha o modal atual e avisa o usuário
+                this.closest('dialog').close();
+                alert(`${nome} foi adicionado ao carrinho!`);
+            });
+        });
+
+                // --- 3. LÊ O ARQUIVO produtos.json PARA AS DESCRIÇÕES E PESQUISA ---
+        async function conectarMeuJSON() {
+            try {
+                const resposta = await fetch('produtos.json');
+                const produtosJSON = await resposta.json();
+
+                // Substitui "Exemplo: llllllllllll" pela descrição do produtos.json
+                const modais = document.querySelectorAll('.modalProduto');
+                modais.forEach(modal => {
+                    const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
+                    const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
+
+                    if (dados) {
+                        const paragrafo = modal.querySelector('p');
+                        if (paragrafo && paragrafo.innerText.includes('llllllllllll')) {
+                            paragrafo.innerText = dados.descricao;
+                        }
+                    }
+                });
+
+                // Faz a barra de pesquisa filtrar os destaques da página inicial
+                const btnPesquisa = document.getElementById('enviarPesquisa');
+                const inputPesquisa = document.getElementById('barraPesquisa');
+
+                if (btnPesquisa && inputPesquisa) {
+                    btnPesquisa.addEventListener('click', (e) => {
+                        e.preventDefault(); // Evita pular direto para produtos.html se quiser filtrar aqui
+                        const termo = inputPesquisa.value.toLowerCase().trim();
+                        const cards = document.querySelectorAll('.destaques > div');
+
+                        cards.forEach(card => {
+                            const nomeCard = card.querySelector('p').innerText.toLowerCase();
+                            const dados = produtosJSON.find(p => p.nome.toLowerCase() === nomeCard);
+
+                            const bateNome = nomeCard.includes(termo);
+                            const bateCategoria = dados && dados.categoria.toLowerCase().includes(termo);
+
+                            card.style.display = (bateNome || bateCategoria) ? '' : 'none';
+                        });
+                    });
+                }
+            } catch (erro) {
+                console.error('Erro ao ler o arquivo produtos.json:', erro);
+            }
+        }
+
+        conectarMeuJSON();
+
+                // --- PESQUISA QUE REDIRECIONA PARA PRODUTOS.HTML ---
+        const btnPesquisaIndex = document.getElementById('enviarPesquisa');
+        const inputPesquisaIndex = document.getElementById('barraPesquisa');
+
+        function irParaProdutos() {
+            const termo = inputPesquisaIndex.value.trim();
+
+            if (termo !== '') {
+                // Redireciona levando o termo digitado na URL
+                window.location.href = `produtos.html?busca=${encodeURIComponent(termo)}`;
+            } else {
+                // Se estiver vazio, apenas abre a página de produtos
+                window.location.href = 'produtos.html';
+            }
+        }
+
+        if (btnPesquisaIndex && inputPesquisaIndex) {
+            // Funciona ao clicar no botão "Pesquisar"
+            btnPesquisaIndex.addEventListener('click', irParaProdutos);
+
+            // Também funciona ao apertar a tecla "Enter" no teclado
+            inputPesquisaIndex.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    irParaProdutos();
+                }
+            });
+        }
+
+
+    </script>
 </body>
 
 </html>
