@@ -1,0 +1,14 @@
+[
+    {
+        "nome": "Admin Shadow",
+        "email": "admin@shadowrealm.com",
+        "senha": "admin123",
+        "cpf": "111.111.111-11"
+    },
+    {
+        "nome": "Cliente Teste",
+        "email": "teste@gmail.com",
+        "senha": "teste123",
+        "cpf": "222.222.222-22"
+    }
+]

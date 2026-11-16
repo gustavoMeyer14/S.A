@@ -6,7 +6,40 @@ function fechaModalCliente() {
     document.getElementById('modalCliente').classList.remove('aberto');
 }
 
+function sairConta() {
+    localStorage.removeItem('usuarioLogado');
+    localStorage.removeItem('usuarioAtual');
+    alert("Você saiu da sua conta.");
+    window.location.href = "index.html";
+}
+
 window.addEventListener("DOMContentLoaded", function () {
+    const paginaAtual = window.location.pathname.split("/").pop();
+    const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+
+    if (estaLogado && paginaAtual === 'cliente.html') {
+        alert("Você já está logado em uma conta!");
+        window.location.href = "index.html";
+        return;
+    }
+
+    const navUsuario = document.querySelector('.nav-usuario');
+    if (navUsuario && estaLogado) {
+        const linkCadastro = navUsuario.querySelector('a[href="cadastro.html"]');
+        const linkLogin = navUsuario.querySelector('a[href="cliente.html"]');
+        if (linkCadastro) linkCadastro.style.display = 'none';
+        if (linkLogin) linkLogin.style.display = 'none';
+
+        const linkSair = document.createElement('a');
+        linkSair.href = "#";
+        linkSair.textContent = "Sair";
+        linkSair.onclick = function (e) {
+            e.preventDefault();
+            sairConta();
+        };
+        navUsuario.insertBefore(linkSair, navUsuario.firstChild);
+    }
+
     var inputCpf = document.getElementById('cpf');
     if (inputCpf) {
         inputCpf.addEventListener('input', function (e) {
@@ -42,11 +75,11 @@ function cpfInvalido(rawCpf) {
     return false;
 }
 
-function validaLogin() {
-    var email = document.frmlogin.txtemail.value;
+async function validaLogin() {
+    var email = document.frmlogin.txtemail.value.trim();
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
-    if (!expRegemail.test(email.trim())) {
+    if (!expRegemail.test(email)) {
         alert("Preencha o Campo Email ou formato inválido !!!");
         document.frmlogin.txtemail.focus();
         return false;
@@ -58,6 +91,27 @@ function validaLogin() {
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
         alert("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.");
         document.frmlogin.txtsenha.focus();
+        return false;
+    }
+
+    var usuariosJSON = [];
+    try {
+        var resposta = await fetch('usuarios.json');
+        if (resposta.ok) {
+            usuariosJSON = await resposta.json();
+        }
+    } catch (e) {
+    }
+
+    var usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
+    var todosUsuarios = usuariosJSON.concat(usuariosLocais);
+
+    var usuarioValido = todosUsuarios.find(function (u) {
+        return u.email.toLowerCase() === email.toLowerCase() && u.senha === senha;
+    });
+
+    if (!usuarioValido) {
+        alert("E-mail ou senha incorretos, ou conta não encontrada!");
         return false;
     }
 
@@ -92,7 +146,9 @@ function fechaModalLogin() {
 }
 
 function confirmaLogin() {
+    var email = document.frmlogin.txtemail.value.trim();
     localStorage.setItem('usuarioLogado', 'true');
+    localStorage.setItem('usuarioAtual', email);
     alert("Login realizado com sucesso!");
     fechaModalLogin();
     document.frmlogin.reset();
