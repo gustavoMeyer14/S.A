@@ -40,7 +40,7 @@
     <!-- Área Principal (Fundo Escuro) -->
     <main class="cart-content">
 
-        <!-- Lista de Produtos (Lado Esquerdo) - O JS do seu colega vai preencher aqui -->
+        <!-- Lista de Produtos (Lado Esquerdo) -->
         <section class="products-list" id="products-list">
             <p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>
             <p style="text-align: center;">
@@ -93,17 +93,17 @@
                         <legend>Forma de pagamento:</legend>
 
                         <label class="method-option">
-                            <input type="radio" name="payment-group" value="pix" checked>
+                            <input type="radio" name="payment-group" class="payment-group" value="pix" checked>
                             <span>Pix</span>
                         </label>
 
                         <label class="method-option">
-                            <input type="radio" name="payment-group" value="debito">
+                            <input type="radio" name="payment-group" class="payment-group" value="debito">
                             <span>Débito</span>
                         </label>
 
                         <label class="method-option">
-                            <input type="radio" name="payment-group" value="parcelado">
+                            <input type="radio" name="payment-group" class="payment-group" value="parcelado">
                             <span class="multiline">Parcelado em até<br>12x sem Juros</span>
                         </label>
                     </fieldset>
@@ -117,17 +117,17 @@
 
                     <div class="form-group">
                         <label for="input-rua">Rua:</label>
-                        <input type="text" id="input-rua" placeholder="Ex: Rua Dona Elza Mainertins" required>
+                        <input type="text" id="input-rua" placeholder="Ex: Rua abobrinha doce" required>
                     </div>
 
                     <div class="form-group">
                         <label for="input-estado">Estado:</label>
-                        <input type="text" id="input-estado" placeholder="Ex: Santa Catarina" required>
+                        <input type="text" id="input-estado" placeholder="Ex: Gato laranja" required>
                     </div>
 
                     <div class="form-group">
                         <label for="input-cidade">Cidade:</label>
-                        <input type="text" id="input-cidade" placeholder="Ex: Joinville" required>
+                        <input type="text" id="input-cidade" placeholder="Ex: Abobrinha estragada" required>
                     </div>
 
                     <button type="submit" class="btn-confirm-payment">Confirmar pagamento</button>

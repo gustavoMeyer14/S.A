@@ -21,7 +21,8 @@
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
                 <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png"></button>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
+                        src="imagens/Usuario.png"></button>
             </nav>
         </div>
     </header>
@@ -96,8 +97,19 @@
             <button type="button" id="card1">Ver mais</button>
         </div>
         <dialog id="modal-card1" class="modalProduto">
-            <h2>- Ichigo Kurosaki</h2>
-            <p>Exemplo: llllllllllll</p>
+
+            <!--descrição-->
+            <div class="colunas" style="width: 100%; height: 500px; margin: 0; padding: 20px; border-radius: 0px;">
+                <img src="imagens/bleach.png" alt="Imagem do Produto 1">
+                <h2>- Ichigo Kurosaki</h2>
+                <p>Exemplo: llllllllllll</p>
+            </div>
+            
+            <!--comentarios-->
+            <div class="colunas" style="width: 100%; height: 600px; margin: 0; border-radius: 0px;">
+
+            </div>
+
             <footer class="modal-footer">
                 <button type="button" id="fechar-card1">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Ichigo Kurosaki" data-preco="340.00"

@@ -39,7 +39,7 @@ footer {
 .destaques {
   margin-top: 50px;
   width: 1500px;
-  height: 500px;
+  height: 900px;
   background-color: #000000;
   border: 1px solid #C62828;
   border-radius: 20px;
@@ -270,24 +270,7 @@ footer {
   display: none;
 }
 
-.responsivo1 {
-  width: 500px;
-  margin: 0 auto;
-  height: 500px;
-}
 
-.responsivo2 {
-  width: 1000px;
-  margin: 0 auto;
-  height: 500px;
-}
-
-
-.responsivo3 {
-  width: 1350px;
-  margin: 0 auto;
-  height: 500px;
-}
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
@@ -527,7 +510,7 @@ footer {
   border: 1px solid #C62828;
   /* Borda grossa escura */
   border-radius: 25px;
-  max-width: 900px;
+  width: 1000px;
   margin: 40px auto;
   padding: 30px;
   display: grid;
@@ -551,14 +534,18 @@ footer {
   padding: 12px 20px;
   border-radius: 12px;
   border: 1px solid #C62828;
+  width: 550px;
+  text-align: left;
 }
 
 .product-thumb img {
-  width: 60px;
-  height: 60px;
+  width: 75px;
+  height: 75px;
   object-fit: cover;
   border-radius: 4px;
   background-color: #fff;
+  border-radius: 20px;
+  border: 1px solid #C62828;
 }
 
 .product-name {
@@ -579,26 +566,28 @@ footer {
 .quantity-controls button {
   background: none;
   border: 1px solid #C62828;
-  color: #5a0d0d;
+  color: #C62828;
   font-size: 1.3rem;
   font-weight: bold;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  font-size: 30px;
 }
 
 .quantity-controls button:hover {
   background-color: #5a0d0d;
   color: #ffffff;
+  scale: 110%;
 }
 
 .qty-value {
-  font-size: 1.4rem;
+  font-size: 30px;
   font-weight: bold;
   color: #ffffff;
   min-width: 20px;
@@ -610,11 +599,12 @@ footer {
    ========================================================================== */
 .checkout-summary {
   background-color: #1e1e1e;
-  border: 2px solid #5a0d0d;
+  border: 1px solid #C62828;
   border-radius: 15px;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  max-height: 550px;
 }
 
 .checkout-summary h2 {
@@ -732,7 +722,7 @@ footer {
 
 .modal-container {
   background-color: #262626;
-  border: 5px solid #5a0d0d;
+  border: 1px solid #C62828;
   border-radius: 25px;
   width: 90%;
   max-width: 850px;
@@ -745,21 +735,27 @@ footer {
 .modal-header {
   text-align: center;
   margin-bottom: 25px;
+  border-radius: 20px;
 }
 
 .modal-header h2 {
   font-size: 2rem;
   color: #ffffff;
   font-weight: bold;
+  padding: 25px;
 }
 
-/* Botão de Fechar invisível para manter layout limpo do print, mas funcional */
 .btn-close-modal {
   position: absolute;
   top: 15px;
   right: 20px;
-  font-size: 1.8rem;
-  color: #888;
+  font-size: 30px;
+  background-color: #5a0d0d;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  width: 50px;
+  height: 50px;
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -825,6 +821,7 @@ footer {
   cursor: pointer;
   text-align: center;
   position: relative;
+  width: 350px;
 }
 
 /* Ocultando o input radio padrão */
@@ -1046,6 +1043,20 @@ option:hover {
   background-color: #151515;
 }
 
+.modalProduto img {
+  width: 200px;
+  height: 200px;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  float: left;
+  margin: 20px;
+}
+
+.modalProduto h2 {
+  font-size: 50px;
+  color: #ffffff;
+}
+
 dialog[open] {
   display: flex;
   flex-direction: column;
@@ -1061,8 +1072,8 @@ dialog[open] {
   color: #ffffff;
   border: 1px solid #C62828;
   border-radius: 20px;
-  width: 500px;
-  height: 350px;
+  width: 1500px;
+  height: 900px;
 
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   text-align: left;
@@ -1092,9 +1103,9 @@ dialog[open] {
 
 dialog .modal-footer {
   margin: 10px;
-  border-top: 1px solid #C62828;
+  border-top: none;
   padding: 10px;
-  width: 475px;
+  width: 100%;
 
 }
 
@@ -1107,11 +1118,12 @@ dialog .modal-footer button {
   border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
-  width: 150px;
+  width: 250px;
+  font-size: 25px;
 }
 
 dialog .btn-carrinho {
-  background-color: #28a745;
+  background-color: #C62828;
   color: #ffffff;
 }
 
