@@ -21,8 +21,7 @@
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
                 <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
-                        src="imagens/Usuario.png"></button>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png"></button>
             </nav>
         </div>
     </header>
@@ -43,8 +42,6 @@
         <h2>Procure o que deseja.</h2>
         <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Ex.: Bleach">
         <button type="button" id="enviarPesquisa">Pesquisar</button>
-        <!-- Barra de Filtros e Sub-filtros -->
-        <!-- Barra de Filtros e Sub-filtros alinhados lado a lado -->
         <div class="painel-filtros"
             style="max-width: 900px; margin: 15px auto 30px auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px;">
 
@@ -87,14 +84,11 @@
                 Limpar Filtros
             </button>
         </div>
-
-
     </div>
 
     <section class="destaques">
         <h2> - Produtos - </h2>
 
-        <!-- card 1 -->
         <div>
             <img src="imagens/bleach.png" alt="Produto 1">
             <p>Ichigo Kurosaki</p>
@@ -111,7 +105,6 @@
             </footer>
         </dialog>
 
-        <!-- card 2 -->
         <div>
             <img src="imagens/kisuke.png" alt="Produto 2">
             <p>Kisuke Urahara</p>
@@ -134,7 +127,6 @@
             </footer>
         </dialog>
 
-        <!-- card 3 -->
         <div>
             <img src="imagens/renje.png" alt="Produto 3">
             <p>Renji Abarai</p>
@@ -151,7 +143,6 @@
             </footer>
         </dialog>
 
-        <!-- card 4 -->
         <div>
             <img src="imagens/rukia.png" alt="Produto 4">
             <p>Rukia Kuchiki</p>
@@ -168,7 +159,6 @@
             </footer>
         </dialog>
 
-        <!-- card 5 -->
         <div>
             <img src="imagens/toshiro.png" alt="Produto 5">
             <p>Toshiro Hitsugaya</p>
@@ -185,8 +175,6 @@
             </footer>
         </dialog>
 
-
-        <!-- card 6 -->
         <div>
             <img src="imagens/Levi.png" alt="Produto 6">
             <p>Levi Ackerman</p>
@@ -203,7 +191,6 @@
             </footer>
         </dialog>
 
-        <!-- card 7 -->
         <div>
             <img src="imagens/Maomao.png" alt="Produto 7">
             <p>Maomao</p>
@@ -220,7 +207,6 @@
             </footer>
         </dialog>
 
-        <!-- card 8 -->
         <div>
             <img src="imagens/Canva - download.png" alt="Produto 8">
             <p>Satoru Gojo</p>
@@ -237,7 +223,6 @@
             </footer>
         </dialog>
 
-        <!-- card 9 -->
         <div>
             <img src="imagens/Canva - download (1).png" alt="Produto 9">
             <p>Greninja</p>
@@ -254,7 +239,6 @@
             </footer>
         </dialog>
 
-        <!-- card 10 -->
         <div>
             <img src="imagens/Snorlax.png" alt="Produto 10">
             <p>Snorlax</p>
@@ -270,15 +254,23 @@
                     data-imagem="imagens/Snorlax.png">+ Carrinho</button>
             </footer>
         </dialog>
-
     </section>
 
     <footer>
         &copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.
     </footer>
 
+    <dialog id="modalAvisoLogin">
+        <h2>Acesso Necessário</h2>
+        <p>Você precisa estar logado ou cadastrado em sua conta para adicionar produtos ao carrinho.</p>
+        <footer>
+            <button type="button" id="fecharAvisoLogin">Cancelar</button>
+            <button type="button" onclick="window.location.href='cliente.html'">Login</button>
+            <button type="button" onclick="window.location.href='cadastro.html'">Cadastrar</button>
+        </footer>
+    </dialog>
+
     <script>
-        // 1. Faz os botões "Ver mais" e "Fechar" funcionarem
         for (let i = 1; i <= 10; i++) {
             const btnVerMais = document.getElementById(`card${i}`);
             const modal = document.getElementById(`modal-card${i}`);
@@ -290,10 +282,24 @@
             }
         }
 
-        // 2. Adiciona ao carrinho
         const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
+        const modalAvisoLogin = document.getElementById('modalAvisoLogin');
+        const btnFecharAviso = document.getElementById('fecharAvisoLogin');
+
+        if (btnFecharAviso && modalAvisoLogin) {
+            btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+        }
+
         botoesCarrinho.forEach(botao => {
             botao.addEventListener('click', function () {
+                const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+
+                if (!estaLogado) {
+                    this.closest('dialog').close();
+                    modalAvisoLogin.showModal();
+                    return;
+                }
+
                 const nome = this.getAttribute('data-nome');
                 const preco = parseFloat(this.getAttribute('data-preco'));
                 const imagem = this.getAttribute('data-imagem');
@@ -313,13 +319,11 @@
             });
         });
 
-        // 3. Conecta produtos.json (Descrições + Pesquisa + Sub-filtros)
         async function conectarMeuJSON() {
             try {
                 const resposta = await fetch('produtos.json');
                 const produtosJSON = await resposta.json();
 
-                // Preenche descrições nos modais que têm "llllllllllll"
                 document.querySelectorAll('.modalProduto').forEach(modal => {
                     const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
                     const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
@@ -332,7 +336,6 @@
                     }
                 });
 
-                // Configura todos os filtros e sub-filtros juntos
                 const selectCategoria = document.getElementById('filtroCategoria');
                 const selectPreco = document.getElementById('filtroPreco');
                 const selectOrdem = document.getElementById('ordenarPreco');
@@ -378,7 +381,6 @@
                         }
                     });
 
-                    // Ordenação visual
                     if (ordemEscolhida !== 'padrao') {
                         const cardsOrdenados = [...cards].sort((a, b) => {
                             const dadosA = produtosJSON.find(p => p.nome.toLowerCase() === a.querySelector('p').innerText.toLowerCase());
@@ -391,7 +393,6 @@
                         cards.forEach(card => card.style.order = '');
                     }
 
-                    // Mensagem se nada for encontrado
                     let aviso = document.getElementById('aviso-pesquisa');
                     if (!aviso) {
                         aviso = document.createElement('p');
@@ -402,7 +403,6 @@
                     aviso.innerText = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
                 }
 
-                // Escuta mudanças em todos os campos
                 if (selectCategoria) selectCategoria.addEventListener('change', aplicarTodosFiltros);
                 if (selectPreco) selectPreco.addEventListener('change', aplicarTodosFiltros);
                 if (selectOrdem) selectOrdem.addEventListener('change', aplicarTodosFiltros);
@@ -419,7 +419,6 @@
                     });
                 }
 
-                // Lê busca vinda da página inicial (ex: produtos.html?busca=Bleach)
                 const buscaURL = new URLSearchParams(window.location.search).get('busca');
                 if (buscaURL && inputPesquisa) {
                     inputPesquisa.value = buscaURL;
@@ -433,8 +432,6 @@
 
         conectarMeuJSON();
     </script>
-</body>
-
 </body>
 
 </html>

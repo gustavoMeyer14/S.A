@@ -6,7 +6,6 @@ function fechaModalCliente() {
     document.getElementById('modalCliente').classList.remove('aberto');
 }
 
-// ==================== CONFIGURAÇÃO DA MÁSCARA DO CPF ====================
 window.addEventListener("DOMContentLoaded", function () {
     var inputCpf = document.getElementById('cpf');
     if (inputCpf) {
@@ -20,12 +19,10 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Algoritmo Oficial de Validação do CPF
 function cpfInvalido(rawCpf) {
     var cpf = rawCpf.replace(/\D/g, '');
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return true;
 
-    // Validação do primeiro dígito verificador
     var soma = 0;
     for (var i = 0; i < 9; i++) {
         soma += parseInt(cpf.charAt(i)) * (10 - i);
@@ -34,7 +31,6 @@ function cpfInvalido(rawCpf) {
     var digito1 = (resto === 10 || resto === 11) ? 0 : resto;
     if (digito1 !== parseInt(cpf.charAt(9))) return true;
 
-    // Validação do segundo dígito verificador
     soma = 0;
     for (var j = 0; j < 10; j++) {
         soma += parseInt(cpf.charAt(j)) * (11 - j);
@@ -45,7 +41,6 @@ function cpfInvalido(rawCpf) {
 
     return false;
 }
-// ========================================================================
 
 function validaLogin() {
     var email = document.frmlogin.txtemail.value;
@@ -97,16 +92,16 @@ function fechaModalLogin() {
 }
 
 function confirmaLogin() {
-    alert("Mensagem enviada com sucesso!");
+    localStorage.setItem('usuarioLogado', 'true');
+    alert("Login realizado com sucesso!");
     fechaModalLogin();
     document.frmlogin.reset();
+    window.location.href = "index.html";
 }
 
 function verificaMotivo(valor) {
     console.log("Formulário limpo");
 }
-
-//---------------------- CADASTRO  -------------------------//
 
 function validaCadastro() {
     var nome = document.frmcadastro.txtnome.value;
@@ -126,7 +121,6 @@ function validaCadastro() {
         return false;
     }
 
-    // Validação do CPF corrigida
     var cpf = document.frmcadastro.txtcpf.value;
     if (cpf.trim() === "") {
         alert("Por favor, preencha o Campo CPF!");
@@ -169,18 +163,12 @@ function fechaModalCadastro() {
 }
 
 function confirmaCadastro() {
-    alert("Mensagem enviada com sucesso!");
+    localStorage.setItem('usuarioLogado', 'true');
+    alert("Cadastro realizado com sucesso!");
     fechaModalCadastro();
     document.frmcadastro.reset();
+    window.location.href = "index.html";
 }
-
-// 6. EVITA O ERRO DO BOTÃO LIMPAR: Criação da função que faltava
-function verificaMotivo(valor) {
-    console.log("Formulário limpo");
-}
-
-
-/**=======================================   JAVASCRIPT CARRINHO   =================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
     const productsList = document.getElementById('products-list');
@@ -189,25 +177,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const addressForm = document.querySelector('.address-column');
     const btnBuy = document.querySelector('.btn-buy');
 
-    // Elementos do Cupom
     const couponInput = document.getElementById('coupon-input');
     const btnCoupon = document.getElementById('btn-coupon');
     const couponMessage = document.getElementById('coupon-message');
 
-    // === TABELA DE CUPONS VÁLIDOS (Código : Porcentagem de Desconto) ===
     const cuponsValidos = {
-        'SHADOW26': 0.10,  // 10% de desconto
-        'GEEK15': 0.15,    // 15% de desconto
-        'SHADOW50': 0.50   // 50% de desconto
+        'SHADOW26': 0.10,
+        'GEEK15': 0.15,
+        'SHADOW50': 0.50
     };
 
-    let descontoAtual = 0; // Inicia em 0%
+    let descontoAtual = 0;
     let cupomAtivo = '';
 
-    // 1. Busca os produtos salvos no localStorage (ou inicia lista vazia)
     let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
 
-    // Bloqueio de Compra se o carrinho estiver vazio
     if (btnBuy) {
         btnBuy.onclick = (e) => {
             if (carrinho.length === 0) {
@@ -217,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // === LÓGICA DE APLICAÇÃO DO CUPOM ===
     if (btnCoupon && couponInput) {
         btnCoupon.onclick = () => {
             const codigoDigitado = couponInput.value.trim().toUpperCase();
@@ -232,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cupomAtivo = codigoDigitado;
                 const porcText = Math.round(descontoAtual * 100) + '%';
                 exibirMensagemCupom(`Cupom ${codigoDigitado} aplicado! (-${porcText})`, '#00ff88');
-                renderizarCarrinho(); // Recalcular com o novo desconto
+                renderizarCarrinho();
             } else {
                 descontoAtual = 0;
                 cupomAtivo = '';
@@ -249,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Função para desenhar os produtos na tela e calcular totais
     function renderizarCarrinho() {
         if (!productsList) return;
 
@@ -291,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
         atualizarResumo(grandTotal, carrinho);
     }
 
-    // 3. Altera a quantidade ou remove o item se chegar a zero
     window.alterarQuantidade = function (index, delta) {
         carrinho[index].quantidade += delta;
 
@@ -303,14 +284,12 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarCarrinho();
     };
 
-    // 3.1. Remove o produto diretamente do carrinho
     window.removerProduto = function (index) {
         carrinho.splice(index, 1);
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();
     };
 
-    // 4. Atualiza os painéis de valor total (Com aplicação de Cupom)
     function atualizarResumo(grandTotal, itens) {
         if (!priceBreakdown) return;
 
@@ -326,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Aplicação do Desconto do Cupom
         let valorComDesconto = grandTotal;
         if (descontoAtual > 0 && grandTotal > 0) {
             const valorDesconto = grandTotal * descontoAtual;
@@ -340,13 +318,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         priceBreakdown.innerHTML = breakdownHTML;
 
-        // Atualiza o valor final no modal de pagamento
         if (modalTotalValue) {
             modalTotalValue.textContent = `Valor Total: R$ ${valorComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     }
 
-    // 5. Confirmação do Formulário de Pagamento
     if (addressForm) {
         addressForm.onsubmit = (e) => {
             e.preventDefault();
@@ -366,9 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarCarrinho();
 });
 
-
-// CADASTRAR CARTÃO //
-
 const inputNumero = document.getElementById('numero');
 const inputTitular = document.getElementById('titular');
 const inputValidade = document.getElementById('validade');
@@ -376,7 +349,6 @@ const inputCvv = document.getElementById('cvv');
 const inputEndereco = document.getElementById('endereco');
 const form = document.getElementById('formCartao');
 
-// Elementos do Modal
 const modal = document.getElementById('modalDados');
 const btnCorrigir = document.getElementById('btnCorrigir');
 const btnConfirmar = document.getElementById('btnConfirmar');
@@ -386,74 +358,79 @@ const resValidade = document.getElementById('resValidade');
 const resCvv = document.getElementById('resCvv');
 const resEndereco = document.getElementById('resEndereco');
 
-// Formata os 16 dígitos do cartão (0000 0000 0000 0000)
-inputNumero.addEventListener('input', (e) => {
-    let valor = e.target.value.replace(/\D/g, '').substring(0, 16);
-    e.target.value = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
-});
+if (inputNumero) {
+    inputNumero.addEventListener('input', (e) => {
+        let valor = e.target.value.replace(/\D/g, '').substring(0, 16);
+        e.target.value = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
+    });
+}
 
-// Deixa o nome do titular em maiúsculas
-inputTitular.addEventListener('input', (e) => {
-    e.target.value = e.target.value.toUpperCase();
-});
+if (inputTitular) {
+    inputTitular.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase();
+    });
+}
 
-// Formata a data de validade (MM/AA)
-inputValidade.addEventListener('input', (e) => {
-    let valor = e.target.value.replace(/\D/g, '').substring(0, 4);
-    if (valor.length >= 3) {
-        e.target.value = valor.slice(0, 2) + '/' + valor.slice(2);
-    } else {
-        e.target.value = valor;
-    }
-});
+if (inputValidade) {
+    inputValidade.addEventListener('input', (e) => {
+        let valor = e.target.value.replace(/\D/g, '').substring(0, 4);
+        if (valor.length >= 3) {
+            e.target.value = valor.slice(0, 2) + '/' + valor.slice(2);
+        } else {
+            e.target.value = valor;
+        }
+    });
+}
 
-// Permite apenas 3 números no CVV
-inputCvv.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
-});
+if (inputCvv) {
+    inputCvv.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+    });
+}
 
-// Validação e abertura do modal com os dados
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
+if (form) {
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    const numeroLimpo = inputNumero.value.replace(/\s/g, '');
-    if (numeroLimpo.length !== 16) {
-        alert('Por favor, insira os 16 dígitos do cartão.');
-        inputNumero.focus();
-        return;
-    }
+        const numeroLimpo = inputNumero.value.replace(/\s/g, '');
+        if (numeroLimpo.length !== 16) {
+            alert('Por favor, insira os 16 dígitos do cartão.');
+            inputNumero.focus();
+            return;
+        }
 
-    if (inputValidade.value.length !== 5) {
-        alert('Insira uma data de validade válida no formato MM/AA.');
-        inputValidade.focus();
-        return;
-    }
+        if (inputValidade.value.length !== 5) {
+            alert('Insira uma data de validade válida no formato MM/AA.');
+            inputValidade.focus();
+            return;
+        }
 
-    if (inputCvv.value.length !== 3) {
-        alert('O CVV deve conter exatamente 3 dígitos.');
-        inputCvv.focus();
-        return;
-    }
+        if (inputCvv.value.length !== 3) {
+            alert('O CVV deve conter exatamente 3 dígitos.');
+            inputCvv.focus();
+            return;
+        }
 
-    // Preenche os dados no modal
-    resNumero.textContent = inputNumero.value;
-    resTitular.textContent = inputTitular.value;
-    resValidade.textContent = inputValidade.value;
-    resCvv.textContent = inputCvv.value;
-    resEndereco.textContent = inputEndereco.value;
+        resNumero.textContent = inputNumero.value;
+        resTitular.textContent = inputTitular.value;
+        resValidade.textContent = inputValidade.value;
+        resCvv.textContent = inputCvv.value;
+        resEndereco.textContent = inputEndereco.value;
 
-    // Abre o modal na tela
-    modal.showModal();
-});
+        modal.showModal();
+    });
+}
 
-// Botão Corrigir: fecha o modal mantendo os dados preenchidos para edição
-btnCorrigir.addEventListener('click', () => {
-    modal.close();
-});
+if (btnCorrigir) {
+    btnCorrigir.addEventListener('click', () => {
+        modal.close();
+    });
+}
 
-// Botão Confirmar Cadastro: confirma o envio, fecha o modal e limpa o formulário
-btnConfirmar.addEventListener('click', () => {
-    modal.close();
-    alert('Cartão cadastrado com sucesso!');
-    form.reset();
-});
+if (btnConfirmar) {
+    btnConfirmar.addEventListener('click', () => {
+        modal.close();
+        alert('Cartão cadastrado com sucesso!');
+        form.reset();
+    });
+}
