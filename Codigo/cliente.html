@@ -21,7 +21,8 @@
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
                 <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png"></button>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
+                        src="imagens/Usuario.png"></button>
             </nav>
         </div>
     </header>
@@ -40,7 +41,7 @@
 
     <h2 style="font-size: 35px; margin: 20px;">Login</h2>
 
-    <form name="frmlogin" method="post" action="#" onsubmit="return validaLogin()" class="formLogin"
+    <form name="frmlogin" method="post" action="#" onsubmit="event.preventDefault(); validaLogin();" class="formLogin"
         style="height: 360px; width: 925px;">
         <fieldset class="login">
             <div class="colunas">
