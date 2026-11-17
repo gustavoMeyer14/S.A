@@ -87,20 +87,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        async function carregarBaseClientes() {
-            if (!localStorage.getItem('clientesShadowRealm')) {
-                try {
-                   const res = await fetch('clientes.json');
-                   const clientes = await res.json();
-                    localStorage.setItem('clientesShadowRealm', JSON.stringify(clientes));
-                }
-
-            }
-            
-        }
-    </script>
 </body>
 
 </html>
