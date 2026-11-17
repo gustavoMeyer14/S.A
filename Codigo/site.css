@@ -1035,12 +1035,41 @@ option:hover {
   font-size: 1.1rem;
 }
 
-.modalProduto {
-  width: 1500px;
-  height: 1000px;
+/* Estilo base comum para qualquer <dialog> aberto */
+dialog[open] {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+
+  background-color: #1e1e1e;
+  color: #ffffff;
   border: 1px solid #C62828;
   border-radius: 20px;
-  background-color: #151515;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+
+/* 1. Modal de Descrição do Produto e Carrinho */
+.modalProduto[open] {
+  width: 1500px;
+  max-width: 95vw;
+  height: 900px;
+  max-height: 90vh;
+  text-align: left;
+  overflow-y: auto;
+  font-size: 25px;
+  padding: 20px;
 }
 
 .modalProduto img {
@@ -1057,30 +1086,67 @@ option:hover {
   color: #ffffff;
 }
 
-dialog[open] {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+/* 2. Modal de Aviso de Login */
+#modalAvisoLogin[open] {
+  width: 500px;
+  max-width: 90vw;
+  height: auto;
+  padding: 30px;
+  text-align: center;
+  gap: 20px;
+}
 
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  margin: 0;
-
-  background-color: #1e1e1e;
+#modalAvisoLogin h2 {
+  font-size: 28px;
   color: #ffffff;
-  border: 1px solid #C62828;
+  border-bottom: 1px solid #C62828;
+  padding-bottom: 10px;
+}
+
+#modalAvisoLogin p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #e0e0e0;
+}
+
+#modalAvisoLogin footer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0 0 0;
+  padding: 15px 0 0 0;
+  border-top: 1px solid #C62828;
+}
+
+#modalAvisoLogin footer button {
+  padding: 10px 18px;
   border-radius: 20px;
-  width: 1500px;
-  height: 900px;
+  border: 1px solid #C62828;
+  background-color: #C62828;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  text-align: left;
+#modalAvisoLogin footer button:first-child {
+  background-color: #2b2b2b;
+}
 
-  overflow: hidden;
-  box-sizing: border-box;
-  font-size: 25px;
+#modalAvisoLogin footer button:hover {
+  background-color: #151515;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(198, 40, 40, 0.5);
+}
+
+/* 3. Modal de Confirmação do Cartão (cadastrocartao.html) */
+dialog.menor[open] {
+  width: 550px;
+  max-width: 90vw;
+  height: auto;
+  padding: 25px;
+  font-size: 18px;
 }
 
 .btnCartão {
