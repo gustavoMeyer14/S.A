@@ -40,7 +40,7 @@ footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center; /* Centraliza os cards automaticamente */
-  gap: 40px;               /* Substitui os margins manuais entre cards */
+  gap: 20px;               /* Substitui os margins manuais entre cards */
   
   margin: 50px auto;       /* Centraliza a caixa preta na tela */
   width: 90%;              /* Se adapta a qualquer monitor */
