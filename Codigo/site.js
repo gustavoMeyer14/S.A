@@ -86,7 +86,8 @@ async function validaLogin() {
     }
 
     var senha = document.frmlogin.txtsenha.value;
-    var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    // Aceita letras, números e caracteres especiais como @ (mínimo 8 caracteres)
+    var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
         alert("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.");
@@ -95,16 +96,34 @@ async function validaLogin() {
     }
 
     var usuariosJSON = [];
+    var clientesJSON = [];
+
     try {
-        var resposta = await fetch('usuarios.json');
-        if (resposta.ok) {
-            usuariosJSON = await resposta.json();
-        }
+        var respUsuarios = await fetch('usuarios.json');
+        if (respUsuarios.ok) usuariosJSON = await respUsuarios.json();
     } catch (e) {
+        console.warn("Aviso: fetch de usuarios.json bloqueado (abra com Live Server).");
+    }
+
+    try {
+        var respClientes = await fetch('clientes.json');
+        if (respClientes.ok) clientesJSON = await respClientes.json();
+    } catch (e) {
+        console.warn("Aviso: fetch de clientes.json bloqueado (abra com Live Server).");
+    }
+
+    // Fallback caso o site seja aberto via duplo-clique (file://) sem servidor local
+    if (usuariosJSON.length === 0 && clientesJSON.length === 0) {
+        usuariosJSON = [
+            { nome: "Admin Shadow", email: "admin@shadowrealm.com", senha: "admin123", cpf: "111.111.111-11" },
+            { nome: "Cliente Teste", email: "teste@gmail.com", senha: "teste123", cpf: "222.222.222-22" },
+            { nome: "João da Silva", email: "joao.silva@example.com", senha: "senha123", cpf: "123.456.789-00" },
+            { nome: "Maria Oliveira", email: "maria.oliveira@example.com", senha: "senha456", cpf: "987.654.321-00" }
+        ];
     }
 
     var usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
-    var todosUsuarios = usuariosJSON.concat(usuariosLocais);
+    var todosUsuarios = usuariosJSON.concat(clientesJSON, usuariosLocais);
 
     var usuarioValido = todosUsuarios.find(function (u) {
         return u.email.toLowerCase() === email.toLowerCase() && u.senha === senha;
@@ -163,14 +182,13 @@ function validaCadastro() {
     var nome = document.frmcadastro.txtnome.value;
     var expRegnome = /^[A-ZÀ-Ú][a-zà-ú]+(\s+[A-ZÀ-Ú][a-zà-ú]+)+$/i;
     if (!expRegnome.test(nome.trim())) {
-        alert("Preencha o Campo Nome completo!!!");
+        alert("Preencha o Campo Nome completo (nome e sobrenome)!!!");
         document.frmcadastro.txtnome.focus();
         return false;
     }
 
     var email = document.frmcadastro.txtemail.value;
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-
     if (!expRegemail.test(email.trim())) {
         alert("Preencha o Campo Email ou formato inválido !!!");
         document.frmcadastro.txtemail.focus();
@@ -178,20 +196,14 @@ function validaCadastro() {
     }
 
     var cpf = document.frmcadastro.txtcpf.value;
-    if (cpf.trim() === "") {
-        alert("Por favor, preencha o Campo CPF!");
-        document.frmcadastro.txtcpf.focus();
-        return false;
-    }
-    if (cpfInvalido(cpf)) {
+    if (cpf.trim() === "" || cpfInvalido(cpf)) {
         alert("CPF inválido! Verifique os números digitados.");
         document.frmcadastro.txtcpf.focus();
         return false;
     }
 
     var senha = document.frmcadastro.txtsenha.value;
-    var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
+    var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
         alert("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.");
         document.frmcadastro.txtsenha.focus();
@@ -219,10 +231,34 @@ function fechaModalCadastro() {
 }
 
 function confirmaCadastro() {
+    var f = document.frmcadastro;
+    var novoUsuario = {
+        nome: f.txtnome.value.trim(),
+        email: f.txtemail.value.trim().toLowerCase(),
+        cpf: f.txtcpf.value.trim(),
+        senha: f.txtsenha.value
+    };
+
+    var usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
+
+    var jaExiste = usuariosLocais.some(function (u) {
+        return u.email === novoUsuario.email || u.cpf === novoUsuario.cpf;
+    });
+
+    if (jaExiste) {
+        alert("Este e-mail ou CPF já está cadastrado!");
+        fechaModalCadastro();
+        return;
+    }
+
+    usuariosLocais.push(novoUsuario);
+    localStorage.setItem('usuariosShadowRealm', JSON.stringify(usuariosLocais));
     localStorage.setItem('usuarioLogado', 'true');
+    localStorage.setItem('usuarioAtual', novoUsuario.email);
+
     alert("Cadastro realizado com sucesso!");
     fechaModalCadastro();
-    document.frmcadastro.reset();
+    f.reset();
     window.location.href = "index.html";
 }
 
@@ -444,9 +480,88 @@ if (inputCvv) {
     });
 }
 
+function validarValidadeCartao(validade) {
+    if (!/^\d{2}\/\d{2}$/.test(validade)) return false;
+
+    const [mesStr, anoStr] = validade.split('/');
+    const mes = parseInt(mesStr, 10);
+    const ano = 2000 + parseInt(anoStr, 10);
+
+    if (mes < 1 || mes > 12) return false;
+
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth() + 1;
+
+    if (ano < anoAtual || (ano === anoAtual && mes < mesAtual)) {
+        return false;
+    }
+    return true;
+}
+
+// Renderiza os cartões salvos na tela
+function renderizarCartoesSalvos() {
+    const container = document.getElementById('listaCartoesSalvos');
+    if (!container) return;
+
+    const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+
+    if (cartoes.length === 0) {
+        container.innerHTML = '<p style="color: #aaa; font-size: 18px;">Nenhum cartão cadastrado ainda.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    cartoes.forEach((cartao, index) => {
+        const tipo = index === 0 ? 'Cartão Principal' : 'Cartão Secundário';
+        const botaoPrincipal = index === 1
+            ? `<button type="button" class="btn-secundario-cartao" onclick="definirCartaoPrincipal(${index})">Tornar Principal</button>`
+            : '';
+
+        const div = document.createElement('div');
+        div.className = 'card-cartao-salvo';
+        div.innerHTML = `
+            <span class="badge-cartao">${tipo}</span>
+            <p class="numero-mascarado">${cartao.numeroMascarado}</p>
+            <p><strong>Titular:</strong> ${cartao.titular}</p>
+            <p><strong>Validade:</strong> ${cartao.validade}</p>
+            <div class="acoes-cartao">
+                ${botaoPrincipal}
+                <button type="button" class="btn-remover-cartao" onclick="removerCartao(${index})">Remover</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+window.removerCartao = function (index) {
+    if (!confirm('Deseja realmente remover este cartão?')) return;
+
+    const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+    cartoes.splice(index, 1);
+    localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
+    renderizarCartoesSalvos();
+};
+
+window.definirCartaoPrincipal = function (index) {
+    const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+    if (index === 1 && cartoes.length === 2) {
+        // Inverte a posição: o secundário vira índice 0 (Principal)
+        [cartoes[0], cartoes[1]] = [cartoes[1], cartoes[0]];
+        localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
+        renderizarCartoesSalvos();
+    }
+};
+
 if (form) {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+
+        const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+        if (cartoes.length >= 2) {
+            alert('Você já atingiu o limite de 2 cartões (Principal e Secundário). Remova um para cadastrar outro.');
+            return;
+        }
 
         const numeroLimpo = inputNumero.value.replace(/\s/g, '');
         if (numeroLimpo.length !== 16) {
@@ -455,8 +570,15 @@ if (form) {
             return;
         }
 
-        if (inputValidade.value.length !== 5) {
-            alert('Insira uma data de validade válida no formato MM/AA.');
+        const numeroMascarado = '**** **** **** ' + numeroLimpo.slice(-4);
+        const jaCadastrado = cartoes.some(c => c.numeroMascarado === numeroMascarado && c.validade === inputValidade.value);
+        if (jaCadastrado) {
+            alert('Este cartão já está cadastrado!');
+            return;
+        }
+
+        if (!validarValidadeCartao(inputValidade.value)) {
+            alert('Data de validade inválida ou cartão vencido! Use o formato MM/AA.');
             inputValidade.focus();
             return;
         }
@@ -485,8 +607,25 @@ if (btnCorrigir) {
 
 if (btnConfirmar) {
     btnConfirmar.addEventListener('click', () => {
+        const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+        const numeroLimpo = inputNumero.value.replace(/\s/g, '');
+
+        cartoes.push({
+            numeroMascarado: '**** **** **** ' + numeroLimpo.slice(-4),
+            final: numeroLimpo.slice(-4),
+            titular: inputTitular.value.trim(),
+            validade: inputValidade.value,
+            endereco: inputEndereco.value.trim()
+        });
+
+        localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
+
         modal.close();
-        alert('Cartão cadastrado com sucesso!');
+        alert(cartoes.length === 1 ? 'Cartão Principal cadastrado com sucesso!' : 'Cartão Secundário cadastrado com sucesso!');
         form.reset();
+        renderizarCartoesSalvos();
     });
 }
+
+// Carrega os cartões salvos assim que a página abre
+renderizarCartoesSalvos();

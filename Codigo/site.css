@@ -1318,3 +1318,87 @@ dialog .btn-fechar {
   color: #ffffff;
   transform: scale(1.08);
 }
+
+
+/* bagulho dos cartões salvos / cadastrados lá no cadastrocartao.html */
+
+.cartoes-salvos-container {
+  width: 95%;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 25px;
+  background-color: #000000;
+  border: 2px solid #C62828;
+  border-radius: 20px;
+}
+
+.cartoes-salvos-container h2 {
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+.lista-cartoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.card-cartao-salvo {
+  background-color: #262626;
+  border: 1px solid #C62828;
+  border-radius: 15px;
+  padding: 20px;
+  width: 380px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.badge-cartao {
+  background-color: #C62828;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  align-self: flex-start;
+}
+
+.numero-mascarado {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: 5px 0;
+}
+
+.acoes-cartao {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-remover-cartao,
+.btn-secundario-cartao {
+  padding: 8px 14px;
+  border-radius: 15px;
+  border: 1px solid #C62828;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-remover-cartao {
+  background-color: #5a0d0d;
+}
+
+.btn-secundario-cartao {
+  background-color: #151515;
+}
+
+.btn-remover-cartao:hover,
+.btn-secundario-cartao:hover {
+  background-color: #C62828;
+}

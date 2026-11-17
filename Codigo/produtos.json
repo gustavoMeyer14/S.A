@@ -12,7 +12,7 @@
     {
         "id": "2",
         "nome": "Kisuke Urahara",
-        "preco": 360.00,
+        "preco": 460.00,
         "categoria": "Bleach",
         "pagina": "produtos.html",
         "descricao": "Escala: 1/6 (~30 cm), em resina de alto padrão. Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do chapéu listrado (inclui cabeça extra com expressão séria). Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta, acompanhado da bengala no ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha. Base Diorama: Telhas de Karakura com lanterna apagada, Yoruichi em forma de gato preto na ponta e um frasco de Mod-Soul escondido.",
@@ -27,7 +27,7 @@
         "pagina": "produtos.html",
         "descricao": "Escala: 1/6 (~31 cm), em resina de alto padrão. Pose e Expressão: Em postura de ataque intenso com expressão feroz e sobrancelhas tatuadas em destaque. Vestes e Armas: Uniforme de Tenente da 6ª Divisão com faixa branca na testa e a Zabimaru em sua forma Shikai segmentada estendendo-se ao redor da figure. Base Diorama: Rocha esculpida com marcas de impacto e poeira levantada.",
         "destaque": true,
-        "imagem": "imagens/renji.png"
+        "imagem": "imagens/renje.png"
     },
     {
         "id": "4",
@@ -87,7 +87,7 @@
         "pagina": "index.html",
         "descricao": "Escala: 1/6 (~27 cm), em resina de alto padrão. Pose e Expressão: Agachado sobre a superfície da água em postura ágil de ninja, pronto para o bote com olhar focado. Vestes e Poderes: Cachecol longo e fluido esculpido com movimento dinâmico e duas Water Shurikens gigantes em resina azul translúcida com efeito de respingos. Base Diorama: Onda cristalina quebrando sobre rochas submersas.",
         "destaque": false,
-        "imagem": "imagens/Canva - download(1).png"
+        "imagem": "imagens/Canva - download (1).png"
     },
     {
         "id": "10",
