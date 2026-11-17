@@ -40,7 +40,7 @@ footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center; /* Centraliza os cards automaticamente */
-  gap: 40px;               /* Substitui os margins manuais entre cards */
+  gap: 20px;               /* Substitui os margins manuais entre cards */
   
   margin: 50px auto;       /* Centraliza a caixa preta na tela */
   width: 90%;              /* Se adapta a qualquer monitor */
@@ -60,7 +60,6 @@ footer {
   margin-bottom: 10px;
 }
 
-/* O ">" garante que esse estilo só pegue os cards, sem estragar os modais */
 .destaques > div {
   width: 250px;
   height: 350px;
@@ -212,15 +211,21 @@ footer {
 }
 
 .modalCliente-conteudo {
-  background-color: #000000;
+  background-color: #262626;
   color: #ffffff;
-  width: 700px;
+  width: 500px;
   height: 600px;
   overflow-y: auto;
   padding: 30px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
   border: 1px solid #C62828;
+  align-items: center;
+}
+
+.modalCliente-conteudo h2 {
+  font-size: 35px;
+  border-bottom: 1px solid #C62828;
 }
 
 .aberto {
@@ -234,7 +239,7 @@ footer {
 
 .nav-usuario a {
   width: 250px;
-  height: 70px;
+  height: 65px;
   color: #ffffff;
   float: left;
   text-decoration: none;
@@ -243,8 +248,8 @@ footer {
   border: 1px solid #C62828;
   margin: 30px;
   margin-left: 50px;
-  padding: 5px;
-  font-size: 30px;
+  padding: 15px;
+  font-size: 25px;
 }
 
 .nav-usuario a:hover {
@@ -256,13 +261,13 @@ footer {
 
 .botaoFecharCliente {
   width: 300px;
-  height: 70px;
+  height: 50px;
   border-radius: 20px;
   background-color: #C62828;
   border: 1px solid #C62828;
   color: #ffffff;
-  margin-top: 20px;
-  font-size: 30px;
+  margin-top: 60px;
+  font-size: 25px;
 }
 
 .botaoFecharCliente:hover {
@@ -1258,4 +1263,88 @@ dialog .btn-fechar {
   border-color: #C62828;
   color: #ffffff;
   transform: scale(1.08);
+}
+
+
+/* bagulho dos cartões salvos / cadastrados lá no cadastrocartao.html */
+
+.cartoes-salvos-container {
+  width: 95%;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 25px;
+  background-color: #000000;
+  border: 2px solid #C62828;
+  border-radius: 20px;
+}
+
+.cartoes-salvos-container h2 {
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+.lista-cartoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.card-cartao-salvo {
+  background-color: #262626;
+  border: 1px solid #C62828;
+  border-radius: 15px;
+  padding: 20px;
+  width: 380px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.badge-cartao {
+  background-color: #C62828;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  align-self: flex-start;
+}
+
+.numero-mascarado {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: 5px 0;
+}
+
+.acoes-cartao {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-remover-cartao,
+.btn-secundario-cartao {
+  padding: 8px 14px;
+  border-radius: 15px;
+  border: 1px solid #C62828;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-remover-cartao {
+  background-color: #5a0d0d;
+}
+
+.btn-secundario-cartao {
+  background-color: #151515;
+}
+
+.btn-remover-cartao:hover,
+.btn-secundario-cartao:hover {
+  background-color: #C62828;
 }

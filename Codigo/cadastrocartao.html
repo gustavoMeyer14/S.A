@@ -8,7 +8,7 @@
     <meta name="author" content="Shadow Realm">
     <title>Shadow Realm Store - Cadastro de Cartão</title>
     <link rel="stylesheet" href="site.css">
-    <link rel="stylesheet" href="site.js">
+    <script src="site.js" defer></script>
 </head>
 
 <body>
@@ -29,13 +29,13 @@
 
     <div class="modalCliente" id="modalCliente">
         <div class="modalCliente-conteudo">
-            <h2 style="font-size: 30px;">- Menu do usuário -</h2>
+            <h2>- Menu do usuário -</h2>
             <nav class="nav-usuario">
-                <a href="cadastro.html">cadastro</a>
+                <a href="cadastro.html">Cadastro</a>
                 <a href="cliente.html">Login</a>
                 <a href="cadastrocartao.html">Cadastrar cartão</a>
-                <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
             </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
         </div>
     </div>
 
@@ -73,10 +73,16 @@
 
             </fieldset>
         </form>
+
+        <!-- Área onde os cartões cadastrados vão aparecer -->
+        <section class="cartoes-salvos-container">
+            <h2>Meus Cartões Cadastrados (Máx. 2)</h2>
+            <div id="listaCartoesSalvos" class="lista-cartoes"></div>
+        </section>
     </main>
 
     <!-- Modal com os dados preenchidos -->
-    <dialog id="modalDados" style="width: 500px; height: 300px;">
+    <dialog class="menor" id="modalDados">
         <h3>Confira os Dados do Cartão</h3>
         <div id="conteudoModal">
             <p><strong>Número do cartão:</strong> <span id="resNumero"></span></p>

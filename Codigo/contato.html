@@ -37,13 +37,13 @@
 
     <div class="modalCliente" id="modalCliente">
         <div class="modalCliente-conteudo">
-            <h2 style="font-size: 30px;">- Menu do usuário -</h2>
+            <h2>- Menu do usuário -</h2>
             <nav class="nav-usuario">
-                <a href="cadastro.html">cadastro</a>
+                <a href="cadastro.html">Cadastro</a>
                 <a href="cliente.html">Login</a>
                 <a href="cadastrocartao.html">Cadastrar cartão</a>
-                <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
             </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
         </div>
     </div>
 
@@ -63,8 +63,7 @@
         <section class="contato-section">
 
 
-            <form action="#" method="post" class="contato-form" id="contato">
-
+                <form action="#" method="post" class="contato-form" id="contato" onsubmit="enviarContato(event)">
                 <div class="colunas">
                     <label for="nome">Nome completo:</label>
                     <input type="text" id="nome" name="nome" class="contato-form" placeholder="Digite seu nome"
@@ -91,10 +90,9 @@
                 </div>
 
                 <div class="colunasBotao">
-                    <button type="reset">Limpar</button><button type="reset" onclick="abreMensagem()">Enviar
-                        Mensagem</button>
+                    <button type="reset">Limpar</button>
+                    <button type="submit">Enviar Mensagem</button>
                 </div>
-
             </form>
         </section>
 
@@ -141,14 +139,21 @@
                     para enviar suas dúvidas e enviaremos nossa reposta por meio de e-mail.
                 </p>
             </div>
-
         </section>
-
     </main>
 
     <footer>
         <p>&copy; 2026 Shadow Realm Store - Todos os direitos reservados.</p>
     </footer>
+
+    <script>
+    function enviarContato(event) {
+        event.preventDefault(); 
+        const resultado = document.getElementById('resultado');
+        resultado.classList.remove('escondida');
+        event.target.reset();
+    }
+</script>
 
 </body>
 
