@@ -365,7 +365,7 @@
                     const termoBusca = inputPesquisa ? limparTexto(inputPesquisa.value) : '';
 
                     const secao = document.querySelector('.destaques');
-                    const cards = Array.from(secao.querySelectorAll('div'));
+                    const cards = Array.from(secao.querySelectorAll(':scope > div'));
                     let visiveis = 0;
 
                     cards.forEach(card => {
