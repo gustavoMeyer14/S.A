@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Realm Store - Meus Pedidos</title>
+    <link rel="stylesheet" href="site.css">
+    <script src="site.js" defer></script>
+    <script src="shopee.js" defer></script>
+
+    <style>
+        .container-pedidos {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #0d0d0d;
+            border: 2px solid #b82929;
+            border-radius: 15px;
+            color: #ffffff;
+        }
+
+        .container-pedidos h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .card-pedido {
+            background-color: #1f1f1f;
+            border: 1px solid #b82929;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .cabecalho-pedido {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-pedido {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-cancelado {
+            background-color: #6c757d;
+        }
+
+        .item-pedido {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .item-pedido img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .rodape-pedido {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+
+        .acoes-pedido {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-rastrear {
+            background-color: #b82929;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-rastrear:hover {
+            background-color: #ff4d4d;
+        }
+
+        .btn-cancelar {
+            background-color: transparent;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-cancelar:hover {
+            background-color: #ff4d4d;
+            color: #ffffff;
+        }
+
+        .modalRastreio[open] {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 2px solid #b82929;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 450px;
+            width: 90%;
+            text-align: left;
+        }
+
+        .modalRastreio::backdrop {
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+
+        .etapa-rastreio {
+            border-left: 3px solid #b82929;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+
+        /* Controle das abas internas */
+        .aba-sistema {
+            display: none;
+        }
+
+        .aba-sistema.ativa {
+            display: block;
+        }
+
+        .campo-form {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1f1f1f;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        /* Barra rápida de abas dentro de Pedidos */
+        .subnav-pedidos {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <div class="nav">
+            <nav>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png" alt="Usuário"></button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2>- Menu do usuário -</h2>
+            <nav class="nav-usuario">
+                <a href="cadastro.html">Cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+            </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+        </div>
+    </div>
+
+    <main class="container-pedidos">
+        <!-- Navegação entre as abas sem perder o menu principal do site -->
+        <div class="subnav-pedidos">
+            <button type="button" class="btn-rastrear" onclick="mostrarAba('aba-pedidos')">Meus Pedidos</button>
+            <button type="button" class="btn-cancelar" onclick="mostrarAba('aba-produtos')">Compra Rápida</button>
+            <button type="button" class="btn-cancelar" onclick="mostrarAba('aba-carrinho')">Mini Carrinho</button>
+        </div>
+
+        <!-- ABA 1: MEUS PEDIDOS -->
+        <section id="aba-pedidos" class="aba-sistema ativa">
+            <h2>- Meus Pedidos -</h2>
+            <div id="lista-pedidos"></div>
+        </section>
+
+        <!-- ABA 2: PRODUTOS -->
+        <section id="aba-produtos" class="aba-sistema">
+            <h2>- Produtos -</h2>
+            <div class="card-pedido" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Action Figure Shadow Monarch</strong>
+                    <p style="color: #bbb; font-size: 14px;">R$ 249,90</p>
+                </div>
+                <button type="button" class="btn-rastrear" onclick="comprarItem('Action Figure Shadow Monarch', 249.90, 'imagens/produto.png')">Comprar</button>
+            </div>
+            <div class="card-pedido" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Action Figure Gojo Satoru</strong>
+                    <p style="color: #bbb; font-size: 14px;">R$ 299,90</p>
+                </div>
+                <button type="button" class="btn-rastrear" onclick="comprarItem('Action Figure Gojo Satoru', 299.90, 'imagens/produto.png')">Comprar</button>
+            </div>
+        </section>
+
+        <!-- ABA 3: CARRINHO -->
+        <section id="aba-carrinho" class="aba-sistema">
+            <h2>- Carrinho -</h2>
+            <div id="lista-carrinho"></div>
+            <div class="rodape-pedido">
+                <strong id="total-carrinho">Total: R$ 0,00</strong>
+                <button type="button" class="btn-rastrear" onclick="finalizarCompra()">Finalizar Pedido</button>
+            </div>
+        </section>
+
+        <!-- ABA 4: LOGIN -->
+        <section id="aba-login" class="aba-sistema">
+            <h2>- Login do Cliente -</h2>
+            <div style="max-width: 400px; margin: 0 auto;">
+                <input type="text" id="login-cpf" class="campo-form" placeholder="Digite seu CPF ou E-mail">
+                <button type="button" class="btn-rastrear" style="width: 100%;" onclick="entrarCliente()">Entrar</button>
+            </div>
+        </section>
+    </main>
+
+    <dialog id="modal-rastreio" class="modalRastreio">
+        <h2 id="titulo-rastreio" class="titulo-rastreio">- Rastreamento -</h2>
+        <p id="codigo-rastreio" style="color: #bbb; font-size: 14px; margin-bottom: 15px;"></p>
+        <div id="etapas-rastreio"></div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button type="button" class="btn-rastrear" onclick="document.getElementById('modal-rastreio').close()">Fechar</button>
+        </div>
+    </dialog>
+
+    <footer>
+        &copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.
+    </footer>
+
+    <script>
+        // Helper para compatibilizar o login oficial (site.js) com o login desta tela
+        function obterUsuarioAtivo() {
+            const logadoOficial = localStorage.getItem('usuarioLogado') === 'true';
+            const emailOficial = localStorage.getItem('usuarioAtual');
+            if (logadoOficial && emailOficial) {
+                return { identificador: emailOficial };
+            }
+
+            const clienteLocal = JSON.parse(localStorage.getItem('clienteLogado'));
+            if (clienteLocal && clienteLocal.cpf) {
+                return { identificador: clienteLocal.cpf };
+            }
+
+            return null;
+        }
+
+        // Troca entre as abas sem sair da página
+        function mostrarAba(idAba) {
+            document.querySelectorAll('.aba-sistema').forEach(aba => aba.classList.remove('ativa'));
+            document.getElementById(idAba).classList.add('ativa');
+
+            if (idAba === 'aba-pedidos') carregarPedidos();
+            if (idAba === 'aba-carrinho') carregarCarrinho();
+        }
+
+        // Login rápido sincronizado com o site.js
+        function entrarCliente() {
+            const identificador = document.getElementById('login-cpf').value.trim();
+            if (!identificador) return alert('Informe o CPF ou E-mail!');
+
+            localStorage.setItem('clienteLogado', JSON.stringify({ cpf: identificador }));
+            localStorage.setItem('usuarioLogado', 'true');
+            localStorage.setItem('usuarioAtual', identificador);
+            if (!localStorage.getItem('usuarioNome')) {
+                localStorage.setItem('usuarioNome', identificador.split('@')[0]);
+            }
+
+            alert('Login realizado!');
+            mostrarAba('aba-pedidos');
+        }
+
+        // Adicionar ao carrinho
+        function comprarItem(nome, preco, imagem) {
+            const carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+            const existente = carrinho.find(item => item.nome === nome);
+            if (existente) {
+                existente.quantidade += 1;
+            } else {
+                carrinho.push({ nome, preco, imagem, quantidade: 1 });
+            }
+            localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+            alert('Adicionado ao carrinho!');
+        }
+
+        // Exibir carrinho
+        function carregarCarrinho() {
+            const carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+            const container = document.getElementById('lista-carrinho');
+            if (carrinho.length === 0) {
+                container.innerHTML = '<p style="text-align: center;">Seu carrinho está vazio.</p>';
+                document.getElementById('total-carrinho').innerText = 'Total: R$ 0,00';
+                return;
+            }
+            let total = 0;
+            container.innerHTML = carrinho.map(item => {
+                total += item.preco * item.quantidade;
+                return `<div class="card-pedido"><strong>${item.nome}</strong> (${item.quantidade}x) - R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}</div>`;
+            }).join('');
+            document.getElementById('total-carrinho').innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        // Finalizar compra -> salva no formato compatível com carregarPedidos()
+        function finalizarCompra() {
+            const usuarioAtivo = obterUsuarioAtivo();
+            if (!usuarioAtivo) {
+                alert('Faça login primeiro!');
+                mostrarAba('aba-login');
+                return;
+            }
+            const carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+            if (carrinho.length === 0) return alert('Carrinho vazio!');
+
+            const todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            todosPedidos.push({
+                numeroPedido: Math.floor(1000 + Math.random() * 9000),
+                clienteCpf: usuarioAtivo.identificador,
+                data: new Date().toLocaleDateString('pt-BR'),
+                cartaoUsado: 'Cartão',
+                status: 'Pedido Confirmado',
+                total: carrinho.reduce((s, i) => s + (i.preco * i.quantidade), 0),
+                itens: carrinho
+            });
+
+            localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
+            localStorage.removeItem('carrinhoShadowRealm');
+            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+            mostrarAba('aba-pedidos');
+        }
+
+        // Carregar lista de pedidos do usuário
+        function carregarPedidos() {
+            const container = document.getElementById('lista-pedidos');
+            const usuarioAtivo = obterUsuarioAtivo();
+
+            if (!usuarioAtivo) {
+                container.innerHTML = `<p style="text-align: center;">Você precisa <a href="cliente.html" style="color: #ff4d4d;">fazer login</a> para visualizar seus pedidos.</p>`;
+                return;
+            }
+
+            const todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            // Filtra os pedidos do usuário atual (ou exibe pedidos feitos sem identificador no carrinho.html)
+            const meusPedidos = todosPedidos.filter(p => !p.clienteCpf || p.clienteCpf === usuarioAtivo.identificador);
+
+            if (meusPedidos.length === 0) {
+                container.innerHTML = `<p style="text-align: center;">Você ainda não realizou nenhum pedido.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            meusPedidos.slice().reverse().forEach((pedido, idx) => {
+                const numPedido = pedido.numeroPedido || (1000 + idx);
+                const statusAtual = pedido.status || 'Pedido Confirmado';
+                const totalPedido = typeof pedido.total === 'number'
+                    ? pedido.total
+                    : (pedido.itens || []).reduce((s, i) => s + (i.preco * i.quantidade), 0);
+
+                const estaCancelado = statusAtual === 'Pedido Cancelado';
+                const classeStatus = estaCancelado ? 'status-pedido status-cancelado' : 'status-pedido';
+
+                let itensHTML = '';
+                (pedido.itens || []).forEach(item => {
+                    itensHTML += `
+                        <div class="item-pedido">
+                            <img src="${item.imagem || 'imagens/produto.png'}" alt="${item.nome}">
+                            <div>
+                                <p><strong>${item.nome}</strong></p>
+                                <p>Quantidade: ${item.quantidade} | Unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const botoesHTML = estaCancelado
+                    ? '<span style="color: #999; font-size: 14px;">Este pedido foi cancelado.</span>'
+                    : `
+                        <button type="button" class="btn-rastrear" onclick="abrirRastreio(${numPedido}, '${pedido.data}')">Rastrear Entrega</button>
+                        <button type="button" class="btn-cancelar" onclick="cancelarPedido(${numPedido})">Cancelar Pedido</button>
+                      `;
+
+                container.innerHTML += `
+                    <div class="card-pedido">
+                        <div class="cabecalho-pedido">
+                            <div>
+                                <strong>Pedido #${numPedido}</strong>
+                                <p style="font-size: 13px; color: #bbb;">Data: ${pedido.data} | Pagamento: ${pedido.cartaoUsado || 'Pix / Cartão'}</p>
+                            </div>
+                            <span class="${classeStatus}">${statusAtual}</span>
+                        </div>
+                        ${itensHTML}
+                        <div class="rodape-pedido">
+                            <div class="acoes-pedido">
+                                ${botoesHTML}
+                            </div>
+                            <div style="font-size: 18px;">
+                                Total: <strong>R$ ${totalPedido.toFixed(2).replace('.', ',')}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function abrirRastreio(numeroPedido, dataPedido) {
+            document.getElementById('titulo-rastreio').innerText = `- Pedido #${numeroPedido} -`;
+            document.getElementById('codigo-rastreio').innerText = `Código de rastreio: SR${numeroPedido}BR`;
+
+            document.getElementById('etapas-rastreio').innerHTML = `
+                <div class="etapa-rastreio">
+                    <p><strong>Pedido Confirmado</strong></p>
+                    <p style="font-size: 13px; color: #bbb;">${dataPedido} - Pagamento aprovado.</p>
+                </div>
+                <div class="etapa-rastreio">
+                    <p><strong>Em Separação no Estoque</strong></p>
+                    <p style="font-size: 13px; color: #bbb;">${dataPedido} - Suas figures estão sendo embaladas com proteção.</p>
+                </div>
+                <div class="etapa-rastreio" style="border-left-color: #555;">
+                    <p style="color: #888;"><strong>Em Trânsito</strong></p>
+                    <p style="font-size: 13px; color: #888;">Aguardando coleta da transportadora.</p>
+                </div>
+            `;
+            document.getElementById('modal-rastreio').showModal();
+        }
+
+        function cancelarPedido(numeroPedido) {
+            const confirmacao = confirm(`Tem certeza que deseja cancelar o Pedido #${numeroPedido}?`);
+            if (!confirmacao) return;
+
+            let todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            const index = todosPedidos.findIndex((p, idx) => (p.numeroPedido || (1000 + idx)) === numeroPedido);
+            if (index !== -1) {
+                todosPedidos[index].status = 'Pedido Cancelado';
+                localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
+                alert(`Pedido #${numeroPedido} cancelado com sucesso.`);
+                carregarPedidos();
+            }
+        }
+
+        carregarPedidos();
+    </script>
+</body>
+
+</html>

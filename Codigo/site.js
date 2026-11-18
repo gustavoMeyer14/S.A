@@ -6,9 +6,23 @@ function fechaModalCliente() {
     document.getElementById('modalCliente').classList.remove('aberto');
 }
 
+function toggleSenha(inputId, btnElement) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        btnElement.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btnElement.textContent = '👁️';
+    }
+}
+
 function sairConta() {
     localStorage.removeItem('usuarioLogado');
     localStorage.removeItem('usuarioAtual');
+    localStorage.removeItem('usuarioNome');
     alert("Você saiu da sua conta.");
     window.location.href = "index.html";
 }
@@ -23,12 +37,46 @@ window.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    const modalConteudo = document.querySelector('.modalCliente-conteudo');
     const navUsuario = document.querySelector('.nav-usuario');
+
     if (navUsuario && estaLogado) {
+        const nomeSalvo = localStorage.getItem('usuarioNome') || 'Cliente';
+        const primeiroNome = nomeSalvo.split(' ')[0];
+
+        if (modalConteudo) {
+            const tituloModal = modalConteudo.querySelector('h2');
+            if (tituloModal) {
+                tituloModal.textContent = `Olá, ${primeiroNome}!`;
+            }
+        }
+
         const linkCadastro = navUsuario.querySelector('a[href="cadastro.html"]');
         const linkLogin = navUsuario.querySelector('a[href="cliente.html"]');
         if (linkCadastro) linkCadastro.style.display = 'none';
         if (linkLogin) linkLogin.style.display = 'none';
+
+        const linkPerfil = document.createElement('a');
+        linkPerfil.href = "#";
+        linkPerfil.textContent = "Meu Perfil";
+        linkPerfil.onclick = function (e) {
+            e.preventDefault();
+            const emailAtual = localStorage.getItem('usuarioAtual') || '';
+            alert(`Perfil do Cliente\nNome: ${nomeSalvo}\nE-mail: ${emailAtual}`);
+        };
+
+        const linkPedidos = document.createElement('a');
+        linkPedidos.href = "#";
+        linkPedidos.textContent = "Meus Pedidos";
+        linkPedidos.onclick = function (e) {
+            e.preventDefault();
+            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            if (pedidos.length === 0) {
+                alert("Você ainda não possui pedidos realizados.");
+            } else {
+                alert(`Você possui ${pedidos.length} pedido(s) registrado(s).`);
+            }
+        };
 
         const linkSair = document.createElement('a');
         linkSair.href = "#";
@@ -37,7 +85,10 @@ window.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             sairConta();
         };
-        navUsuario.insertBefore(linkSair, navUsuario.firstChild);
+
+        navUsuario.insertBefore(linkPedidos, navUsuario.firstChild);
+        navUsuario.insertBefore(linkPerfil, navUsuario.firstChild);
+        navUsuario.appendChild(linkSair);
     }
 
     var inputCpf = document.getElementById('cpf');
@@ -75,6 +126,8 @@ function cpfInvalido(rawCpf) {
     return false;
 }
 
+var usuarioEncontradoLogin = null;
+
 async function validaLogin() {
     var email = document.frmlogin.txtemail.value.trim();
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -86,7 +139,6 @@ async function validaLogin() {
     }
 
     var senha = document.frmlogin.txtsenha.value;
-    // Aceita letras, números e caracteres especiais como @ (mínimo 8 caracteres)
     var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
@@ -112,7 +164,6 @@ async function validaLogin() {
         console.warn("Aviso: fetch de clientes.json bloqueado (abra com Live Server).");
     }
 
-    // Fallback caso o site seja aberto via duplo-clique (file://) sem servidor local
     if (usuariosJSON.length === 0 && clientesJSON.length === 0) {
         usuariosJSON = [
             { nome: "Admin Shadow", email: "admin@shadowrealm.com", senha: "admin123", cpf: "111.111.111-11" },
@@ -134,6 +185,7 @@ async function validaLogin() {
         return false;
     }
 
+    usuarioEncontradoLogin = usuarioValido;
     abreModalLogin();
     return false;
 }
@@ -166,8 +218,12 @@ function fechaModalLogin() {
 
 function confirmaLogin() {
     var email = document.frmlogin.txtemail.value.trim();
+    var nomeUsuario = (usuarioEncontradoLogin && usuarioEncontradoLogin.nome) ? usuarioEncontradoLogin.nome : email.split('@')[0];
+
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', email);
+    localStorage.setItem('usuarioNome', nomeUsuario);
+
     alert("Login realizado com sucesso!");
     fechaModalLogin();
     document.frmlogin.reset();
@@ -255,6 +311,7 @@ function confirmaCadastro() {
     localStorage.setItem('usuariosShadowRealm', JSON.stringify(usuariosLocais));
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', novoUsuario.email);
+    localStorage.setItem('usuarioNome', novoUsuario.nome);
 
     alert("Cadastro realizado com sucesso!");
     fechaModalCadastro();
@@ -424,6 +481,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            pedidos.push({
+                data: new Date().toLocaleDateString('pt-BR'),
+                itens: carrinho
+            });
+            localStorage.setItem('pedidosShadowRealm', JSON.stringify(pedidos));
+
             alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
 
             localStorage.removeItem('carrinhoShadowRealm');
@@ -499,7 +563,6 @@ function validarValidadeCartao(validade) {
     return true;
 }
 
-// Renderiza os cartões salvos na tela
 function renderizarCartoesSalvos() {
     const container = document.getElementById('listaCartoesSalvos');
     if (!container) return;
@@ -546,7 +609,6 @@ window.removerCartao = function (index) {
 window.definirCartaoPrincipal = function (index) {
     const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
     if (index === 1 && cartoes.length === 2) {
-        // Inverte a posição: o secundário vira índice 0 (Principal)
         [cartoes[0], cartoes[1]] = [cartoes[1], cartoes[0]];
         localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
         renderizarCartoesSalvos();
@@ -627,5 +689,4 @@ if (btnConfirmar) {
     });
 }
 
-// Carrega os cartões salvos assim que a página abre
 renderizarCartoesSalvos();
