@@ -329,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const couponInput = document.getElementById('coupon-input');
     const btnCoupon = document.getElementById('btn-coupon');
     const couponMessage = document.getElementById('coupon-message');
+    const btncancelar = document.getElementById('btn-cancelar');
 
     const cuponsValidos = {
         'SHADOW26': 0.10,
@@ -373,6 +374,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     }
+
+    btncancelar.addEventListener
 
     function exibirMensagemCupom(texto, cor) {
         if (couponMessage) {
