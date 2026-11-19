@@ -151,7 +151,7 @@ function turbinarCardsProdutos() {
 }
 
 // 4. Contador de itens no ícone do carrinho no header
-function atualizarBadgeCarrinho() {
+window.atualizarBadgeCarrinho = function() {
     const linkCarrinho = document.querySelector('header nav a[href="carrinho.html"]');
     if (!linkCarrinho) return;
 
@@ -181,3 +181,9 @@ function mostrarToastShopee(mensagem) {
     toast.classList.add('visivel');
     setTimeout(() => toast.classList.remove('visivel'), 3000);
 }
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'carrinhoShadowRealm') {
+        atualizarBadgeCarrinho();
+    }
+});

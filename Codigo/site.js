@@ -455,14 +455,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();
+        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
     };
 
     window.removerProduto = function (index) {
         carrinho.splice(index, 1);
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();
+        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
     };
-
+    
     function atualizarResumo(grandTotal, itens) {
         if (!priceBreakdown) return;
 

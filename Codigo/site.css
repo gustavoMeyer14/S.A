@@ -710,7 +710,7 @@ footer {
   transition: 0.3s;
   scale: 110%;
   background-color: #000000;
-  box-shadow: 0 10px 25px #C62828;
+  box-shadow: 0 10px 25px #C62822;
 }
 
 /* ==========================================================================
@@ -1274,17 +1274,18 @@ dialog .btn-fechar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
 .coupon-field button {
-  width: 100px;
+  width: 125px;
   height: 40px;
   background-color: #C62828;
   border-radius: 20px;
   border: 1px solid #C62828;
   color: #ffffff;
+  margin: px;
 }
 
 .coupon-field button:hover {
