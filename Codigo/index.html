@@ -51,6 +51,8 @@
         <h2> - Destaques - </h2>
 
         <div>
+        
+            <!-- 2. Mantenha o restante do card como já está -->
             <img src="imagens/Levi.png" alt="Produto 1">
             <p>Levi Ackerman</p>
             <h3><strong>R$ 250,00</strong></h3>
@@ -95,6 +97,10 @@
                 <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
                     data-imagem="imagens/Levi.png">+ Carrinho</button>
+                
+                <!-- Novo botão de compra direta -->
+                <button type="button" class="btn-comprar-agora" data-nome="Levi Ackerman" data-preco="250.00"
+                    data-imagem="imagens/Levi.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -143,6 +149,8 @@
                 <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
                     data-imagem="imagens/Maomao.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Maomao" data-preco="300.00"
+                    data-imagem="imagens/Maomao.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -191,6 +199,8 @@
                 <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="200.00"
                     data-imagem="imagens/Canva - download.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Satoru Gojo" data-preco="200.00"
+                    data-imagem="imagens/Canva - download.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -239,6 +249,8 @@
                 <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
                     data-imagem="imagens/Canva - download (1).png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Greninja" data-preco="400.00"
+                    data-imagem="imagens/Canva - download (1).png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -287,6 +299,8 @@
                 <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
                     data-imagem="imagens/Snorlax.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Snorlax" data-preco="450.00"
+                    data-imagem="imagens/Snorlax.png">Comprar Agora</button>
             </footer>
         </dialog>
     </section>
@@ -315,48 +329,83 @@
             btnFechar.addEventListener('click', () => modal.close());
         }
 
-        const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
         const modalAvisoLogin = document.getElementById('modalAvisoLogin');
-        const btnFecharAviso = document.getElementById('fecharAvisoLogin');
+const btnFecharAviso = document.getElementById('fecharAvisoLogin');
 
-        if (btnFecharAviso && modalAvisoLogin) {
-            btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
-        }
+if (btnFecharAviso && modalAvisoLogin) {
+    btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+}
 
-        botoesCarrinho.forEach(botao => {
-            botao.addEventListener('click', function () {
-                const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+// Função única para os 3 tipos de botão
+function processarCompra(botao, irParaPagamento = false) {
+    const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+    const modalAtual = botao.closest('dialog'); // Será null se o clique vier do card
 
-                if (!estaLogado) {
-                    this.closest('dialog').close();
-                    modalAvisoLogin.showModal();
-                    return;
-                }
+    // 1. Verifica se o cliente está logado
+    if (!estaLogado) {
+        if (modalAtual) modalAtual.close();
+        if (modalAvisoLogin) modalAvisoLogin.showModal();
+        return;
+    }
 
-                const nome = this.getAttribute('data-nome');
-                const preco = parseFloat(this.getAttribute('data-preco'));
-                const imagem = this.getAttribute('data-imagem');
+    // 2. Lê os dados do produto no botão clicado
+    const nome = botao.getAttribute('data-nome');
+    const preco = parseFloat(botao.getAttribute('data-preco'));
+    const imagem = botao.getAttribute('data-imagem');
 
-                let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
-                const produtoExistente = carrinho.find(item => item.nome === nome);
+    // 3. Salva ou soma a quantidade no localStorage
+    let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+    const produtoExistente = carrinho.find(item => item.nome === nome);
 
-                if (produtoExistente) {
-                    produtoExistente.quantidade += 1;
-                } else {
-                    carrinho.push({
-                        nome: nome,
-                        preco: preco,
-                        imagem: imagem,
-                        quantidade: 1
-                    });
-                }
+    if (produtoExistente) {
+        produtoExistente.quantidade += 1;
+    } else {
+        carrinho.push({ nome, preco, imagem, quantidade: 1 });
+    }
 
-                localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+    localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
 
-                this.closest('dialog').close();
-                alert(`${nome} foi adicionado ao carrinho!`);
-            });
-        });
+    // 4. Define o que acontece após salvar:
+    if (irParaPagamento) {
+        // Caso A: Clicou em "Comprar Agora" -> redireciona direto
+        window.location.href = 'carrinho.html#tela-pagamento';
+    } else if (modalAtual) {
+        // Caso B: Clicou em "+ Carrinho" no modal -> fecha e avisa
+        modalAtual.close();
+        alert(`${nome} foi adicionado ao carrinho!`);
+    } else {
+        // Caso C: Clicou no ícone rápido do card -> muda o ícone para ✔ por 1,5s
+        const iconeAnterior = botao.innerHTML;
+        botao.innerHTML = '✔';
+        botao.style.backgroundColor = '#28a745';
+        botao.style.borderColor = '#28a745';
+
+        setTimeout(() => {
+            botao.innerHTML = iconeAnterior;
+            botao.style.backgroundColor = '';
+            botao.style.borderColor = '';
+        }, 1500);
+    }
+}
+
+// Conecta os 3 grupos de botões à função
+document.querySelectorAll('.btn-carrinho').forEach(btn => {
+    btn.addEventListener('click', function () {
+        processarCompra(this, false);
+    });
+});
+
+document.querySelectorAll('.btn-compra-rapida').forEach(btn => {
+    btn.addEventListener('click', function () {
+        processarCompra(this, false);
+    });
+});
+
+document.querySelectorAll('.btn-comprar-agora').forEach(btn => {
+    btn.addEventListener('click', function () {
+        processarCompra(this, true);
+    });
+});
 
         async function conectarMeuJSON() {
             try {

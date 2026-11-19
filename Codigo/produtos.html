@@ -139,6 +139,8 @@
                 <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Ichigo Kurosaki" data-preco="340.00"
                     data-imagem="imagens/bleach.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Ichigo Kurosaki" data-preco="340.00"
+                    data-imagem="imagens/bleach.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -187,6 +189,8 @@
                 <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Kisuke Urahara" data-preco="460.00"
                     data-imagem="imagens/kisuke.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Kisuke Urahara" data-preco="460.00"
+                    data-imagem="imagens/kisuke.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -235,6 +239,8 @@
                 <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Renji Abarai" data-preco="400.00"
                     data-imagem="imagens/renje.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Renji Abarai" data-preco="400.00"
+                    data-imagem="imagens/renje.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -283,6 +289,8 @@
                 <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Rukia Kuchiki" data-preco="430.00"
                     data-imagem="imagens/rukia.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Rukia Kuchiki" data-preco="430.00"
+                    data-imagem="imagens/rukia.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -331,6 +339,8 @@
                 <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Toshiro Hitsugaya" data-preco="200.00"
                     data-imagem="imagens/toshiro.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Toshiro Hitsugaya" data-preco="200.00"
+                    data-imagem="imagens/toshiro.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -379,6 +389,8 @@
                 <button type="button" id="fechar-card6" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
                     data-imagem="imagens/Levi.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Levi Ackerman" data-preco="250.00"
+                    data-imagem="imagens/Levi.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -427,6 +439,8 @@
                 <button type="button" id="fechar-card7" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
                     data-imagem="imagens/Maomao.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Maomao" data-preco="300.00"
+                    data-imagem="imagens/Maomao.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -475,6 +489,8 @@
                 <button type="button" id="fechar-card8" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="350.00"
                     data-imagem="imagens/Canva - download.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Satoru Gojo" data-preco="350.00"
+                    data-imagem="imagens/Canva - download.png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -523,6 +539,8 @@
                 <button type="button" id="fechar-card9" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
                     data-imagem="imagens/Canva - download (1).png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Greninja" data-preco="400.00"
+                    data-imagem="imagens/Canva - download (1).png">Comprar Agora</button>
             </footer>
         </dialog>
 
@@ -571,6 +589,8 @@
                 <button type="button" id="fechar-card10" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
                     data-imagem="imagens/Snorlax.png">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="Snorlax" data-preco="450.00"
+                    data-imagem="imagens/Snorlax.png">Comprar Agora</button>
             </footer>
         </dialog>
     </section>
@@ -600,43 +620,76 @@
                 btnFechar.addEventListener('click', () => modal.close());
             }
         }
+    const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
+    const modalAvisoLogin = document.getElementById('modalAvisoLogin');
+    const btnFecharAviso = document.getElementById('fecharAvisoLogin');
 
-        const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
-        const modalAvisoLogin = document.getElementById('modalAvisoLogin');
-        const btnFecharAviso = document.getElementById('fecharAvisoLogin');
+    if (btnFecharAviso && modalAvisoLogin) {
+        btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+    }
 
-        if (btnFecharAviso && modalAvisoLogin) {
-            btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+    function processarCompra(botao, irParaPagamento = false) {
+        const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+        const modalAtual = botao.closest('dialog');
+
+        if (!estaLogado) {
+            if (modalAtual) modalAtual.close();
+            if (modalAvisoLogin) modalAvisoLogin.showModal();
+            return;
         }
 
-        botoesCarrinho.forEach(botao => {
-            botao.addEventListener('click', function () {
-                const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+        const nome = botao.getAttribute('data-nome');
+        const preco = parseFloat(botao.getAttribute('data-preco'));
+        const imagem = botao.getAttribute('data-imagem');
 
-                if (!estaLogado) {
-                    this.closest('dialog').close();
-                    modalAvisoLogin.showModal();
-                    return;
-                }
+        let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+        const produtoExistente = carrinho.find(item => item.nome === nome);
 
-                const nome = this.getAttribute('data-nome');
-                const preco = parseFloat(this.getAttribute('data-preco'));
-                const imagem = this.getAttribute('data-imagem');
+        if (produtoExistente) {
+            produtoExistente.quantidade += 1;
+        } else {
+            carrinho.push({ nome, preco, imagem, quantidade: 1 });
+        }
 
-                let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
-                const produtoExistente = carrinho.find(item => item.nome === nome);
+        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
 
-                if (produtoExistente) {
-                    produtoExistente.quantidade += 1;
-                } else {
-                    carrinho.push({ nome, preco, imagem, quantidade: 1 });
-                }
+        if (irParaPagamento) {
+            window.location.href = 'carrinho.html#tela-pagamento';
+        } else if (modalAtual) {
+            modalAtual.close();
+            alert(`${nome} foi adicionado ao carrinho!`);
+        } else {
+            const iconeAnterior = botao.innerHTML;
+            botao.innerHTML = '✔';
+            botao.style.backgroundColor = '#28a745';
+            botao.style.borderColor = '#28a745';
 
-                localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
-                this.closest('dialog').close();
-                alert(`${nome} foi adicionado ao carrinho!`);
-            });
+            setTimeout(() => {
+                botao.innerHTML = iconeAnterior;
+                botao.style.backgroundColor = '';
+                botao.style.borderColor = '';
+            }, 1500);
+        }
+    }
+
+    document.querySelectorAll('.btn-carrinho').forEach(btn => {
+        btn.addEventListener('click', function () {
+            processarCompra(this, false);
         });
+    });
+
+    document.querySelectorAll('.btn-compra-rapida').forEach(btn => {
+        btn.addEventListener('click', function () {
+            processarCompra(this, false);
+        });
+    });
+
+    document.querySelectorAll('.btn-comprar-agora').forEach(btn => {
+        btn.addEventListener('click', function () {
+            processarCompra(this, true);
+        });
+    });
+    // ============================================================
 
         async function conectarMeuJSON() {
             try {
