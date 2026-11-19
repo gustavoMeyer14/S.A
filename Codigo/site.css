@@ -669,10 +669,11 @@ footer {
 /* Campo de Cupom */
 .coupon-field {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .coupon-field label {
@@ -687,8 +688,10 @@ footer {
   border-radius: 20px;
   color: #888888;
   font-size: 0.9rem;
-  width: 140px;
+  width: 160px;
   text-align: center;
+  outline: none;
+  transition: 0.3;
 }
 
 /* Botão Vermelho Redondo (Pílula) */

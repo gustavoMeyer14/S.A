@@ -375,7 +375,28 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    btncancelar.addEventListener
+    if (btncancelar) {
+        btncancelar.onclick = () => {
+            // Se não tiver cupom aplicado, avisa o usuário
+            if (descontoAtual === 0 && cupomAtivo === '') {
+                exibirMensagemCupom('Nenhum cupom aplicado no momento.', '#ffaa00');
+                return;
+            }
+
+            // 1. Zera as variáveis de desconto
+            descontoAtual = 0;
+            cupomAtivo = '';
+
+            // 2. Limpa o campo de texto do cupom
+            if (couponInput) {
+                couponInput.value = '';
+            }
+
+            // 3. Atualiza a mensagem na tela e recalcula o carrinho
+            exibirMensagemCupom('Cupom cancelado.', '#ffaa00');
+            renderizarCarrinho();
+        };
+    }
 
     function exibirMensagemCupom(texto, cor) {
         if (couponMessage) {
