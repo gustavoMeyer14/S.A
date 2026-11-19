@@ -526,9 +526,7 @@ footer {
    ========================================================================== */
 .cart-content {
   background-color: #000000;
-  /* Fundo interno do carrinho */
   border: 1px solid #C62828;
-  /* Borda grossa escura */
   border-radius: 25px;
   width: 1000px;
   margin: 40px auto;
@@ -710,7 +708,6 @@ footer {
   scale: 110%;
   background-color: #000000;
   box-shadow: 0 10px 25px #C62828;
-  border: 1px solid #ffffff;
 }
 
 /* ==========================================================================
@@ -1293,7 +1290,6 @@ dialog .btn-fechar {
   scale: 110%;
   background-color: #000000;
   box-shadow: 0 10px 25px #C62828;
-  border: 1px solid #ffffff;
 }
 
 /* Botão de Remover Produto */
