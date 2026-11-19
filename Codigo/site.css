@@ -1044,9 +1044,8 @@ option:hover {
 .faq-item:hover {
   scale: 110%;
   transition: 0.3s;
-  border: 1px solid #ffffff;
   cursor: default;
-  box-shadow: 0 10px 25px #ffffff;
+  box-shadow: 0 10px 25px #C62828;
 }
 
 .empty-cart-msg {
