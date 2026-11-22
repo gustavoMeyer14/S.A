@@ -1,4 +1,34 @@
-function iniciarVitrineShadowRealm() {
+// ==========================================
+// 0. REMOÇÃO GARANTIDA DO BOTÃO "MEUS PEDIDOS" DUPLICADO
+// ==========================================
+function removerPedidosDuplicados() {
+    const navUsuario = document.querySelector('#modalCliente .nav-usuario');
+    if (!navUsuario) return;
+
+    const linksPedidos = Array.from(navUsuario.querySelectorAll('a')).filter(a =>
+        a.textContent.trim().toLowerCase() === 'meus pedidos'
+    );
+
+    if (linksPedidos.length > 1) {
+        // Remove o link extra com href="#" injetado pelo site.js e mantém o link oficial (pedidos.html)
+        const extraSiteJs = linksPedidos.find(a => a.getAttribute('href') === '#');
+        if (extraSiteJs) {
+            extraSiteJs.remove();
+        } else {
+            linksPedidos[0].remove();
+        }
+    }
+}
+
+// Executa imediatamente (graças ao defer), no DOMContentLoaded e no load
+removerPedidosDuplicados();
+document.addEventListener('DOMContentLoaded', removerPedidosDuplicados);
+window.addEventListener('load', removerPedidosDuplicados);
+
+// ==========================================
+// INICIALIZAÇÃO DA VITRINE SHADOW REALM
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
     const produtosOriginais = [
         'ichigo kurosaki',
         'kisuke urahara',
@@ -9,40 +39,9 @@ function iniciarVitrineShadowRealm() {
 
     injetarEstilosVitrine();
     configurarFavoritosGlobal();
-    processarCardsEModais(produtosOriginais);
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', iniciarVitrineShadowRealm);
-} else {
-    iniciarVitrineShadowRealm();
-}
-
-function obterUsuarioLogadoAvaliacao() {
-    const logadoOficial = localStorage.getItem('usuarioLogado') === 'true';
-    const emailOficial = localStorage.getItem('usuarioAtual');
-    if (logadoOficial && emailOficial) {
-        return {
-            logado: true,
-            id: emailOficial.trim().toLowerCase(),
-            nomeExibicao: emailOficial.includes('@') ? emailOficial.split('@')[0] : emailOficial
-        };
-    }
-
-    try {
-        const clienteLocal = JSON.parse(localStorage.getItem('clienteLogado'));
-        if (clienteLocal && (clienteLocal.email || clienteLocal.cpf || clienteLocal.nome)) {
-            const id = (clienteLocal.email || clienteLocal.cpf || clienteLocal.nome).trim().toLowerCase();
-            return {
-                logado: true,
-                id,
-                nomeExibicao: clienteLocal.nome || id
-            };
-        }
-    } catch {}
-
-    return { logado: false, id: null, nomeExibicao: null };
-}
+    processarCardsVitrine(produtosOriginais);
+    inicializarComentariosHTML();
+});
 
 function injetarEstilosVitrine() {
     if (document.getElementById('estilos-vitrine-sr')) return;
@@ -86,36 +85,25 @@ function injetarEstilosVitrine() {
             letter-spacing: 0.5px;
             box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
         }
-        .form-avaliacao-sr, .aviso-login-avaliacao {
-            background: #141414;
-            border: 1px solid #b82929;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 12px;
-            text-align: left;
-        }
-        .estrelas-seletor {
-            display: flex;
-            gap: 4px;
-            font-size: 20px;
-            cursor: pointer;
-            margin: 4px 0;
-        }
-        .estrelas-seletor span { color: #555; transition: color 0.15s; }
-        .estrelas-seletor span.ativa { color: #ffca28; }
-        .btn-excluir-avaliacao {
-            background: transparent;
-            border: 1px solid #ff4d4d;
-            color: #ff4d4d;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 6px;
-            width: auto !important;
+        /* Expansão automática do modal e da área de comentários */
+        dialog.modalProduto[open] {
             height: auto !important;
+            max-height: 88vh !important;
+            overflow-y: auto !important;
         }
-        .btn-excluir-avaliacao:hover { background: #ff4d4d; color: #fff; }
+        .modalProduto-comentarios {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+        }
+        .modalProduto-comentarios .comentarios {
+            height: auto !important;
+            word-wrap: break-word !important;
+        }
+        /* Modal de Favoritos */
         #modalFavoritosSR[open] {
             position: fixed !important;
             top: 50% !important;
@@ -155,7 +143,7 @@ function injetarEstilosVitrine() {
 }
 
 // ==========================================
-// 1. LISTA DE DESEJOS / FAVORITOS (❤️)
+// 1. LISTA DE FAVORITOS (❤️) E SELO DE ORIGINALIDADE
 // ==========================================
 function obterFavoritos() {
     try { return JSON.parse(localStorage.getItem('favoritosShadowRealm')) || []; }
@@ -178,8 +166,8 @@ function configurarFavoritosGlobal() {
             if (typeof fechaModalCliente === 'function') fechaModalCliente();
             abrirModalFavoritos();
         });
-        const botaoFechar = navUsuario.querySelector('.botaoFecharCliente');
-        if (botaoFechar) navUsuario.insertBefore(btnFavMenu, botaoFechar);
+        const linkSair = Array.from(navUsuario.querySelectorAll('a')).find(a => a.textContent.trim().toLowerCase() === 'sair');
+        if (linkSair) navUsuario.insertBefore(btnFavMenu, linkSair);
         else navUsuario.appendChild(btnFavMenu);
     }
 
@@ -234,10 +222,7 @@ window.removerFavoritoModal = function (nome) {
     });
 };
 
-// ==========================================
-// 2. SELO DE ORIGINALIDADE E COMENTÁRIOS EXISTENTES
-// ==========================================
-function processarCardsEModais(produtosOriginais) {
+function processarCardsVitrine(produtosOriginais) {
     const cards = document.querySelectorAll('.destaques > div');
     const favoritos = obterFavoritos();
 
@@ -254,7 +239,6 @@ function processarCardsEModais(produtosOriginais) {
         const precoNum = parseFloat(precoEl.innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
         const isOriginal = produtosOriginais.includes(chave);
 
-        // A) Botão Favorito ❤️ no card
         if (!card.querySelector('.btn-favorito-card')) {
             const jaFavorito = favoritos.some(f => f.nome === nomeProduto);
             const btnFav = document.createElement('button');
@@ -280,7 +264,6 @@ function processarCardsEModais(produtosOriginais) {
             card.appendChild(btnFav);
         }
 
-        // B) Selo de Originalidade
         if (isOriginal && !card.querySelector('.selo-originalidade')) {
             const selo = document.createElement('span');
             selo.className = 'selo-originalidade';
@@ -288,164 +271,100 @@ function processarCardsEModais(produtosOriginais) {
             nomeEl.insertAdjacentElement('afterend', selo);
         }
 
-        // C) Conecta nos comentários já existentes dentro do modal
         if (btnVerMais) {
             const modal = document.getElementById(`modal-${btnVerMais.id}`);
-            if (modal) {
-                const tituloModal = modal.querySelector('h2');
-                if (isOriginal && tituloModal && !modal.querySelector('.selo-originalidade')) {
-                    const seloModal = document.createElement('span');
-                    seloModal.className = 'selo-originalidade';
-                    seloModal.innerHTML = '🛡️ Produto 100% Original Certificado';
-                    tituloModal.insertAdjacentElement('afterend', seloModal);
-                }
-
-                integrarNosComentariosExistentes(modal, nomeProduto);
+            const tituloModal = modal?.querySelector('h2');
+            if (isOriginal && tituloModal && !modal.querySelector('.selo-originalidade')) {
+                const seloModal = document.createElement('span');
+                seloModal.className = 'selo-originalidade';
+                seloModal.innerHTML = '🛡️ Produto 100% Original Certificado';
+                tituloModal.insertAdjacentElement('afterend', seloModal);
             }
         }
     });
 }
 
 // ==========================================
-// 3. INTEGRAÇÃO COM .modalProduto-comentarios DO SITE
+// 2. COMENTÁRIOS DIRETOS NO HTML (SALVAR + EXPANDIR + EXCLUIR)
 // ==========================================
-function integrarNosComentariosExistentes(modal, nomeProduto) {
-    if (modal.dataset.avaliacoesConectadas === 'true') return;
-    modal.dataset.avaliacoesConectadas = 'true';
+function inicializarComentariosHTML() {
+    const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+    const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim();
+    const nomeSalvo = (localStorage.getItem('usuarioNome') || '').trim();
+    const nomeUsuario = nomeSalvo || (usuarioAtual.includes('@') ? usuarioAtual.split('@')[0] : usuarioAtual);
 
-    let containerComentarios = modal.querySelector('.modalProduto-comentarios');
-    if (!containerComentarios) {
-        containerComentarios = document.createElement('div');
-        containerComentarios.className = 'modalProduto-comentarios';
-        const footerModal = modal.querySelector('.modal-footer');
-        if (footerModal) modal.insertBefore(containerComentarios, footerModal);
-        else modal.appendChild(containerComentarios);
-    }
+    document.querySelectorAll('.modalProduto-comentarios[data-produto]').forEach(container => {
+        const produto = container.getAttribute('data-produto').toLowerCase().trim();
+        const chave = `comentarios_${produto}`;
+        const form = container.querySelector('.form-comentario-html');
+        const aviso = container.querySelector('.aviso-nao-logado');
+        const lista = container.querySelector('.lista-novos-comentarios');
 
-    const chaveStorage = `avaliacoesShadowRealm_${nomeProduto}`;
-    const usuario = obterUsuarioLogadoAvaliacao();
+        if (!estaLogado || !usuarioAtual) {
+            if (form) form.style.display = 'none';
+            if (aviso) aviso.style.display = 'block';
+        } else {
+            if (form) form.style.display = 'block';
+            if (aviso) aviso.style.display = 'none';
+        }
 
-    // Cria área do formulário no topo de .modalProduto-comentarios (sem apagar nenhum comentário existente)
-    const areaTopo = document.createElement('div');
-    areaTopo.className = 'avaliacao-topo-sr';
-    areaTopo.innerHTML = usuario.logado
-        ? `
-            <div class="form-avaliacao-sr">
-                <p style="font-size: 13px; color: #ccc; margin: 0;">Avaliando como <strong style="color:#ffca28;">${usuario.nomeExibicao}</strong>:</p>
-                <div class="estrelas-seletor" data-nota="5">
-                    <span data-val="1" class="ativa">★</span>
-                    <span data-val="2" class="ativa">★</span>
-                    <span data-val="3" class="ativa">★</span>
-                    <span data-val="4" class="ativa">★</span>
-                    <span data-val="5" class="ativa">★</span>
-                </div>
-                <textarea rows="2" placeholder="Escreva seu comentário sobre a figure..."
-                    style="width:100%; box-sizing:border-box; background:#222; color:#fff; border:1px solid #444; border-radius:8px; padding:8px; margin-bottom:8px; resize:vertical;"></textarea>
-                <button type="button" class="btn-enviar-avaliacao"
-                    style="background:#b82929; color:#fff; border:none; padding:6px 14px; border-radius:8px; font-weight:bold; cursor:pointer; width:auto; height:auto;">
-                    Comentar
-                </button>
-            </div>
-          `
-        : `
-            <div class="aviso-login-avaliacao" style="text-align:center;">
-                <p style="font-size: 13px; color: #ddd; margin: 0 0 8px 0;">🔒 Faça login para comentar e avaliar este produto.</p>
-                <button type="button" onclick="window.location.href='cliente.html'"
-                    style="background:#b82929; color:#fff; border:none; padding:6px 14px; border-radius:8px; font-weight:bold; cursor:pointer; width:auto; height:auto;">
-                    Fazer Login
-                </button>
-            </div>
-          `;
+        function renderizar() {
+            if (!lista) return;
+            let salvos = [];
+            try { salvos = JSON.parse(localStorage.getItem(chave)) || []; }
+            catch { salvos = []; }
 
-    containerComentarios.insertBefore(areaTopo, containerComentarios.firstChild);
+            lista.innerHTML = '';
 
-    function lerAvaliacoes() {
-        try { return JSON.parse(localStorage.getItem(chaveStorage)) || []; }
-        catch { return []; }
-    }
+            salvos.slice().reverse().forEach((item, idxRev) => {
+                const idxReal = salvos.length - 1 - idxRev;
+                const dono = estaLogado && item.autorId === usuarioAtual.toLowerCase();
 
-    function renderizarComentariosSalvos() {
-        containerComentarios.querySelectorAll('.comentario-dinamico-sr').forEach(el => el.remove());
+                const div = document.createElement('div');
+                div.className = 'comentarios';
+                div.style.height = 'auto';
+                div.innerHTML = `
+                    <h2>${item.autor} <span style="color:#ffca28; font-size:14px;">${'★'.repeat(item.nota)}${'☆'.repeat(5 - item.nota)}</span></h2>
+                    <p>${item.texto}</p>
+                    <small style="font-size:11px; color:#888; display:block;">${item.data || ''}</small>
+                    ${dono ? `<button type="button" class="btn-del" style="width:auto; height:auto; padding:3px 10px; margin-top:6px; font-size:12px; background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; border-radius:5px; cursor:pointer;">🗑️ Excluir</button>` : ''}
+                `;
 
-        const salvas = lerAvaliacoes();
-        const userAtual = obterUsuarioLogadoAvaliacao();
+                if (dono) {
+                    div.querySelector('.btn-del').addEventListener('click', () => {
+                        const atual = JSON.parse(localStorage.getItem(chave)) || [];
+                        atual.splice(idxReal, 1);
+                        localStorage.setItem(chave, JSON.stringify(atual));
+                        renderizar();
+                    });
+                }
 
-        salvas.slice().reverse().forEach((av, idxReverso) => {
-            const indiceReal = salvas.length - 1 - idxReverso;
-            const podeExcluir = userAtual.logado && (
-                av.autorId === userAtual.id ||
-                (!av.autorId && av.autor?.toLowerCase() === userAtual.nomeExibicao?.toLowerCase())
-            );
-
-            const cardComentario = document.createElement('div');
-            cardComentario.className = 'comentarios comentario-dinamico-sr';
-            cardComentario.innerHTML = `
-                <h2>${av.autor} <span style="color:#ffca28; font-size:14px;">${'★'.repeat(av.nota)}${'☆'.repeat(5 - av.nota)}</span></h2>
-                <p>${av.texto}</p>
-                <small style="font-size:11px; color:#888; display:block;">${av.data}</small>
-                ${podeExcluir ? `<button type="button" class="btn-excluir-avaliacao" data-idx="${indiceReal}">🗑️ Excluir</button>` : ''}
-            `;
-
-            const btnExcluir = cardComentario.querySelector('.btn-excluir-avaliacao');
-            if (btnExcluir) {
-                btnExcluir.addEventListener('click', () => {
-                    const listaAtual = lerAvaliacoes();
-                    listaAtual.splice(indiceReal, 1);
-                    localStorage.setItem(chaveStorage, JSON.stringify(listaAtual));
-                    renderizarComentariosSalvos();
-                });
-            }
-
-            areaTopo.insertAdjacentElement('afterend', cardComentario);
-        });
-    }
-
-    if (usuario.logado) {
-        const seletor = areaTopo.querySelector('.estrelas-seletor');
-        const estrelas = seletor.querySelectorAll('span');
-        const textarea = areaTopo.querySelector('textarea');
-        const btnEnviar = areaTopo.querySelector('.btn-enviar-avaliacao');
-
-        estrelas.forEach(star => {
-            star.addEventListener('click', () => {
-                const nota = parseInt(star.getAttribute('data-val'), 10);
-                seletor.setAttribute('data-nota', nota);
-                estrelas.forEach(s => {
-                    s.classList.toggle('ativa', parseInt(s.getAttribute('data-val'), 10) <= nota);
-                });
+                lista.appendChild(div);
             });
-        });
+        }
 
-        btnEnviar.addEventListener('click', () => {
-            const userCheck = obterUsuarioLogadoAvaliacao();
-            if (!userCheck.logado) {
-                alert('Você precisa estar logado para comentar!');
-                return;
-            }
+        if (form && estaLogado && usuarioAtual) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const texto = form.querySelector('textarea').value.trim();
+                const nota = parseInt(form.querySelector('select').value, 10) || 5;
+                if (!texto) return;
 
-            const texto = textarea.value.trim();
-            if (!texto) {
-                alert('Escreva um comentário antes de enviar.');
-                return;
-            }
+                const salvos = JSON.parse(localStorage.getItem(chave)) || [];
+                salvos.push({
+                    autorId: usuarioAtual.toLowerCase(),
+                    autor: nomeUsuario,
+                    nota,
+                    texto,
+                    data: new Date().toLocaleDateString('pt-BR')
+                });
 
-            const nota = parseInt(seletor.getAttribute('data-nota'), 10) || 5;
-            const salvas = lerAvaliacoes();
-
-            salvas.push({
-                id: Date.now(),
-                autorId: userCheck.id,
-                autor: userCheck.nomeExibicao,
-                nota,
-                texto,
-                data: new Date().toLocaleDateString('pt-BR')
+                localStorage.setItem(chave, JSON.stringify(salvos));
+                form.reset();
+                renderizar();
             });
+        }
 
-            localStorage.setItem(chaveStorage, JSON.stringify(salvas));
-            textarea.value = '';
-            renderizarComentariosSalvos();
-        });
-    }
-
-    renderizarComentariosSalvos();
+        renderizar();
+    });
 }
