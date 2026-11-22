@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (addressForm) {
+   if (addressForm) {
         addressForm.onsubmit = (e) => {
             e.preventDefault();
 
@@ -520,7 +520,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html';
         };
     }
-
     renderizarCarrinho();
 });
 
