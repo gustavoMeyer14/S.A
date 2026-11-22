@@ -102,7 +102,7 @@
             background-color: #ff4d4d;
         }
 
-        .btn-cancelar {
+        .btn-cancelar-pedido {
             background-color: transparent;
             color: #ff4d4d;
             border: 1px solid #ff4d4d;
@@ -112,12 +112,17 @@
             cursor: pointer;
         }
 
-        .btn-cancelar:hover {
+        .btn-cancelar-pedido:hover {
             background-color: #ff4d4d;
             color: #ffffff;
         }
 
-        .modalRastreio[open] {
+       .modalRastreio[open] {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
             background-color: #1a1a1a;
             color: #ffffff;
             border: 2px solid #b82929;
@@ -125,9 +130,8 @@
             padding: 25px;
             max-width: 450px;
             width: 90%;
-            text-align: left;
+            text-align: center;
         }
-
         .modalRastreio::backdrop {
             background-color: rgba(0, 0, 0, 0.75);
         }
@@ -136,6 +140,14 @@
             border-left: 3px solid #b82929;
             padding-left: 15px;
             margin: 15px 0;
+            text-align: left;
+        }
+
+        .acoes-modal-cancelar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
         }
     </style>
 </head>
@@ -171,10 +183,12 @@
     <main class="container-pedidos">
         <section id="aba-pedidos">
             <h2>- Meus Pedidos -</h2>
-            <div id="lista-pedidos"></div>
+            <!-- ID exclusivo para impedir que site.js ou shopee.js sobrescrevam a lista -->
+            <div id="lista-pedidos-exclusiva"></div>
         </section>
     </main>
 
+    <!-- MODAL DE RASTREIO -->
     <dialog id="modal-rastreio" class="modalRastreio">
         <h2 id="titulo-rastreio" class="titulo-rastreio">- Rastreamento -</h2>
         <p id="codigo-rastreio" style="color: #bbb; font-size: 14px; margin-bottom: 15px;"></p>
@@ -184,25 +198,39 @@
         </div>
     </dialog>
 
+    <!-- MODAL DE CONFIRMAÇÃO DE CANCELAMENTO -->
+    <dialog id="modal-cancelar" class="modalRastreio">
+        <h2 style="text-align: center; margin-bottom: 15px;">- Cancelar Pedido -</h2>
+        <p id="texto-modal-cancelar" style="color: #ddd; font-size: 15px; line-height: 1.5; text-align: center;">
+            Tem certeza que deseja cancelar este pedido? Essa ação não poderá ser desfeita.
+        </p>
+        <div class="acoes-modal-cancelar">
+            <button type="button" id="btn-fechar-modal-cancelar" class="btn-cancelar-pedido">Voltar</button>
+            <button type="button" id="btn-confirmar-cancelamento" class="btn-rastrear">Sim, Cancelar</button>
+        </div>
+    </dialog>
+
     <footer>
         &copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.
     </footer>
 
- <script>
+   <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const listaPedidosEl = document.getElementById('lista-pedidos');
+            const listaPedidosEl = document.getElementById('lista-pedidos-exclusiva') || document.getElementById('lista-pedidos');
+            const modalCancelar = document.getElementById('modal-cancelar');
+            const textoModalCancelar = document.getElementById('texto-modal-cancelar');
+            const btnFecharModalCancelar = document.getElementById('btn-fechar-modal-cancelar');
+            const btnConfirmarCancelamento = document.getElementById('btn-confirmar-cancelamento');
+
+            let pedidoParaCancelar = null;
 
             function obterUsuarioAtivo() {
                 const logadoOficial = localStorage.getItem('usuarioLogado') === 'true';
                 const emailOficial = localStorage.getItem('usuarioAtual');
-                if (logadoOficial && emailOficial) {
-                    return { identificador: emailOficial };
-                }
+                if (logadoOficial && emailOficial) return { identificador: emailOficial };
 
                 const clienteLocal = JSON.parse(localStorage.getItem('clienteLogado'));
-                if (clienteLocal && clienteLocal.cpf) {
-                    return { identificador: clienteLocal.cpf };
-                }
+                if (clienteLocal && clienteLocal.cpf) return { identificador: clienteLocal.cpf };
 
                 return null;
             }
@@ -226,8 +254,6 @@
                 }
 
                 const todosPedidos = lerPedidos();
-
-                // Garante que todo pedido salvo tenha um ID fixo gravado
                 let precisaSalvar = false;
                 todosPedidos.forEach((p, idx) => {
                     if (!p.numeroPedido) {
@@ -274,7 +300,7 @@
                         ? '<span style="color: #999; font-size: 14px;">Este pedido foi cancelado.</span>'
                         : `
                             <button type="button" class="btn-rastrear" data-acao="rastrear" data-num="${numPedido}" data-data="${pedido.data}">Rastrear Entrega</button>
-                            <button type="button" class="btn-cancelar" data-acao="cancelar" data-num="${numPedido}">Cancelar Pedido</button>
+                            <button type="button" class="btn-cancelar-pedido" data-acao="cancelar" data-num="${numPedido}">Cancelar Pedido</button>
                           `;
 
                     listaPedidosEl.innerHTML += `
@@ -300,9 +326,13 @@
                 });
             }
 
-            listaPedidosEl.addEventListener('click', (e) => {
+            // Captura o clique na fase de captura (true) ANTES de qualquer outro script
+            document.addEventListener('click', (e) => {
                 const botao = e.target.closest('button[data-acao]');
                 if (!botao) return;
+
+                e.preventDefault();
+                e.stopImmediatePropagation();
 
                 const acao = botao.getAttribute('data-acao');
                 const numPedido = botao.getAttribute('data-num');
@@ -330,31 +360,31 @@
                 }
 
                 if (acao === 'cancelar') {
-                    if (!confirm(`Tem certeza que deseja cancelar o Pedido #${numPedido}?`)) return;
-
-                    const todosPedidos = lerPedidos();
-                    const alvo = todosPedidos.find(p => String(p.numeroPedido) === String(numPedido));
-
-                    if (alvo) {
-                        alvo.status = 'Pedido Cancelado';
-                        localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
-                        carregarPedidos();
-                    } else {
-                        // Caso o pedido estivesse apenas visual, atualiza o card diretamente
-                        const card = document.getElementById(`card-pedido-${numPedido}`);
-                        if (card) {
-                            const badge = card.querySelector('.status-pedido');
-                            if (badge) {
-                                badge.textContent = 'Pedido Cancelado';
-                                badge.classList.add('status-cancelado');
-                            }
-                            const acoes = card.querySelector('.acoes-pedido');
-                            if (acoes) {
-                                acoes.innerHTML = '<span style="color: #999; font-size: 14px;">Este pedido foi cancelado.</span>';
-                            }
-                        }
-                    }
+                    pedidoParaCancelar = numPedido;
+                    textoModalCancelar.innerHTML = `Tem certeza que deseja cancelar o <strong>Pedido #${numPedido}</strong>?<br>Essa ação não poderá ser desfeita.`;
+                    modalCancelar.showModal();
                 }
+            }, true);
+
+            btnFecharModalCancelar.addEventListener('click', () => {
+                pedidoParaCancelar = null;
+                modalCancelar.close();
+            });
+
+            btnConfirmarCancelamento.addEventListener('click', () => {
+                if (!pedidoParaCancelar) return;
+
+                const todosPedidos = lerPedidos();
+                const alvo = todosPedidos.find(p => String(p.numeroPedido) === String(pedidoParaCancelar));
+
+                if (alvo) {
+                    alvo.status = 'Pedido Cancelado';
+                    localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
+                }
+
+                modalCancelar.close();
+                pedidoParaCancelar = null;
+                carregarPedidos();
             });
 
             carregarPedidos();

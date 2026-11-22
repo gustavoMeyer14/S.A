@@ -9,7 +9,6 @@
     <title>Shadow Realm Store - Produtos</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
-    <script src="shopee.js" defer></script>
 </head>
 
 <body>
@@ -19,9 +18,9 @@
         <div class="nav">
             <nav>
                 <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png"></a>
-                <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
                 <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
                         src="imagens/Usuario.png"></button>
             </nav>
@@ -30,14 +29,13 @@
 
     <div class="modalCliente" id="modalCliente">
         <div class="modalCliente-conteudo">
-            <h2>- Menu do usuário -</h2>
+            <h2 style="font-size: 30px;">Usuário</h2>
             <nav class="nav-usuario">
-                <a href="cadastro.html">Cadastro</a>
+                <a href="cadastro.html">cadastro</a>
                 <a href="cliente.html">Login</a>
                 <a href="cadastrocartao.html">Cadastrar cartão</a>
-                <a href="pedidos.html">Meus Pedidos</a>
+                <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
             </nav>
-            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
         </div>
     </div>
 
@@ -45,6 +43,8 @@
         <h2>Procure o que deseja.</h2>
         <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Ex.: Bleach">
         <button type="button" id="enviarPesquisa">Pesquisar</button>
+        <!-- Barra de Filtros e Sub-filtros -->
+        <!-- Barra de Filtros e Sub-filtros alinhados lado a lado -->
         <div class="painel-filtros"
             style="max-width: 900px; margin: 15px auto 30px auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px;">
 
@@ -57,7 +57,7 @@
                     <option value="Attack on Titan">Attack on Titan</option>
                     <option value="Jujutsu Kaisen">Jujutsu Kaisen</option>
                     <option value="Pokémon">Pokémon</option>
-                    <option value="Diário de uma Apotecária">Diário de uma Apotecária</option>
+                    <option value="Diario de uma potecaria">Diário de uma Apotecária</option>
                 </select>
             </div>
 
@@ -87,11 +87,14 @@
                 Limpar Filtros
             </button>
         </div>
+
+
     </div>
 
     <section class="destaques">
         <h2> - Produtos - </h2>
 
+        <!-- card 1 -->
         <div>
             <img src="imagens/bleach.png" alt="Produto 1">
             <p>Ichigo Kurosaki</p>
@@ -99,51 +102,16 @@
             <button type="button" id="card1">Ver mais</button>
         </div>
         <dialog id="modal-card1" class="modalProduto">
-
-            <!--descrição-->
-            <div class="modalProduto-conteudo">
-                <img src="imagens/bleach.png" alt="Imagem do Produto 1">
-                <h2>- Ichigo Kurosaki</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Ichigo Kurosaki</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card1">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Ichigo Kurosaki" data-preco="340.00"
                     data-imagem="imagens/bleach.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Ichigo Kurosaki" data-preco="340.00"
-                    data-imagem="imagens/bleach.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 2 -->
         <div>
             <img src="imagens/kisuke.png" alt="Produto 2">
             <p>Kisuke Urahara</p>
@@ -151,49 +119,22 @@
             <button type="button" id="card2">Ver mais</button>
         </div>
         <dialog id="modal-card2" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/kisuke.png" alt="Produto 2">
-                <h2>- Kisuke Urahara</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Kisuke Urahara</h2>
+            <p>Exemplo: Escala: 1/6 (~30 cm), em resina de alto padrão.</p>
+            <p>Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do
+                chapéu listrado (inclui cabeça extra com expressão séria).</p>
+            <p>Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta. Vem com a bengala no
+                ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha.</p>
+            <p>Base Diorama: Telhas de Karakura com uma lanterna apagada, a Yoruichi em forma de gato preto observando
+                na ponta e um frasco de Mod-Soul escondido como easter egg.</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card2">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Kisuke Urahara" data-preco="460.00"
                     data-imagem="imagens/kisuke.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Kisuke Urahara" data-preco="460.00"
-                    data-imagem="imagens/kisuke.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 3 -->
         <div>
             <img src="imagens/renje.png" alt="Produto 3">
             <p>Renji Abarai</p>
@@ -201,49 +142,16 @@
             <button type="button" id="card3">Ver mais</button>
         </div>
         <dialog id="modal-card3" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/renje.png" alt="Produto 3">
-                <h2>- Renji Abarai</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Renji Abarai</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card3">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Renji Abarai" data-preco="400.00"
                     data-imagem="imagens/renje.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Renji Abarai" data-preco="400.00"
-                    data-imagem="imagens/renje.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 4 -->
         <div>
             <img src="imagens/rukia.png" alt="Produto 4">
             <p>Rukia Kuchiki</p>
@@ -251,49 +159,16 @@
             <button type="button" id="card4">Ver mais</button>
         </div>
         <dialog id="modal-card4" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/rukia.png" alt="Produto 4">
-                <h2>- Rukia Kuchiki</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Rukia Kuchiki</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card4">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Rukia Kuchiki" data-preco="430.00"
                     data-imagem="imagens/rukia.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Rukia Kuchiki" data-preco="430.00"
-                    data-imagem="imagens/rukia.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 5 -->
         <div>
             <img src="imagens/toshiro.png" alt="Produto 5">
             <p>Toshiro Hitsugaya</p>
@@ -301,49 +176,17 @@
             <button type="button" id="card5">Ver mais</button>
         </div>
         <dialog id="modal-card5" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/toshiro.png" alt="Produto 5">
-                <h2>- Toshiro Hitsugaya</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Toshiro Hitsugaya</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card5">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Toshiro Hitsugaya" data-preco="200.00"
                     data-imagem="imagens/toshiro.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Toshiro Hitsugaya" data-preco="200.00"
-                    data-imagem="imagens/toshiro.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+
+        <!-- card 6 -->
         <div>
             <img src="imagens/Levi.png" alt="Produto 6">
             <p>Levi Ackerman</p>
@@ -351,49 +194,16 @@
             <button type="button" id="card6">Ver mais</button>
         </div>
         <dialog id="modal-card6" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Levi.png" alt="Produto 6">
-                <h2>- Levi Ackerman</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Levi Ackerman</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card6" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card6">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
                     data-imagem="imagens/Levi.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Levi Ackerman" data-preco="250.00"
-                    data-imagem="imagens/Levi.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 7 -->
         <div>
             <img src="imagens/Maomao.png" alt="Produto 7">
             <p>Maomao</p>
@@ -401,49 +211,16 @@
             <button type="button" id="card7">Ver mais</button>
         </div>
         <dialog id="modal-card7" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Maomao.png" alt="Produto 7">
-                <h2>- Maomao</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Maomao</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card7" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card7">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
                     data-imagem="imagens/Maomao.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Maomao" data-preco="300.00"
-                    data-imagem="imagens/Maomao.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 8 -->
         <div>
             <img src="imagens/Canva - download.png" alt="Produto 8">
             <p>Satoru Gojo</p>
@@ -451,49 +228,16 @@
             <button type="button" id="card8">Ver mais</button>
         </div>
         <dialog id="modal-card8" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download.png" alt="Produto 8">
-                <h2>- Satoru Gojo</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Satoru Gojo</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card8" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card8">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="350.00"
                     data-imagem="imagens/Canva - download.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Satoru Gojo" data-preco="350.00"
-                    data-imagem="imagens/Canva - download.png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 9 -->
         <div>
             <img src="imagens/Canva - download (1).png" alt="Produto 9">
             <p>Greninja</p>
@@ -501,49 +245,16 @@
             <button type="button" id="card9">Ver mais</button>
         </div>
         <dialog id="modal-card9" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download (1).png" alt="Produto 9">
-                <h2>- Greninja</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>
-
+            <h2>- Greninja</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card9" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card9">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
                     data-imagem="imagens/Canva - download (1).png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Greninja" data-preco="400.00"
-                    data-imagem="imagens/Canva - download (1).png">Comprar Agora</button>
             </footer>
         </dialog>
 
+        <!-- card 10 -->
         <div>
             <img src="imagens/Snorlax.png" alt="Produto 10">
             <p>Snorlax</p>
@@ -551,65 +262,23 @@
             <button type="button" id="card10">Ver mais</button>
         </div>
         <dialog id="modal-card10" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Snorlax.png" alt="Produto 10">
-                <h2>- Snorlax</h2>
-                <p>Exemplo: llllllllllll</p>
-            </div>
-
-            <!--cometarios-->
-            <div class="modalProduto-comentarios">
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-
-                <div class="comentarios">
-                    <h2>usuario aq</h2>
-                    <p>comentario</p>
-                </div>
-            </div>  
-
+            <h2>- Snorlax</h2>
+            <p>Exemplo: llllllllllll</p>
             <footer class="modal-footer">
-                <button type="button" id="fechar-card10" class="btn-fechar">Fechar</button>
+                <button type="button" id="fechar-card10">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
                     data-imagem="imagens/Snorlax.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Snorlax" data-preco="450.00"
-                    data-imagem="imagens/Snorlax.png">Comprar Agora</button>
             </footer>
         </dialog>
+
     </section>
 
     <footer>
         &copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.
     </footer>
 
-    <dialog id="modalAvisoLogin">
-        <h2>Acesso Necessário</h2>
-        <p>Você precisa estar logado ou cadastrado em sua conta para adicionar produtos ao carrinho.</p>
-        <footer>
-            <button type="button" id="fecharAvisoLogin">Cancelar</button>
-            <button type="button" onclick="window.location.href='cliente.html'">Login</button>
-            <button type="button" onclick="window.location.href='cadastro.html'">Cadastrar</button>
-        </footer>
-    </dialog>
-
     <script>
+        // 1. Faz os botões "Ver mais" e "Fechar" funcionarem
         for (let i = 1; i <= 10; i++) {
             const btnVerMais = document.getElementById(`card${i}`);
             const modal = document.getElementById(`modal-card${i}`);
@@ -620,82 +289,37 @@
                 btnFechar.addEventListener('click', () => modal.close());
             }
         }
-    const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
-    const modalAvisoLogin = document.getElementById('modalAvisoLogin');
-    const btnFecharAviso = document.getElementById('fecharAvisoLogin');
 
-    if (btnFecharAviso && modalAvisoLogin) {
-        btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
-    }
+        // 2. Adiciona ao carrinho
+        const botoesCarrinho = document.querySelectorAll('.btn-carrinho');
+        botoesCarrinho.forEach(botao => {
+            botao.addEventListener('click', function () {
+                const nome = this.getAttribute('data-nome');
+                const preco = parseFloat(this.getAttribute('data-preco'));
+                const imagem = this.getAttribute('data-imagem');
 
-    function processarCompra(botao, irParaPagamento = false) {
-        const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
-        const modalAtual = botao.closest('dialog');
+                let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+                const produtoExistente = carrinho.find(item => item.nome === nome);
 
-        if (!estaLogado) {
-            if (modalAtual) modalAtual.close();
-            if (modalAvisoLogin) modalAvisoLogin.showModal();
-            return;
-        }
+                if (produtoExistente) {
+                    produtoExistente.quantidade += 1;
+                } else {
+                    carrinho.push({ nome, preco, imagem, quantidade: 1 });
+                }
 
-        const nome = botao.getAttribute('data-nome');
-        const preco = parseFloat(botao.getAttribute('data-preco'));
-        const imagem = botao.getAttribute('data-imagem');
-
-        let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
-        const produtoExistente = carrinho.find(item => item.nome === nome);
-
-        if (produtoExistente) {
-            produtoExistente.quantidade += 1;
-        } else {
-            carrinho.push({ nome, preco, imagem, quantidade: 1 });
-        }
-
-        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
-
-        if (irParaPagamento) {
-            window.location.href = 'carrinho.html#tela-pagamento';
-        } else if (modalAtual) {
-            modalAtual.close();
-            alert(`${nome} foi adicionado ao carrinho!`);
-        } else {
-            const iconeAnterior = botao.innerHTML;
-            botao.innerHTML = '✔';
-            botao.style.backgroundColor = '#28a745';
-            botao.style.borderColor = '#28a745';
-
-            setTimeout(() => {
-                botao.innerHTML = iconeAnterior;
-                botao.style.backgroundColor = '';
-                botao.style.borderColor = '';
-            }, 1500);
-        }
-    }
-
-    document.querySelectorAll('.btn-carrinho').forEach(btn => {
-        btn.addEventListener('click', function () {
-            processarCompra(this, false);
+                localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+                this.closest('dialog').close();
+                alert(`${nome} foi adicionado ao carrinho!`);
+            });
         });
-    });
 
-    document.querySelectorAll('.btn-compra-rapida').forEach(btn => {
-        btn.addEventListener('click', function () {
-            processarCompra(this, false);
-        });
-    });
-
-    document.querySelectorAll('.btn-comprar-agora').forEach(btn => {
-        btn.addEventListener('click', function () {
-            processarCompra(this, true);
-        });
-    });
-    // ============================================================
-
+        // 3. Conecta produtos.json (Descrições + Pesquisa + Sub-filtros)
         async function conectarMeuJSON() {
             try {
                 const resposta = await fetch('produtos.json');
                 const produtosJSON = await resposta.json();
 
+                // Preenche descrições nos modais que têm "llllllllllll"
                 document.querySelectorAll('.modalProduto').forEach(modal => {
                     const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
                     const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
@@ -708,6 +332,7 @@
                     }
                 });
 
+                // Configura todos os filtros e sub-filtros juntos
                 const selectCategoria = document.getElementById('filtroCategoria');
                 const selectPreco = document.getElementById('filtroPreco');
                 const selectOrdem = document.getElementById('ordenarPreco');
@@ -726,7 +351,7 @@
                     const termoBusca = inputPesquisa ? limparTexto(inputPesquisa.value) : '';
 
                     const secao = document.querySelector('.destaques');
-                    const cards = Array.from(secao.querySelectorAll(':scope > div'));
+                    const cards = Array.from(secao.querySelectorAll('div'));
                     let visiveis = 0;
 
                     cards.forEach(card => {
@@ -753,6 +378,7 @@
                         }
                     });
 
+                    // Ordenação visual
                     if (ordemEscolhida !== 'padrao') {
                         const cardsOrdenados = [...cards].sort((a, b) => {
                             const dadosA = produtosJSON.find(p => p.nome.toLowerCase() === a.querySelector('p').innerText.toLowerCase());
@@ -765,6 +391,7 @@
                         cards.forEach(card => card.style.order = '');
                     }
 
+                    // Mensagem se nada for encontrado
                     let aviso = document.getElementById('aviso-pesquisa');
                     if (!aviso) {
                         aviso = document.createElement('p');
@@ -775,6 +402,7 @@
                     aviso.innerText = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
                 }
 
+                // Escuta mudanças em todos os campos
                 if (selectCategoria) selectCategoria.addEventListener('change', aplicarTodosFiltros);
                 if (selectPreco) selectPreco.addEventListener('change', aplicarTodosFiltros);
                 if (selectOrdem) selectOrdem.addEventListener('change', aplicarTodosFiltros);
@@ -791,6 +419,7 @@
                     });
                 }
 
+                // Lê busca vinda da página inicial (ex: produtos.html?busca=Bleach)
                 const buscaURL = new URLSearchParams(window.location.search).get('busca');
                 if (buscaURL && inputPesquisa) {
                     inputPesquisa.value = buscaURL;
@@ -804,6 +433,8 @@
 
         conectarMeuJSON();
     </script>
+</body>
+
 </body>
 
 </html>
