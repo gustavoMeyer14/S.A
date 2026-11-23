@@ -764,6 +764,45 @@ footer a:hover {
   box-shadow: 0 10px 25px #C62822;
 }
 
+/* 3. Modal de Confirmação do Cartão (cadastrocartao.html) */
+dialog.menor[open] {
+  width: 92%;
+  max-width: 650px;
+  min-height: 360px;
+  padding: 35px 40px;
+  font-size: 20px;
+  gap: 20px;
+}
+
+dialog.menor > div:last-child {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  margin: 0;
+}
+
+.btnCartão {
+  flex: 1;
+  max-width: 240px;
+  height: 52px;
+  margin: 0;
+  border-radius: 25px;
+  border: 1px solid #C62828;
+  background-color: #C62828;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btnCartão:hover {
+  transition: 0.3s;
+  background-color: #000000;
+  box-shadow: 0 10px 25px #C62828;
+  scale: 105%;
+}
+
 /* ==========================================================================
    5. TELA 2: MODAL DE PAGAMENTO E FRETE
    ========================================================================== */
@@ -1368,9 +1407,10 @@ dialog .btn-fechar {
   border-radius: 15px;
   padding: 20px;
   width: 380px;
-  text-align: left;
+  text-align: center;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
 }
 
@@ -1381,7 +1421,7 @@ dialog .btn-fechar {
   border-radius: 12px;
   font-size: 14px;
   font-weight: bold;
-  align-self: flex-start;
+  align-self: center;
 }
 
 .numero-mascarado {
@@ -1393,23 +1433,24 @@ dialog .btn-fechar {
 
 .acoes-cartao {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
   margin-top: 10px;
 }
 
 .btn-remover-cartao,
 .btn-secundario-cartao {
-  padding: 8px 14px;
-  border-radius: 15px;
+  width: 150px;
+  height: 45px;
+  border-radius: 20px;
   border: 1px solid #C62828;
+  background-color: #C62828;
   color: #ffffff;
   cursor: pointer;
+  font-size: 16px;
   font-weight: bold;
   transition: 0.3s;
-}
-
-.btn-remover-cartao {
-  background-color: #5a0d0d;
 }
 
 .btn-secundario-cartao {
@@ -1418,7 +1459,10 @@ dialog .btn-fechar {
 
 .btn-remover-cartao:hover,
 .btn-secundario-cartao:hover {
-  background-color: #C62828;
+  background-color: #151515;
+  border: 1px solid #C62828;
+  scale: 110%;
+  box-shadow: 0 10px 25px #C62828;
 }
 
 /* Ajusta o espaçamento dos links no modal do usuário para caberem 4 opções sem apertar */
