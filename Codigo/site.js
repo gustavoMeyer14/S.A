@@ -1,9 +1,11 @@
 function abreModalCliente() {
-    document.getElementById('modalCliente').classList.add('aberto');
+    const modal = document.getElementById('modalCliente');
+    if (modal) modal.classList.add('aberto');
 }
 
 function fechaModalCliente() {
-    document.getElementById('modalCliente').classList.remove('aberto');
+    const modal = document.getElementById('modalCliente');
+    if (modal) modal.classList.remove('aberto');
 }
 
 function toggleSenha(inputId, btnElement) {
@@ -23,8 +25,33 @@ function sairConta() {
     localStorage.removeItem('usuarioLogado');
     localStorage.removeItem('usuarioAtual');
     localStorage.removeItem('usuarioNome');
+    localStorage.removeItem('clienteLogado');
     alert("Você saiu da sua conta.");
     window.location.href = "index.html";
+}
+
+function obterChaveCartoesUsuario() {
+    const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
+    return usuarioAtual ? `cartoesShadowRealm_${usuarioAtual}` : 'cartoesShadowRealm';
+}
+
+function lerCartoesUsuario() {
+    const chave = obterChaveCartoesUsuario();
+    try {
+        const dados = JSON.parse(localStorage.getItem(chave));
+        if (Array.isArray(dados)) return dados;
+    } catch {}
+    try {
+        const legado = JSON.parse(localStorage.getItem('cartoesShadowRealm'));
+        return Array.isArray(legado) ? legado : [];
+    } catch {
+        return [];
+    }
+}
+
+function salvarCartoesUsuario(lista) {
+    const chave = obterChaveCartoesUsuario();
+    localStorage.setItem(chave, JSON.stringify(lista));
 }
 
 window.addEventListener("DOMContentLoaded", function () {
@@ -56,39 +83,17 @@ window.addEventListener("DOMContentLoaded", function () {
         if (linkCadastro) linkCadastro.style.display = 'none';
         if (linkLogin) linkLogin.style.display = 'none';
 
-        const linkPerfil = document.createElement('a');
-        linkPerfil.href = "#";
-        linkPerfil.textContent = "Meu Perfil";
-        linkPerfil.onclick = function (e) {
-            e.preventDefault();
-            const emailAtual = localStorage.getItem('usuarioAtual') || '';
-            alert(`Perfil do Cliente\nNome: ${nomeSalvo}\nE-mail: ${emailAtual}`);
-        };
-
-        const linkPedidos = document.createElement('a');
-        linkPedidos.href = "#";
-        linkPedidos.textContent = "Meus Pedidos";
-        linkPedidos.onclick = function (e) {
-            e.preventDefault();
-            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
-            if (pedidos.length === 0) {
-                alert("Você ainda não possui pedidos realizados.");
-            } else {
-                alert(`Você possui ${pedidos.length} pedido(s) registrado(s).`);
-            }
-        };
-
-        const linkSair = document.createElement('a');
-        linkSair.href = "#";
-        linkSair.textContent = "Sair";
-        linkSair.onclick = function (e) {
-            e.preventDefault();
-            sairConta();
-        };
-
-        navUsuario.insertBefore(linkPedidos, navUsuario.firstChild);
-        navUsuario.insertBefore(linkPerfil, navUsuario.firstChild);
-        navUsuario.appendChild(linkSair);
+        if (!document.getElementById('link-sair-conta')) {
+            const linkSair = document.createElement('a');
+            linkSair.href = "#";
+            linkSair.id = "link-sair-conta";
+            linkSair.textContent = "Sair";
+            linkSair.onclick = function (e) {
+                e.preventDefault();
+                sairConta();
+            };
+            navUsuario.appendChild(linkSair);
+        }
     }
 
     var inputCpf = document.getElementById('cpf');
@@ -153,16 +158,12 @@ async function validaLogin() {
     try {
         var respUsuarios = await fetch('usuarios.json');
         if (respUsuarios.ok) usuariosJSON = await respUsuarios.json();
-    } catch (e) {
-        console.warn("Aviso: fetch de usuarios.json bloqueado (abra com Live Server).");
-    }
+    } catch (e) {}
 
     try {
         var respClientes = await fetch('clientes.json');
         if (respClientes.ok) clientesJSON = await respClientes.json();
-    } catch (e) {
-        console.warn("Aviso: fetch de clientes.json bloqueado (abra com Live Server).");
-    }
+    } catch (e) {}
 
     if (usuariosJSON.length === 0 && clientesJSON.length === 0) {
         usuariosJSON = [
@@ -174,10 +175,10 @@ async function validaLogin() {
     }
 
     var usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
-    var todosUsuarios = usuariosJSON.concat(clientesJSON, usuariosLocais);
+    var todosUsuarios = usuariosLocais.concat(usuariosJSON, clientesJSON);
 
     var usuarioValido = todosUsuarios.find(function (u) {
-        return u.email.toLowerCase() === email.toLowerCase() && u.senha === senha;
+        return u.email && u.email.toLowerCase() === email.toLowerCase() && u.senha === senha;
     });
 
     if (!usuarioValido) {
@@ -194,7 +195,7 @@ function abreModalLogin() {
     var f = document.frmlogin;
     var dados = [
         ["Email", f.txtemail.value],
-        ["Senha", f.txtsenha.value]
+        ["Senha", "•".repeat(f.txtsenha.value.length)]
     ];
     renderizarListaModal("listaDadosLogin", dados);
     document.getElementById("modalDadosLogin").classList.add("aberto");
@@ -217,12 +218,17 @@ function fechaModalLogin() {
 }
 
 function confirmaLogin() {
-    var email = document.frmlogin.txtemail.value.trim();
+    var email = document.frmlogin.txtemail.value.trim().toLowerCase();
     var nomeUsuario = (usuarioEncontradoLogin && usuarioEncontradoLogin.nome) ? usuarioEncontradoLogin.nome : email.split('@')[0];
 
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', email);
     localStorage.setItem('usuarioNome', nomeUsuario);
+    localStorage.setItem('clienteLogado', JSON.stringify({
+        nome: nomeUsuario,
+        email: email,
+        cpf: (usuarioEncontradoLogin && usuarioEncontradoLogin.cpf) || ''
+    }));
 
     alert("Login realizado com sucesso!");
     fechaModalLogin();
@@ -230,8 +236,14 @@ function confirmaLogin() {
     window.location.href = "index.html";
 }
 
-function verificaMotivo(valor) {
-    console.log("Formulário limpo");
+function verificaMotivo() {
+    const barraFill = document.querySelector('.forca-senha-barra-fill');
+    const barraTexto = document.querySelector('.forca-senha-texto');
+    if (barraFill) barraFill.style.width = '0%';
+    if (barraTexto) {
+        barraTexto.style.color = '#888';
+        barraTexto.textContent = 'Força da senha';
+    }
 }
 
 function validaCadastro() {
@@ -275,7 +287,7 @@ function abreModalCadastro() {
     var dados = [
         ["Nome Completo", f.txtnome.value],
         ["Email", f.txtemail.value],
-        ["Senha", f.txtsenha.value],
+        ["Senha", "•".repeat(f.txtsenha.value.length)],
         ["CPF", f.txtcpf.value]
     ];
     renderizarListaModal("listaDadosCadastro", dados);
@@ -312,6 +324,11 @@ function confirmaCadastro() {
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', novoUsuario.email);
     localStorage.setItem('usuarioNome', novoUsuario.nome);
+    localStorage.setItem('clienteLogado', JSON.stringify({
+        nome: novoUsuario.nome,
+        email: novoUsuario.email,
+        cpf: novoUsuario.cpf
+    }));
 
     alert("Cadastro realizado com sucesso!");
     fechaModalCadastro();
@@ -319,6 +336,9 @@ function confirmaCadastro() {
     window.location.href = "index.html";
 }
 
+// ==========================================
+// CARRINHO E CHECKOUT UNIFICADOS
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const productsList = document.getElementById('products-list');
     const priceBreakdown = document.querySelector('.price-breakdown');
@@ -340,13 +360,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let descontoAtual = 0;
     let cupomAtivo = '';
 
-    let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+    function obterCarrinho() {
+        try {
+            const dados = JSON.parse(localStorage.getItem('carrinhoShadowRealm'));
+            return Array.isArray(dados) ? dados : [];
+        } catch {
+            return [];
+        }
+    }
 
     if (btnBuy) {
         btnBuy.onclick = (e) => {
+            const carrinho = obterCarrinho();
             if (carrinho.length === 0) {
                 e.preventDefault();
                 alert('Seu carrinho está vazio! Adicione produtos antes de prosseguir.');
+                return;
+            }
+            const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+            if (!estaLogado) {
+                e.preventDefault();
+                alert('Você precisa estar logado para finalizar a compra!');
+                window.location.href = 'cliente.html';
             }
         };
     }
@@ -360,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (cuponsValidos.hasOwnProperty(codigoDigitado)) {
+            if (Object.prototype.hasOwnProperty.call(cuponsValidos, codigoDigitado)) {
                 descontoAtual = cuponsValidos[codigoDigitado];
                 cupomAtivo = codigoDigitado;
                 const porcText = Math.round(descontoAtual * 100) + '%';
@@ -377,22 +412,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btncancelar) {
         btncancelar.onclick = () => {
-            // Se não tiver cupom aplicado, avisa o usuário
             if (descontoAtual === 0 && cupomAtivo === '') {
                 exibirMensagemCupom('Nenhum cupom aplicado no momento.', '#ffaa00');
                 return;
             }
-
-            // 1. Zera as variáveis de desconto
             descontoAtual = 0;
             cupomAtivo = '';
-
-            // 2. Limpa o campo de texto do cupom
-            if (couponInput) {
-                couponInput.value = '';
-            }
-
-            // 3. Atualiza a mensagem na tela e recalcula o carrinho
+            if (couponInput) couponInput.value = '';
             exibirMensagemCupom('Cupom cancelado.', '#ffaa00');
             renderizarCarrinho();
         };
@@ -405,29 +431,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function calcularTotaisCarrinho(itens) {
+        const subtotal = itens.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
+        const valorDesconto = subtotal * descontoAtual;
+        const subtotalComDesconto = Math.max(0, subtotal - valorDesconto);
+        const frete = subtotal === 0 ? 0 : (subtotalComDesconto >= 250 ? 0 : 25);
+        const totalFinal = subtotalComDesconto + frete;
+        return { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal };
+    }
+
     function renderizarCarrinho() {
         if (!productsList) return;
+        const carrinho = obterCarrinho();
 
         if (carrinho.length === 0) {
             productsList.innerHTML = '<p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>';
-            atualizarResumo(0, []);
+            atualizarResumo([]);
             return;
         }
 
         productsList.innerHTML = '';
-        let grandTotal = 0;
 
         carrinho.forEach((item, index) => {
-            const subtotal = item.preco * item.quantidade;
-            grandTotal += subtotal;
-
             const card = document.createElement('article');
             card.className = 'product-card';
             card.innerHTML = `
                 <div class="product-thumb">
                     <img src="${item.imagem || 'imagens/logo.png'}" alt="${item.nome}">
                 </div>
-                <h3 class="product-name">${item.nome}</h3>
+                <div style="flex:1; margin-left: 20px;">
+                    <h3 class="product-name" style="margin-left:0;">${item.nome}</h3>
+                    <small style="color:#ffca28;">R$ ${(item.preco * item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
+                </div>
                 <div class="quantity-controls">
                     <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)">+</button>
                     <span class="qty-value">${item.quantidade}</span>
@@ -443,12 +478,14 @@ document.addEventListener('DOMContentLoaded', () => {
             productsList.appendChild(card);
         });
 
-        atualizarResumo(grandTotal, carrinho);
+        atualizarResumo(carrinho);
     }
 
     window.alterarQuantidade = function (index, delta) {
-        carrinho[index].quantidade += delta;
+        const carrinho = obterCarrinho();
+        if (!carrinho[index]) return;
 
+        carrinho[index].quantidade += delta;
         if (carrinho[index].quantidade <= 0) {
             carrinho.splice(index, 1);
         }
@@ -459,15 +496,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.removerProduto = function (index) {
+        const carrinho = obterCarrinho();
         carrinho.splice(index, 1);
         localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
         renderizarCarrinho();
         if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
     };
-    
-    function atualizarResumo(grandTotal, itens) {
+
+    function atualizarResumo(itens) {
         if (!priceBreakdown) return;
 
+        const { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal } = calcularTotaisCarrinho(itens);
         let breakdownHTML = '';
 
         if (itens.length === 0) {
@@ -475,54 +514,120 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             itens.forEach((item, index) => {
                 const mathPrefix = index === 0 ? '' : '+ ';
-                const subtotal = item.preco * item.quantidade;
-                breakdownHTML += `<p class="price-item">${mathPrefix}R$ ${subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
+                const itemSub = item.preco * item.quantidade;
+                breakdownHTML += `<p class="price-item">${mathPrefix}R$ ${itemSub.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
             });
         }
 
-        let valorComDesconto = grandTotal;
-        if (descontoAtual > 0 && grandTotal > 0) {
-            const valorDesconto = grandTotal * descontoAtual;
-            valorComDesconto = grandTotal - valorDesconto;
-
+        if (descontoAtual > 0 && subtotal > 0) {
             breakdownHTML += `<p class="price-item" style="color: #00ff88;">- Desconto (${Math.round(descontoAtual * 100)}%): R$ ${valorDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
         }
 
+        if (itens.length > 0) {
+            if (frete === 0) {
+                breakdownHTML += `<p class="price-item" style="color: #00e676;">Frete: GRÁTIS (R$ 0,00)</p>`;
+            } else {
+                breakdownHTML += `<p class="price-item" style="color: #ffca28;">Frete: + R$ 25,00</p>`;
+            }
+        }
+
         breakdownHTML += `<hr class="summary-divider">`;
-        breakdownHTML += `<p class="total-final">Valor Total: <span>R$ ${valorComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>`;
+        breakdownHTML += `<p class="total-final">Valor Total: <span>R$ ${totalFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>`;
 
         priceBreakdown.innerHTML = breakdownHTML;
 
         if (modalTotalValue) {
-            modalTotalValue.textContent = `Valor Total: R$ ${valorComDesconto.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            modalTotalValue.textContent = `Valor Total: R$ ${totalFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        const avisoFrete = document.getElementById('aviso-frete-gratis');
+        if (avisoFrete) {
+            if (subtotal === 0) {
+                avisoFrete.style.display = 'none';
+            } else if (subtotalComDesconto >= 250) {
+                avisoFrete.style.display = 'block';
+                avisoFrete.style.color = '#00e676';
+                avisoFrete.innerHTML = '🚚 Parabéns! Você ganhou <strong>Frete Grátis</strong>!';
+            } else {
+                const falta = (250 - subtotalComDesconto).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                avisoFrete.style.display = 'block';
+                avisoFrete.style.color = '#ffca28';
+                avisoFrete.innerHTML = `🚚 Adicione mais <strong>R$ ${falta}</strong> para ganhar Frete Grátis!`;
+            }
         }
     }
 
-   if (addressForm) {
+    if (addressForm) {
         addressForm.onsubmit = (e) => {
             e.preventDefault();
 
+            const carrinho = obterCarrinho();
             if (carrinho.length === 0) {
                 alert('Seu carrinho está vazio!');
                 return;
             }
 
+            const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+            const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
+            if (!estaLogado || !usuarioAtual) {
+                alert('Faça login para confirmar seu pedido!');
+                window.location.href = 'cliente.html';
+                return;
+            }
+
+            const metodoRadio = document.querySelector('input[name="payment-group"]:checked');
+            const metodo = metodoRadio ? metodoRadio.value : 'pix';
+            const cartoesSalvos = lerCartoesUsuario();
+
+            let descricaoPagamento = 'Pix';
+            if (metodo === 'debito' || metodo === 'parcelado') {
+                if (cartoesSalvos.length === 0) {
+                    alert('Você não possui cartão cadastrado! Cadastre um cartão ou selecione Pix.');
+                    return;
+                }
+                const selectCartao = document.getElementById('select-cartao-uso');
+                const idx = selectCartao ? parseInt(selectCartao.value, 10) : 0;
+                const cartaoEscolhido = cartoesSalvos[idx] || cartoesSalvos[0];
+                const labelTipo = metodo === 'debito' ? 'Débito' : 'Crédito Parcelado';
+                descricaoPagamento = `${labelTipo} (${cartaoEscolhido.numeroMascarado})`;
+            }
+
+            const { totalFinal } = calcularTotaisCarrinho(carrinho);
+            const rua = document.getElementById('input-rua')?.value.trim() || '';
+            const cidade = document.getElementById('input-cidade')?.value.trim() || '';
+            const estado = document.getElementById('input-estado')?.value.trim() || '';
+
             const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            const proximoNumero = pedidos.length > 0
+                ? Math.max(...pedidos.map(p => Number(p.numeroPedido) || 1000)) + 1
+                : 1001;
+
             pedidos.push({
+                numeroPedido: proximoNumero,
+                clienteEmail: usuarioAtual,
                 data: new Date().toLocaleDateString('pt-BR'),
+                status: 'Pedido Confirmado',
+                cartaoUsado: descricaoPagamento,
+                enderecoEntrega: `${rua} - ${cidade}/${estado}`,
+                cupom: cupomAtivo || null,
+                total: Number(totalFinal.toFixed(2)),
                 itens: carrinho
             });
+
             localStorage.setItem('pedidosShadowRealm', JSON.stringify(pedidos));
-
-            alert('Pagamento confirmado com sucesso! Obrigado por comprar na Shadow Realm Store.');
-
             localStorage.removeItem('carrinhoShadowRealm');
-            window.location.href = 'index.html';
+
+            alert(`Pagamento confirmado com sucesso! Pedido #${proximoNumero} registrado.`);
+            window.location.href = 'pedidos.html';
         };
     }
+
     renderizarCarrinho();
 });
 
+// ==========================================
+// CADASTRO DE CARTÃO (cadastrocartao.html)
+// ==========================================
 const inputNumero = document.getElementById('numero');
 const inputTitular = document.getElementById('titular');
 const inputValidade = document.getElementById('validade');
@@ -592,7 +697,7 @@ function renderizarCartoesSalvos() {
     const container = document.getElementById('listaCartoesSalvos');
     if (!container) return;
 
-    const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+    const cartoes = lerCartoesUsuario();
 
     if (cartoes.length === 0) {
         container.innerHTML = '<p style="color: #aaa; font-size: 18px;">Nenhum cartão cadastrado ainda.</p>';
@@ -625,17 +730,17 @@ function renderizarCartoesSalvos() {
 window.removerCartao = function (index) {
     if (!confirm('Deseja realmente remover este cartão?')) return;
 
-    const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+    const cartoes = lerCartoesUsuario();
     cartoes.splice(index, 1);
-    localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
+    salvarCartoesUsuario(cartoes);
     renderizarCartoesSalvos();
 };
 
 window.definirCartaoPrincipal = function (index) {
-    const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+    const cartoes = lerCartoesUsuario();
     if (index === 1 && cartoes.length === 2) {
         [cartoes[0], cartoes[1]] = [cartoes[1], cartoes[0]];
-        localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
+        salvarCartoesUsuario(cartoes);
         renderizarCartoesSalvos();
     }
 };
@@ -644,7 +749,7 @@ if (form) {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+        const cartoes = lerCartoesUsuario();
         if (cartoes.length >= 2) {
             alert('Você já atingiu o limite de 2 cartões (Principal e Secundário). Remova um para cadastrar outro.');
             return;
@@ -694,7 +799,7 @@ if (btnCorrigir) {
 
 if (btnConfirmar) {
     btnConfirmar.addEventListener('click', () => {
-        const cartoes = JSON.parse(localStorage.getItem('cartoesShadowRealm')) || [];
+        const cartoes = lerCartoesUsuario();
         const numeroLimpo = inputNumero.value.replace(/\s/g, '');
 
         cartoes.push({
@@ -705,7 +810,7 @@ if (btnConfirmar) {
             endereco: inputEndereco.value.trim()
         });
 
-        localStorage.setItem('cartoesShadowRealm', JSON.stringify(cartoes));
+        salvarCartoesUsuario(cartoes);
 
         modal.close();
         alert(cartoes.length === 1 ? 'Cartão Principal cadastrado com sucesso!' : 'Cartão Secundário cadastrado com sucesso!');
