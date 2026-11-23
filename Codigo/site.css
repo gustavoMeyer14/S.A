@@ -1081,15 +1081,34 @@ dialog::backdrop {
 
 /* 1. Modal de Descrição do Produto e Carrinho */
 .modalProduto[open] {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Impede que o rodapé invada os cards */
+  gap: 16px;
   width: 1500px;
   max-width: 95vw;
-  height: 900px;
+  height: auto;
   max-height: 90vh;
   text-align: left;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
   font-size: 25px;
-  padding: 20px;
+  padding: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: #C62828 #151515;
+}
+
+/* Barra de rolagem estilizada no tema escuro */
+.modalProduto::-webkit-scrollbar {
+  width: 8px;
+}
+.modalProduto::-webkit-scrollbar-track {
+  background: #151515;
+  border-radius: 10px;
+}
+.modalProduto::-webkit-scrollbar-thumb {
+  background: #C62828;
+  border-radius: 10px;
 }
 
 .modalProduto img {
@@ -1111,136 +1130,85 @@ dialog::backdrop {
   border-radius: 20px;
   background-color: #262626;
   border: 1px solid #C62828;
+  overflow: hidden; /* Contém a imagem flutuante sem vazar */
 }
 
 .modalProduto-comentarios {
   width: 100%;
-  height: 500px;
+  height: auto;
   border-radius: 20px;
   background-color: #262626;
   border: 1px solid #C62828;
-  margin-top: 10px;
   padding: 20px;
 }
 
-.comentarios {
-  width: 250px;
-  height: 250px;
-  background-color: #000000;
-  border: 1px solid #C62828;
-  border-radius: 20px;
-  float: left;
-  margin: 16px;
-  padding: 20px;
+/* Grid uniforme para TODOS os cards de comentários terem a exata mesma altura */
+.lista-novos-comentarios {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  gap: 16px !important;
+  align-items: stretch !important;
 }
 
-.comentarios h2 {
-  font-size: 25px;
+.comentarios,
+.lista-novos-comentarios .comentarios {
+  width: 100% !important;
+  min-height: 240px !important;
+  height: 100% !important;
+  background-color: #000000 !important;
+  border: 1px solid #C62828 !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  float: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
 }
 
-.comentarios p {
-  font-size: 20px;
+.comentarios h2,
+.lista-novos-comentarios .comentarios h2 {
+  font-size: 22px !important;
+  line-height: 1.2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+  margin: 0 !important;
 }
 
-/* 2. Modal de Aviso de Login */
-#modalAvisoLogin[open] {
-  width: 500px;
-  max-width: 90vw;
-  height: auto;
-  padding: 30px;
-  text-align: center;
-  gap: 20px;
+.comentarios p,
+.lista-novos-comentarios .comentarios p {
+  font-size: 16px !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  flex: 1 !important;
 }
 
-#modalAvisoLogin h2 {
-  font-size: 28px;
-  color: #ffffff;
-  border-bottom: 1px solid #C62828;
-  padding-bottom: 10px;
-}
-
-#modalAvisoLogin p {
-  font-size: 18px;
-  line-height: 1.5;
-  color: #e0e0e0;
-}
-
-#modalAvisoLogin footer {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 10px 0 0 0;
-  padding: 15px 0 0 0;
-  border-top: 1px solid #C62828;
-}
-
-#modalAvisoLogin footer button {
-  padding: 10px 18px;
-  border-radius: 20px;
-  border: 1px solid #C62828;
-  background-color: #C62828;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-#modalAvisoLogin footer button:first-child {
-  background-color: #2b2b2b;
-}
-
-#modalAvisoLogin footer button:hover {
-  background-color: #151515;
-  transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(198, 40, 40, 0.5);
-}
-
-/* 3. Modal de Confirmação do Cartão (cadastrocartao.html) */
-dialog.menor[open] {
-  width: 550px;
-  max-width: 90vw;
-  height: auto;
-  padding: 25px;
-  font-size: 18px;
-}
-
-.btnCartão {
-  width: 200px;
-  height: 50px;
-  border-radius: 20px;
-  border: 1px solid #C62828;
-  background-color: #C62828;
-  color: #ffffff;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.btnCartão:hover {
-  transition: 0.3s;
-  background-color: #000000;
-  box-shadow: 0 10px 25px #C62828;
-  scale: 110%;
-}
-
+/* Rodapé fixado abaixo da caixa de comentários, sem sobrepor nada */
 dialog .modal-footer {
-  margin: 10px;
-  border-top: none;
-  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 15px;
+  margin: 8px 0 0 0;
+  padding: 16px 0 4px 0;
+  border-top: 1px solid #C62828;
   width: 100%;
+  clear: both;
 }
 
 dialog .modal-footer button {
-  margin: 5px;
-  flex: 1;
+  margin: 0;
+  flex: 0 1 230px;
   white-space: nowrap;
-  padding: 10px 12px;
-  font-size: 14px;
+  padding: 12px 20px;
   border-radius: 20px;
   cursor: pointer;
   font-weight: bold;
-  width: 250px;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 dialog .btn-carrinho {
