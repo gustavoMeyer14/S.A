@@ -622,7 +622,7 @@ footer {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  max-height: 550px;
+  max-height: 700px;
 }
 
 .checkout-summary h2 {
