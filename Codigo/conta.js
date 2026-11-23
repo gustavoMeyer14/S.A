@@ -16,7 +16,6 @@ function injetarEstilosConta() {
     const style = document.createElement('style');
     style.id = 'estilos-conta-sr';
     style.textContent = `
-        /* Barra de Força da Senha Compacta */
         .forca-senha-wrapper {
             width: 80%;
             margin: 3px auto 2px auto;
@@ -44,13 +43,11 @@ function injetarEstilosConta() {
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        /* Ajusta apenas o formulário de cadastro para comportar a barrinha com folga */
         form[name="frmcadastro"].formLogin {
             height: auto !important;
             min-height: 360px;
             padding-bottom: 15px;
         }
-        /* Modais de Conta (Editar Perfil e Esqueci Senha) */
         dialog.modal-conta-sr[open] {
             position: fixed !important;
             top: 50% !important;
@@ -128,9 +125,6 @@ function injetarEstilosConta() {
     document.head.appendChild(style);
 }
 
-// ==========================================
-// UTILITÁRIO: LER E SALVAR USUÁRIOS NO LOCALSTORAGE
-// ==========================================
 function lerUsuariosCadastrados() {
     const chavesPossiveis = ['usuariosShadowRealm', 'clientesShadowRealm', 'usuarios', 'clientes'];
     for (const chave of chavesPossiveis) {
@@ -160,16 +154,13 @@ function obterPerfilLogado() {
     } catch {}
 
     return {
-        nome: encontrado?.nome || clienteObj.nome || (emailAtual.includes('@') ? emailAtual.split('@')[0] : emailAtual),
+        nome: encontrado?.nome || clienteObj.nome || localStorage.getItem('usuarioNome') || (emailAtual.includes('@') ? emailAtual.split('@')[0] : emailAtual),
         email: encontrado?.email || clienteObj.email || emailAtual,
         cpf: encontrado?.cpf || clienteObj.cpf || '',
         senha: encontrado?.senha || clienteObj.senha || ''
     };
 }
 
-// ==========================================
-// 1. INDICADOR DE FORÇA DA SENHA (cadastro.html)
-// ==========================================
 function anexarMedidorForcaSenha(inputSenha) {
     if (!inputSenha || inputSenha.dataset.medidorAtivo === 'true') return;
     inputSenha.dataset.medidorAtivo = 'true';
@@ -199,8 +190,8 @@ function anexarMedidorForcaSenha(inputSenha) {
         }
 
         let pontos = 0;
-        if (val.length >= 6) pontos++;
         if (val.length >= 8) pontos++;
+        if (val.length >= 10) pontos++;
         if (/[A-Z]/.test(val)) pontos++;
         if (/[0-9]/.test(val)) pontos++;
         if (/[^A-Za-z0-9]/.test(val)) pontos++;
@@ -209,7 +200,7 @@ function anexarMedidorForcaSenha(inputSenha) {
             fill.style.width = '33%';
             fill.style.backgroundColor = '#ff4d4d';
             texto.style.color = '#ff4d4d';
-            texto.textContent = 'Senha fraca (use maiúscula, nº e símbolo)';
+            texto.textContent = 'Senha fraca (mín. 8 chars com letras e números)';
         } else if (pontos <= 4) {
             fill.style.width = '68%';
             fill.style.backgroundColor = '#ffca28';
@@ -231,9 +222,6 @@ function injetarForcaSenhaCadastro() {
     anexarMedidorForcaSenha(inputSenha);
 }
 
-// ==========================================
-// 2. "ESQUECI MINHA SENHA" (cliente.html)
-// ==========================================
 function injetarEsqueciSenhaLogin() {
     const formLogin = document.querySelector('form[name="frmlogin"]');
     if (!formLogin || document.getElementById('link-esqueci-senha')) return;
@@ -265,7 +253,7 @@ function injetarEsqueciSenhaLogin() {
             <label for="rec-email">E-mail cadastrado:</label>
             <input type="email" id="rec-email" placeholder="seuemail@exemplo.com" required>
 
-            <label for="rec-nova-senha">Nova senha:</label>
+            <label for="rec-nova-senha">Nova senha (mín. 8 caracteres, letras e números):</label>
             <div style="position:relative;">
                 <input type="password" id="rec-nova-senha" placeholder="Digite a nova senha" required>
             </div>
@@ -298,16 +286,17 @@ function injetarEsqueciSenhaLogin() {
         dialogRec.close();
     });
 
-    dialogRec.querySelector('#formRecuperarSenhaSR').addEventListener('submit', (e) => {
+    dialogRec.querySelector('#formRecuperarSenhaSR').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = dialogRec.querySelector('#rec-email').value.trim().toLowerCase();
         const novaSenha = dialogRec.querySelector('#rec-nova-senha').value;
         const confirmaSenha = dialogRec.querySelector('#rec-confirma-senha').value;
         const msgEl = dialogRec.querySelector('#msg-recuperar-senha');
 
-        if (novaSenha.length < 4) {
+        const expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!expRegsenha.test(novaSenha)) {
             msgEl.style.color = '#ff4d4d';
-            msgEl.textContent = 'A nova senha deve ter pelo menos 4 caracteres.';
+            msgEl.textContent = 'A nova senha deve ter no mínimo 8 caracteres, com letras e números.';
             return;
         }
         if (novaSenha !== confirmaSenha) {
@@ -317,7 +306,21 @@ function injetarEsqueciSenhaLogin() {
         }
 
         const { chave, lista } = lerUsuariosCadastrados();
-        const idx = lista.findIndex(u => u.email && u.email.toLowerCase() === email);
+        let idx = lista.findIndex(u => u.email && u.email.toLowerCase() === email);
+
+        if (idx === -1) {
+            try {
+                const resp = await fetch('clientes.json');
+                if (resp.ok) {
+                    const clientesJSON = await resp.json();
+                    const clienteBase = clientesJSON.find(u => u.email && u.email.toLowerCase() === email);
+                    if (clienteBase) {
+                        lista.push({ ...clienteBase, senha: novaSenha });
+                        idx = lista.length - 1;
+                    }
+                }
+            } catch {}
+        }
 
         if (idx === -1) {
             msgEl.style.color = '#ff4d4d';
@@ -341,9 +344,6 @@ function injetarEsqueciSenhaLogin() {
     });
 }
 
-// ==========================================
-// 3. MODAL "EDITAR PERFIL" (Menu do Usuário)
-// ==========================================
 function injetarEditarPerfilNoMenu() {
     const navUsuario = document.querySelector('#modalCliente .nav-usuario');
     const perfil = obterPerfilLogado();
@@ -359,8 +359,8 @@ function injetarEditarPerfilNoMenu() {
         abrirModalEditarPerfil();
     });
 
-    const botaoFechar = navUsuario.querySelector('.botaoFecharCliente');
-    if (botaoFechar) navUsuario.insertBefore(linkEditar, botaoFechar);
+    const linkSair = Array.from(navUsuario.querySelectorAll('a')).find(a => a.textContent.trim().toLowerCase() === 'sair');
+    if (linkSair) navUsuario.insertBefore(linkEditar, linkSair);
     else navUsuario.appendChild(linkEditar);
 
     if (!document.getElementById('modalEditarPerfilSR')) {
@@ -406,10 +406,16 @@ function injetarEditarPerfilNoMenu() {
             if (!atual) return;
 
             const novoNome = dialogPerfil.querySelector('#edit-perfil-nome').value.trim();
-            const novoEmail = dialogPerfil.querySelector('#edit-perfil-email').value.trim();
+            const novoEmail = dialogPerfil.querySelector('#edit-perfil-email').value.trim().toLowerCase();
             const novoCpf = dialogPerfil.querySelector('#edit-perfil-cpf').value.trim();
             const novaSenha = dialogPerfil.querySelector('#edit-perfil-senha').value;
             const msgEl = dialogPerfil.querySelector('#msg-editar-perfil');
+
+            if (novaSenha && !/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(novaSenha)) {
+                msgEl.style.color = '#ff4d4d';
+                msgEl.textContent = 'A nova senha deve ter no mínimo 8 caracteres, com letras e números.';
+                return;
+            }
 
             const { chave, lista } = lerUsuariosCadastrados();
             const idx = lista.findIndex(u =>
@@ -432,10 +438,11 @@ function injetarEditarPerfilNoMenu() {
 
             localStorage.setItem(chave, JSON.stringify(lista));
             localStorage.setItem('usuarioAtual', novoEmail);
+            localStorage.setItem('usuarioNome', novoNome);
             localStorage.setItem('clienteLogado', JSON.stringify(registroAtualizado));
 
-            if (atual.email && atual.email !== novoEmail) {
-                const cartoesAntigos = localStorage.getItem(`cartoesShadowRealm_${atual.email}`);
+            if (atual.email && atual.email.toLowerCase() !== novoEmail) {
+                const cartoesAntigos = localStorage.getItem(`cartoesShadowRealm_${atual.email.toLowerCase()}`);
                 if (cartoesAntigos) {
                     localStorage.setItem(`cartoesShadowRealm_${novoEmail}`, cartoesAntigos);
                 }

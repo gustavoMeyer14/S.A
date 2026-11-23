@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const formEndereco = document.querySelector('.address-column');
-    if (!formEndereco) return; // Só executa na página carrinho.html
+    if (!formEndereco) return;
 
-    const usuarioAtual = localStorage.getItem('usuarioAtual') || 'geral';
-    const cartoesSalvos = JSON.parse(localStorage.getItem(`cartoesShadowRealm_${usuarioAtual}`))
+    const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
+    const chaveUsuario = usuarioAtual ? `cartoesShadowRealm_${usuarioAtual}` : 'cartoesShadowRealm';
+    const cartoesSalvos = JSON.parse(localStorage.getItem(chaveUsuario))
         || JSON.parse(localStorage.getItem('cartoesShadowRealm'))
         || [];
 
     injetarSelecaoCartoes(cartoesSalvos);
     injetarEnderecoAutomatico(formEndereco, cartoesSalvos);
-    injetarCalculoFreteReal();
+    configurarFechamentoModalPagamento();
 });
 
-// 1. Exibe <select> com os cartões cadastrados ao escolher Débito ou Parcelado
 function injetarSelecaoCartoes(cartoesSalvos) {
     const radiosPagamento = document.querySelectorAll('input[name="payment-group"]');
     const fieldsetPagamento = document.querySelector('.payment-methods');
@@ -20,7 +20,7 @@ function injetarSelecaoCartoes(cartoesSalvos) {
 
     const boxCartao = document.createElement('div');
     boxCartao.id = 'selecao-cartao-checkout';
-    boxCartao.style.cssText = 'display: none; margin-top: 10px; padding: 10px; background: #151515; border: 1px solid #C62828; border-radius: 10px; text-align: left; font-size: 14px;';
+    boxCartao.style.cssText = 'display: none; width: 100%; max-width: 350px; margin-top: 6px; padding: 10px; background: #151515; border: 1px solid #C62828; border-radius: 10px; text-align: left; font-size: 14px;';
 
     if (cartoesSalvos.length > 0) {
         const opcoes = cartoesSalvos.map((c, idx) =>
@@ -29,7 +29,7 @@ function injetarSelecaoCartoes(cartoesSalvos) {
 
         boxCartao.innerHTML = `
             <label for="select-cartao-uso" style="display:block; margin-bottom:5px; color:#ffca28; font-weight:bold;">Escolha o cartão:</label>
-            <select id="select-cartao-uso" style="width:100%; height:35px; margin:0; font-size:14px; border-radius:8px;">
+            <select id="select-cartao-uso" style="width:100%; height:36px; margin:0; padding:4px 8px; font-size:14px; border-radius:8px; background:#222; color:#fff; border:1px solid #C62828;">
                 ${opcoes}
             </select>
         `;
@@ -51,7 +51,6 @@ function injetarSelecaoCartoes(cartoesSalvos) {
     });
 }
 
-// 2. Injeta busca automática de CEP (ViaCEP) + Botão de endereço do cartão
 function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
     const inputRua = document.getElementById('input-rua');
     const inputEstado = document.getElementById('input-estado');
@@ -65,7 +64,7 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
         btnEndereco.type = 'button';
         btnEndereco.id = 'btn-usar-endereco-cartao';
         btnEndereco.textContent = '📍 Usar endereço do cartão cadastrado';
-        btnEndereco.style.cssText = 'width: 100%; margin-bottom: 12px; padding: 8px; background-color: #262626; color: #ffca28; border: 1px solid #ffca28; border-radius: 8px; font-weight: bold; cursor: pointer;';
+        btnEndereco.style.cssText = 'width: 100%; margin-bottom: 10px; padding: 8px; background-color: #1e1e1e; color: #ffca28; border: 1px solid #ffca28; border-radius: 10px; font-weight: bold; cursor: pointer;';
 
         btnEndereco.addEventListener('click', () => {
             const selectCartao = document.getElementById('select-cartao-uso');
@@ -91,9 +90,11 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
     const grupoCep = document.createElement('div');
     grupoCep.className = 'form-group';
     grupoCep.innerHTML = `
-        <label for="input-cep">CEP (preenche automático):</label>
-        <input type="text" id="input-cep" maxlength="9" placeholder="Ex: 89201-000">
-        <small id="status-cep" style="display:block; font-size:12px; margin-top:3px; color:#bbb;"></small>
+        <label for="input-cep">CEP:</label>
+        <div>
+            <input type="text" id="input-cep" maxlength="9" placeholder="Ex: 89201-000">
+            <small id="status-cep" style="display:block; font-size:12px; margin-top:3px; color:#bbb;"></small>
+        </div>
     `;
     formEndereco.insertBefore(grupoCep, primeiroGrupo);
 
@@ -131,64 +132,19 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
     });
 }
 
-// 3. Linha dinâmica de Frete (R$ 25,00 abaixo de R$ 250 | Grátis acima de R$ 250)
-function injetarCalculoFreteReal() {
-    const priceBreakdown = document.querySelector('.price-breakdown');
-    const totalFinalSpan = document.querySelector('.total-final span');
-    const modalTotalEl = document.querySelector('.modal-total-value');
-    const divisor = document.querySelector('.summary-divider');
-    if (!priceBreakdown || !totalFinalSpan) return;
+function configurarFechamentoModalPagamento() {
+    const telaPagamento = document.getElementById('tela-pagamento');
+    if (!telaPagamento) return;
 
-    let linhaFrete = document.getElementById('linha-frete-dinamica');
-    if (!linhaFrete) {
-        linhaFrete = document.createElement('p');
-        linhaFrete.id = 'linha-frete-dinamica';
-        linhaFrete.style.cssText = 'font-size: 0.95rem; color: #ddd; margin: 6px 0;';
-        linhaFrete.innerHTML = 'Frete: <span>R$ 0,00</span>';
-        if (divisor) priceBreakdown.insertBefore(linhaFrete, divisor);
-        else priceBreakdown.appendChild(linhaFrete);
-    }
-
-    const freteSpan = linhaFrete.querySelector('span');
-
-    function atualizarFrete() {
-        const carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
-        const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
-
-        if (subtotal === 0) {
-            freteSpan.textContent = 'R$ 0,00';
-            freteSpan.style.color = '#ddd';
-            return;
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && window.location.hash === '#tela-pagamento') {
+            window.location.hash = '';
         }
+    });
 
-        const textoAtual = totalFinalSpan.textContent;
-        const jaTemFrete = totalFinalSpan.getAttribute('data-frete-aplicado') === 'true';
-        let base = parseFloat(textoAtual.replace(/[^\d,]/g, '').replace(',', '.')) || subtotal;
-        if (jaTemFrete && base >= 25 && subtotal < 250) {
-            base -= 25;
+    telaPagamento.addEventListener('click', (e) => {
+        if (e.target === telaPagamento) {
+            window.location.hash = '';
         }
-
-        const valorFrete = base >= 250 ? 0 : 25;
-        const totalFinal = base + valorFrete;
-        const formatado = `R$ ${totalFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-        if (valorFrete === 0) {
-            freteSpan.textContent = 'GRÁTIS (R$ 0,00)';
-            freteSpan.style.color = '#00e676';
-            totalFinalSpan.setAttribute('data-frete-aplicado', 'false');
-        } else {
-            freteSpan.textContent = 'R$ 25,00';
-            freteSpan.style.color = '#ffca28';
-            totalFinalSpan.setAttribute('data-frete-aplicado', 'true');
-        }
-
-        totalFinalSpan.textContent = formatado;
-        if (modalTotalEl) modalTotalEl.textContent = `Valor Total: ${formatado}`;
-    }
-
-    setTimeout(atualizarFrete, 100);
-    document.getElementById('products-list')?.addEventListener('click', () => setTimeout(atualizarFrete, 100));
-    document.getElementById('btn-coupon')?.addEventListener('click', () => setTimeout(atualizarFrete, 100));
-    document.getElementById('btn-cancelar')?.addEventListener('click', () => setTimeout(atualizarFrete, 100));
-    document.querySelector('.btn-buy')?.addEventListener('click', () => setTimeout(atualizarFrete, 60));
+    });
 }
