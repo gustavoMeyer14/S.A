@@ -207,8 +207,22 @@ function injetarEstilosVitrine() {
             width: 92%;
             max-height: 80vh;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #b82929 #1a1a1a;
         }
-        #modalFavoritosSR::backdrop { background: rgba(0, 0, 0, 0.75); }
+
+        #modalFavoritosSR[open]::-webkit-scrollbar {
+            width: 6px;
+        }
+        #modalFavoritosSR[open]::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        #modalFavoritosSR[open]::-webkit-scrollbar-thumb {
+            background: #b82929;
+            border-radius: 10px;
+        }
+        
         .item-fav-modal {
             display: flex;
             align-items: center;
@@ -267,7 +281,7 @@ function configurarFavoritosGlobal() {
             <div id="conteudoFavoritosSR"></div>
             <div style="text-align:right; margin-top:15px;">
                 <button type="button" onclick="document.getElementById('modalFavoritosSR').close()"
-                    style="background:#b82929; color:#fff; border:none; padding:8px 18px; border-radius:8px; cursor:pointer; font-weight:bold;">
+                    style="background:#b82929; color:#fff; border:none; padding:8px 18px; border-radius:20px; cursor:pointer; font-weight:bold; width:200px; height:50px;">
                     Fechar
                 </button>
             </div>

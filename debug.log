@@ -1,3 +1,0 @@
-[1123/134523.605:ERROR:third_party\crashpad\crashpad\client\crashpad_client_win.cc:188] crash server did not respond, self-terminating
-[1123/134758.971:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:108] CreateFile: O sistema não pode encontrar o arquivo especificado. (0x2)
-[1123/134759.562:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:108] CreateFile: O sistema não pode encontrar o arquivo especificado. (0x2)
