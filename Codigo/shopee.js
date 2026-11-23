@@ -139,19 +139,40 @@ function turbinarCardsProdutos() {
         // Etiqueta de Frete Grátis e Avaliação logo abaixo do preço
         const precoEl = card.querySelector('h3');
         if (precoEl) {
+
+            // Parcelamento do produto 
+            const parcelamento = document.createElement('p');
+            parcelamento.className = 'shopee-parcelamento';
+            parcelamento.textContent = 'ou 12x de R$ 28,33 sem juros';
+            precoEl.insertAdjacentElement('afterend', parcelamento);
+
+            // Barra de últimas unidades( Recuerda hacer la barra esta en el css ayudaaaaa)
+            const estoque = document.createElement('div');
+            estoque.className = 'shopee-estoque';
+            estoque.innerHTML = `
+        <div class="shopee-estoque-texto">🔥 85% vendido</div>
+        <div class="shopee-estoque-fundo">
+            <div class="shopee-estoque-progresso"></div>
+        </div> 
+    `;
+            parcelamento.insertAdjacentElement('afterend', estoque);
+
+            // Frete grátis e avaliações
             const metaInfo = document.createElement('div');
             metaInfo.className = 'shopee-card-meta';
             metaInfo.innerHTML = `
-                <span class="tag-frete">🚚 Frete Grátis</span>
-                <span class="rating-vendidos">⭐ 4.9 | ${vendidos[index % vendidos.length]} vendidos</span>
-            `;
-            precoEl.insertAdjacentElement('afterend', metaInfo);
+        <span class="tag-frete">🚚 Frete Grátis</span>
+        <span class="rating-vendidos">⭐ 4.9 | ${vendidos[index % vendidos.length]} vendidos</span>
+    `;
+            estoque.insertAdjacentElement('afterend', metaInfo);
         }
+
     });
 }
 
+
 // 4. Contador de itens no ícone do carrinho no header
-window.atualizarBadgeCarrinho = function() {
+window.atualizarBadgeCarrinho = function () {
     const linkCarrinho = document.querySelector('header nav a[href="carrinho.html"]');
     if (!linkCarrinho) return;
 
