@@ -1,40 +1,13 @@
 // ==========================================
-// 0. REMOÇÃO GARANTIDA DO BOTÃO "MEUS PEDIDOS" DUPLICADO
-// ==========================================
-function removerPedidosDuplicados() {
-    const navUsuario = document.querySelector('#modalCliente .nav-usuario');
-    if (!navUsuario) return;
-
-    const linksPedidos = Array.from(navUsuario.querySelectorAll('a')).filter(a =>
-        a.textContent.trim().toLowerCase() === 'meus pedidos'
-    );
-
-    if (linksPedidos.length > 1) {
-        // Remove o link extra com href="#" injetado pelo site.js e mantém o link oficial (pedidos.html)
-        const extraSiteJs = linksPedidos.find(a => a.getAttribute('href') === '#');
-        if (extraSiteJs) {
-            extraSiteJs.remove();
-        } else {
-            linksPedidos[0].remove();
-        }
-    }
-}
-
-// Executa imediatamente (graças ao defer), no DOMContentLoaded e no load
-removerPedidosDuplicados();
-document.addEventListener('DOMContentLoaded', removerPedidosDuplicados);
-window.addEventListener('load', removerPedidosDuplicados);
-
-// ==========================================
 // INICIALIZAÇÃO DA VITRINE SHADOW REALM
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const produtosOriginais = [
         'ichigo kurosaki',
         'kisuke urahara',
-        'levi ackerman',
-        'maomao',
-        'satoru gojo'
+        'renji abarai',
+        'rukia kuchiki',
+        'toshiro hitsugaya'
     ];
 
     injetarEstilosVitrine();
@@ -85,25 +58,78 @@ function injetarEstilosVitrine() {
             letter-spacing: 0.5px;
             box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
         }
-        /* Expansão automática do modal e da área de comentários */
-        dialog.modalProduto[open] {
-            height: auto !important;
-            max-height: 88vh !important;
-            overflow-y: auto !important;
+        .form-comentario-html {
+            background: #1a1a1a;
+            border: 1px solid #C62828;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 10px;
         }
-        .modalProduto-comentarios {
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 10px !important;
+        .form-comentario-html h3 {
+            color: #ffca28;
+            font-size: 18px;
+            margin-bottom: 10px;
         }
-        .modalProduto-comentarios .comentarios {
-            height: auto !important;
-            word-wrap: break-word !important;
+        .form-comentario-linha {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
         }
-        /* Modal de Favoritos */
+        .form-comentario-html select {
+            width: auto !important;
+            height: 38px !important;
+            margin: 0 !important;
+            padding: 4px 12px !important;
+            border-radius: 10px !important;
+            background: #121212 !important;
+            color: #ffca28 !important;
+            border: 1px solid #C62828 !important;
+            font-size: 14px !important;
+        }
+        .form-comentario-html textarea {
+            width: 100% !important;
+            min-height: 75px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #C62828;
+            background: #121212;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 15px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        .btn-enviar-comentario {
+            background: #C62828;
+            color: #ffffff;
+            border: 1px solid #C62828;
+            border-radius: 12px;
+            padding: 9px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .btn-enviar-comentario:hover {
+            background: #000000;
+            box-shadow: 0 4px 14px rgba(198, 40, 40, 0.6);
+        }
+        .aviso-nao-logado {
+            background: #1a1a1a;
+            border: 1px dashed #ffca28;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #e0e0e0;
+            font-size: 15px;
+            text-align: center;
+        }
+        .aviso-nao-logado a {
+            color: #ffca28;
+            font-weight: bold;
+            text-decoration: underline;
+        }
         #modalFavoritosSR[open] {
             position: fixed !important;
             top: 50% !important;
@@ -119,8 +145,22 @@ function injetarEstilosVitrine() {
             width: 92%;
             max-height: 80vh;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #b82929 #1a1a1a;
         }
-        #modalFavoritosSR::backdrop { background: rgba(0, 0, 0, 0.75); }
+
+        #modalFavoritosSR[open]::-webkit-scrollbar {
+            width: 6px;
+        }
+        #modalFavoritosSR[open]::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+        #modalFavoritosSR[open]::-webkit-scrollbar-thumb {
+            background: #b82929;
+            border-radius: 10px;
+        }
+        
         .item-fav-modal {
             display: flex;
             align-items: center;
@@ -179,7 +219,7 @@ function configurarFavoritosGlobal() {
             <div id="conteudoFavoritosSR"></div>
             <div style="text-align:right; margin-top:15px;">
                 <button type="button" onclick="document.getElementById('modalFavoritosSR').close()"
-                    style="background:#b82929; color:#fff; border:none; padding:8px 18px; border-radius:8px; cursor:pointer; font-weight:bold;">
+                    style="background:#b82929; color:#fff; border:none; padding:8px 18px; border-radius:20px; cursor:pointer; font-weight:bold; width:200px; height:50px;">
                     Fechar
                 </button>
             </div>
@@ -285,17 +325,57 @@ function processarCardsVitrine(produtosOriginais) {
 }
 
 // ==========================================
-// 2. COMENTÁRIOS DIRETOS NO HTML (SALVAR + EXPANDIR + EXCLUIR)
+// 2. SISTEMA COMPLETO DE COMENTÁRIOS E AVALIAÇÕES
 // ==========================================
+const comentariosIniciaisPadrao = [
+    { autorId: 'seed1', autor: 'Lucas Kenji', nota: 5, texto: 'Acabamento absurdo! A pintura da resina e os efeitos translúcidos superaram todas as expectativas.', data: '12/10/2026' },
+    { autorId: 'seed2', autor: 'Mariana Souza', nota: 5, texto: 'Chegou super bem embalado na caixa original e sem nenhum arranhão. Recomendo demais a loja!', data: '28/10/2026' },
+    { autorId: 'seed3', autor: 'Rafael Costa', nota: 4, texto: 'Escultura muito fiel ao anime, base diorama bem pesada e firme na estante.', data: '05/11/2026' }
+];
+
 function inicializarComentariosHTML() {
     const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
     const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim();
     const nomeSalvo = (localStorage.getItem('usuarioNome') || '').trim();
     const nomeUsuario = nomeSalvo || (usuarioAtual.includes('@') ? usuarioAtual.split('@')[0] : usuarioAtual);
 
-    document.querySelectorAll('.modalProduto-comentarios[data-produto]').forEach(container => {
-        const produto = container.getAttribute('data-produto').toLowerCase().trim();
-        const chave = `comentarios_${produto}`;
+    document.querySelectorAll('.modalProduto').forEach(modal => {
+        const tituloEl = modal.querySelector('.modalProduto-conteudo h2');
+        const container = modal.querySelector('.modalProduto-comentarios');
+        if (!tituloEl || !container) return;
+
+        const nomeProduto = tituloEl.innerText.replace(/^-\s*/, '').trim();
+        const produtoSlug = nomeProduto.toLowerCase();
+        container.setAttribute('data-produto', produtoSlug);
+
+        if (!container.querySelector('.lista-novos-comentarios')) {
+            container.innerHTML = `
+                <h3 style="color:#ffffff; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:8px;">
+                    💬 Avaliações e Comentários (${nomeProduto})
+                </h3>
+                <form class="form-comentario-html">
+                    <div class="form-comentario-linha">
+                        <label style="font-size:15px; font-weight:bold; color:#eee;">Sua nota:</label>
+                        <select aria-label="Nota da avaliação">
+                            <option value="5">★★★★★ (5 - Excelente)</option>
+                            <option value="4">★★★★☆ (4 - Muito bom)</option>
+                            <option value="3">★★★☆☆ (3 - Bom)</option>
+                            <option value="2">★★☆☆☆ (2 - Regular)</option>
+                            <option value="1">★☆☆☆☆ (1 - Ruim)</option>
+                        </select>
+                        <span style="font-size:13px; color:#bbb;">Comentando como <strong style="color:#ffca28;">${nomeUsuario || 'Visitante'}</strong></span>
+                    </div>
+                    <textarea placeholder="Conte o que achou dos detalhes, pintura e acabamento desta figure..." required></textarea>
+                    <button type="submit" class="btn-enviar-comentario">Publicar Avaliação</button>
+                </form>
+                <div class="aviso-nao-logado">
+                    Quer avaliar esta figure? <a href="cliente.html">Faça login</a> ou <a href="cadastro.html">cadastre-se</a> para comentar!
+                </div>
+                <div class="lista-novos-comentarios"></div>
+            `;
+        }
+
+        const chave = `comentarios_${produtoSlug}`;
         const form = container.querySelector('.form-comentario-html');
         const aviso = container.querySelector('.aviso-nao-logado');
         const lista = container.querySelector('.lista-novos-comentarios');
@@ -308,31 +388,51 @@ function inicializarComentariosHTML() {
             if (aviso) aviso.style.display = 'none';
         }
 
-        function renderizar() {
-            if (!lista) return;
-            let salvos = [];
-            try { salvos = JSON.parse(localStorage.getItem(chave)) || []; }
-            catch { salvos = []; }
+        function obterListaComentarios() {
+            let salvos = null;
+            try { salvos = JSON.parse(localStorage.getItem(chave)); }
+            catch { salvos = null; }
 
+            if (!Array.isArray(salvos)) {
+                salvos = [...comentariosIniciaisPadrao];
+                localStorage.setItem(chave, JSON.stringify(salvos));
+            }
+            return salvos;
+        }
+
+       function renderizar() {
+            if (!lista) return;
+            const salvos = obterListaComentarios();
             lista.innerHTML = '';
+
+            if (salvos.length === 0) {
+                lista.innerHTML = '<p style="color:#aaa; font-size:15px;">Ainda não há avaliações para esta figure. Seja o primeiro a comentar!</p>';
+                return;
+            }
 
             salvos.slice().reverse().forEach((item, idxRev) => {
                 const idxReal = salvos.length - 1 - idxRev;
                 const dono = estaLogado && item.autorId === usuarioAtual.toLowerCase();
+                const notaNum = Math.min(5, Math.max(1, Number(item.nota) || 5));
 
                 const div = document.createElement('div');
                 div.className = 'comentarios';
-                div.style.height = 'auto';
+
                 div.innerHTML = `
-                    <h2>${item.autor} <span style="color:#ffca28; font-size:14px;">${'★'.repeat(item.nota)}${'☆'.repeat(5 - item.nota)}</span></h2>
+                    <h2>
+                        <span>${item.autor}</span>
+                        <span style="color:#ffca28; font-size:15px;">${'★'.repeat(notaNum)}${'☆'.repeat(5 - notaNum)}</span>
+                    </h2>
                     <p>${item.texto}</p>
-                    <small style="font-size:11px; color:#888; display:block;">${item.data || ''}</small>
-                    ${dono ? `<button type="button" class="btn-del" style="width:auto; height:auto; padding:3px 10px; margin-top:6px; font-size:12px; background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; border-radius:5px; cursor:pointer;">🗑️ Excluir</button>` : ''}
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+                        <small style="font-size:12px; color:#888;">${item.data || ''}</small>
+                        ${dono ? `<button type="button" class="btn-del" style="width:auto; height:auto; padding:4px 10px; margin:0; font-size:12px; background:transparent; border:1px solid #C62828; color:#ff4d4d; border-radius:10px; cursor:pointer;">Excluir</button>` : ''}
+                    </div>
                 `;
 
-                if (dono) {
+                if (dono && div.querySelector('.btn-del')) {
                     div.querySelector('.btn-del').addEventListener('click', () => {
-                        const atual = JSON.parse(localStorage.getItem(chave)) || [];
+                        const atual = obterListaComentarios();
                         atual.splice(idxReal, 1);
                         localStorage.setItem(chave, JSON.stringify(atual));
                         renderizar();
@@ -343,14 +443,17 @@ function inicializarComentariosHTML() {
             });
         }
 
-        if (form && estaLogado && usuarioAtual) {
+        if (form && estaLogado && usuarioAtual && form.dataset.listenerAtivo !== 'true') {
+            form.dataset.listenerAtivo = 'true';
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const texto = form.querySelector('textarea').value.trim();
-                const nota = parseInt(form.querySelector('select').value, 10) || 5;
+                const textarea = form.querySelector('textarea');
+                const selectNota = form.querySelector('select');
+                const texto = textarea.value.trim();
+                const nota = parseInt(selectNota.value, 10) || 5;
                 if (!texto) return;
 
-                const salvos = JSON.parse(localStorage.getItem(chave)) || [];
+                const salvos = obterListaComentarios();
                 salvos.push({
                     autorId: usuarioAtual.toLowerCase(),
                     autor: nomeUsuario,
