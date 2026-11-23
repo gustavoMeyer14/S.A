@@ -58,22 +58,12 @@ function injetarEstilosVitrine() {
             letter-spacing: 0.5px;
             box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
         }
-
-        /* ==========================================
-           CAIXA DE AVALIAÇÃO E COMENTÁRIOS
-           ========================================== */
-        .modalProduto-comentarios {
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            padding-bottom: 15px !important;
-        }
         .form-comentario-html {
             background: #1a1a1a;
             border: 1px solid #C62828;
             border-radius: 14px;
             padding: 15px;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
         .form-comentario-html h3 {
             color: #ffca28;
@@ -84,7 +74,6 @@ function injetarEstilosVitrine() {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: space-between;
             gap: 12px;
             margin-bottom: 10px;
         }
@@ -111,7 +100,6 @@ function injetarEstilosVitrine() {
             font-size: 15px;
             resize: vertical;
             margin-bottom: 10px;
-            box-sizing: border-box;
         }
         .btn-enviar-comentario {
             background: #C62828;
@@ -136,62 +124,12 @@ function injetarEstilosVitrine() {
             color: #e0e0e0;
             font-size: 15px;
             text-align: center;
-            margin-bottom: 16px;
         }
         .aviso-nao-logado a {
             color: #ffca28;
             font-weight: bold;
             text-decoration: underline;
         }
-
-        /* Destrava a altura dos cards existentes (Rafael, Mariana, Lucas) para não cortar o texto */
-        .lista-novos-comentarios {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 15px !important;
-            align-items: stretch !important;
-            height: auto !important;
-            overflow: visible !important;
-        }
-        .lista-novos-comentarios .comentarios {
-            height: auto !important;
-            min-height: 150px !important;
-            overflow: visible !important;
-            padding-bottom: 14px !important;
-            box-sizing: border-box !important;
-        }
-
-        /* Estilo diferenciado APENAS para os comentários adicionados pelo cliente */
-        .lista-novos-comentarios .comentarios.comentario-do-cliente {
-            width: 100% !important;
-            flex: 1 1 100% !important;
-            background: linear-gradient(145deg, #1b1515, #121212) !important;
-            border: 1px solid #ffca28 !important;
-            border-left: 5px solid #C62828 !important;
-            border-radius: 12px !important;
-            padding: 16px 18px !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important;
-        }
-        .lista-novos-comentarios .comentarios.comentario-do-cliente h2 {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            flex-wrap: wrap !important;
-            gap: 8px !important;
-            margin-bottom: 8px !important;
-        }
-        .tag-novo-cliente {
-            background: #ffca28;
-            color: #111;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
         #modalFavoritosSR[open] {
             position: fixed !important;
             top: 50% !important;
@@ -412,21 +350,19 @@ function inicializarComentariosHTML() {
 
         if (!container.querySelector('.lista-novos-comentarios')) {
             container.innerHTML = `
-                <h3 style="color:#ffffff; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:8px; margin-bottom:14px;">
+                <h3 style="color:#ffffff; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:8px;">
                     💬 Avaliações e Comentários (${nomeProduto})
                 </h3>
                 <form class="form-comentario-html">
                     <div class="form-comentario-linha">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <label style="font-size:15px; font-weight:bold; color:#eee;">Sua nota:</label>
-                            <select aria-label="Nota da avaliação">
-                                <option value="5">★★★★★ (5 - Excelente)</option>
-                                <option value="4">★★★★☆ (4 - Muito bom)</option>
-                                <option value="3">★★★☆☆ (3 - Bom)</option>
-                                <option value="2">★★☆☆☆ (2 - Regular)</option>
-                                <option value="1">★☆☆☆☆ (1 - Ruim)</option>
-                            </select>
-                        </div>
+                        <label style="font-size:15px; font-weight:bold; color:#eee;">Sua nota:</label>
+                        <select aria-label="Nota da avaliação">
+                            <option value="5">★★★★★ (5 - Excelente)</option>
+                            <option value="4">★★★★☆ (4 - Muito bom)</option>
+                            <option value="3">★★★☆☆ (3 - Bom)</option>
+                            <option value="2">★★☆☆☆ (2 - Regular)</option>
+                            <option value="1">★☆☆☆☆ (1 - Ruim)</option>
+                        </select>
                         <span style="font-size:13px; color:#bbb;">Comentando como <strong style="color:#ffca28;">${nomeUsuario || 'Visitante'}</strong></span>
                     </div>
                     <textarea placeholder="Conte o que achou dos detalhes, pintura e acabamento desta figure..." required></textarea>
@@ -464,7 +400,7 @@ function inicializarComentariosHTML() {
             return salvos;
         }
 
-        function renderizar() {
+       function renderizar() {
             if (!lista) return;
             const salvos = obterListaComentarios();
             lista.innerHTML = '';
@@ -476,37 +412,23 @@ function inicializarComentariosHTML() {
 
             salvos.slice().reverse().forEach((item, idxRev) => {
                 const idxReal = salvos.length - 1 - idxRev;
-                const ehComentarioCliente = !String(item.autorId || '').startsWith('seed');
                 const dono = estaLogado && item.autorId === usuarioAtual.toLowerCase();
                 const notaNum = Math.min(5, Math.max(1, Number(item.nota) || 5));
 
                 const div = document.createElement('div');
-                div.className = ehComentarioCliente ? 'comentarios comentario-do-cliente' : 'comentarios';
+                div.className = 'comentarios';
 
-                if (ehComentarioCliente) {
-                    // Layout exclusivo e completo para o comentário adicionado pelo cliente
-                    div.innerHTML = `
-                        <h2>
-                            <span>${item.autor} <span class="tag-novo-cliente">Cliente</span></span>
-                            <span style="color:#ffca28; font-size:16px;">${'★'.repeat(notaNum)}${'☆'.repeat(5 - notaNum)}</span>
-                        </h2>
-                        <p style="color:#f5f5f5; font-size:15px; line-height:1.5; margin:6px 0;">${item.texto}</p>
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
-                            <small style="font-size:12px; color:#aaa;">Publicado em ${item.data || ''}</small>
-                            ${dono ? `<button type="button" class="btn-del" style="width:auto; height:auto; padding:4px 12px; margin:0; font-size:12px; background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; border-radius:6px; cursor:pointer;">🗑️ Excluir</button>` : ''}
-                        </div>
-                    `;
-                } else {
-                    // Mantém exatamente o formato original dos 3 comentários padrão (Rafael, Mariana, Lucas)
-                    div.innerHTML = `
-                        <h2>
-                            <span>${item.autor}</span>
-                            <span style="color:#ffca28; font-size:15px;">${'★'.repeat(notaNum)}${'☆'.repeat(5 - notaNum)}</span>
-                        </h2>
-                        <p>${item.texto}</p>
-                        <small style="font-size:12px; color:#888; display:block; margin-top:8px;">${item.data || ''}</small>
-                    `;
-                }
+                div.innerHTML = `
+                    <h2>
+                        <span>${item.autor}</span>
+                        <span style="color:#ffca28; font-size:15px;">${'★'.repeat(notaNum)}${'☆'.repeat(5 - notaNum)}</span>
+                    </h2>
+                    <p>${item.texto}</p>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+                        <small style="font-size:12px; color:#888;">${item.data || ''}</small>
+                        ${dono ? `<button type="button" class="btn-del" style="width:auto; height:auto; padding:4px 10px; margin:0; font-size:12px; background:transparent; border:1px solid #C62828; color:#ff4d4d; border-radius:10px; cursor:pointer;">Excluir</button>` : ''}
+                    </div>
+                `;
 
                 if (dono && div.querySelector('.btn-del')) {
                     div.querySelector('.btn-del').addEventListener('click', () => {
