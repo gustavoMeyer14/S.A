@@ -136,14 +136,18 @@ function turbinarCardsProdutos() {
         badgeOff.innerHTML = `${descontos[index % descontos.length]}<br><small>OFF</small>`;
         card.appendChild(badgeOff);
 
-        // Etiqueta de Frete Grátis e Avaliação logo abaixo do preço
-        const precoEl = card.querySelector('h3');
-        if (precoEl) {
+            // Etiqueta de Frete Grátis e Avaliação logo abaixo do preço
+            const precoEl = card.querySelector('h3');
+            if (precoEl) {
+
+            // Calcula o valor da parcela baseado no preço do card
+            const valorNumerico = parseFloat(precoEl.innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const parcela = (valorNumerico / 12).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
             // Parcelamento do produto 
             const parcelamento = document.createElement('p');
             parcelamento.className = 'shopee-parcelamento';
-            parcelamento.textContent = 'ou 12x de R$ 28,33 sem juros';
+            parcelamento.textContent = `ou 12x de R$ ${parcela} sem juros`;
             precoEl.insertAdjacentElement('afterend', parcelamento);
 
             // Barra de últimas unidades( Recuerda hacer la barra esta en el css ayudaaaaa)
