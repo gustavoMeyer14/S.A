@@ -417,6 +417,20 @@
             let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
             const produtoExistente = carrinho.find(item => item.nome === nome);
 
+            if (typeof obterEstoque === 'function') {
+            const disponivel = obterEstoque(nome);
+            const qtdNoCarrinho = produtoExistente ? produtoExistente.quantidade : 0;
+
+            if (disponivel <= 0) {
+                alert(`Desculpe, ${nome} está esgotado!`);
+                return;
+            }
+            if (qtdNoCarrinho + 1 > disponivel) {
+                alert(`Estoque insuficiente! Você já tem ${qtdNoCarrinho} no carrinho e só restam ${disponivel} unidade(s).`);
+                return;
+            }
+        }
+        
             if (produtoExistente) {
                 produtoExistente.quantidade += 1;
             } else {
