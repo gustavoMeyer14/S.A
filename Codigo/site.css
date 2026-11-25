@@ -1221,17 +1221,18 @@ dialog::backdrop {
 .modalProduto[open] {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Impede que o rodapé invada os cards */
+  justify-content: flex-start;
   gap: 16px;
-  width: 1500px;
-  max-width: 95vw;
+  width: 1700px;       
+  max-width: 98vw;      
   height: auto;
-  max-height: 90vh;
+  min-height: 85vh;    
+  max-height: 96vh;    
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;
   font-size: 25px;
-  padding: 24px;
+  padding: 28px;
   scrollbar-width: thin;
   scrollbar-color: #C62828 #151515;
 }
