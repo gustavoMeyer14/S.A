@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Realm Store - Gerenciar Estoque</title>
+    <link rel="stylesheet" href="site.css">
+    <script src="site.js" defer></script>
+    <script src="estoque.js" defer></script>
+    <style>
+        .painel-estoque {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #0d0d0d;
+            border: 2px solid #C62828;
+            border-radius: 20px;
+        }
+        .topo-estoque {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .tabela-estoque {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1b1b1b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .tabela-estoque th, .tabela-estoque td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #333;
+            text-align: left;
+        }
+        .tabela-estoque th { background-color: #C62828; color: #fff; }
+        .tabela-estoque img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #C62828;
+        }
+        .status-tag { padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+        .status-ok { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid #00e676; }
+        .status-baixo { background: rgba(255, 202, 40, 0.15); color: #ffca28; border: 1px solid #ffca28; }
+        .status-zero { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid #ff4d4d; }
+        .controles-qtd { display: flex; align-items: center; gap: 10px; }
+        .btn-est {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid #C62828; background: #262626; color: #fff;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+        }
+        .btn-est:hover { background: #C62828; }
+        .btn-reset {
+            background: #C62828; color: #fff; border: none;
+            padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="topo">
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <div class="nav">
+            <nav>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="painel-estoque">
+        <div class="topo-estoque">
+            <h2>📦 Controle de Estoque</h2>
+            <button type="button" class="btn-reset" id="btnResetarEstoque">Restaurar Estoque Padrão</button>
+        </div>
+
+        <table class="tabela-estoque">
+            <thead>
+                <tr>
+                    <th>Imagem</th>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                    <th>Status</th>
+                    <th>Em Estoque</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabelaEstoque"></tbody>
+        </table>
+    </main>
+
+    <footer>
+        <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        async function renderizarTabelaEstoque() {
+            await window.promessaEstoqueSR;
+            const produtos = await carregarProdutosSR();
+            const tbody = document.getElementById('corpoTabelaEstoque');
+            tbody.innerHTML = '';
+
+            produtos.forEach(prod => {
+                const qtd = obterEstoque(prod.nome);
+                let statusHTML = '<span class="status-tag status-ok">Disponível</span>';
+                if (qtd === 0) statusHTML = '<span class="status-tag status-zero">Esgotado</span>';
+                else if (qtd <= 2) statusHTML = '<span class="status-tag status-baixo">Estoque Baixo</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><img src="${prod.imagem}" alt="${prod.nome}"></td>
+                    <td><strong>${prod.nome}</strong><br><small style="color:#aaa;">${prod.categoria || ''}</small></td>
+                    <td>R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}</td>
+                    <td>${statusHTML}</td>
+                    <td>
+                        <div class="controles-qtd">
+                            <button type="button" class="btn-est" onclick="ajustar('${prod.nome}', -1)">-</button>
+                            <strong style="min-width: 28px; text-align: center; font-size: 18px;">${qtd}</strong>
+                            <button type="button" class="btn-est" onclick="ajustar('${prod.nome}', 1)">+</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function ajustar(nome, delta) {
+            definirEstoque(nome, obterEstoque(nome) + delta);
+            renderizarTabelaEstoque();
+        }
+
+        document.getElementById('btnResetarEstoque').addEventListener('click', () => {
+            if (confirm('Restaurar todas as quantidades iniciais?')) {
+                localStorage.removeItem(CHAVE_ESTOQUE_SR);
+                window.location.reload();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', renderizarTabelaEstoque);
+    </script>
+</body>
+
+</html>
