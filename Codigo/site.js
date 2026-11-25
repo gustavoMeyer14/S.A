@@ -336,9 +336,6 @@ function confirmaCadastro() {
     window.location.href = "index.html";
 }
 
-// ==========================================
-// CARRINHO E CHECKOUT UNIFICADOS
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const productsList = document.getElementById('products-list');
     const priceBreakdown = document.querySelector('.price-breakdown');
@@ -625,9 +622,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarCarrinho();
 });
 
-// ==========================================
-// CADASTRO DE CARTÃO (cadastrocartao.html)
-// ==========================================
 const inputNumero = document.getElementById('numero');
 const inputTitular = document.getElementById('titular');
 const inputValidade = document.getElementById('validade');

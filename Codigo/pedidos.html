@@ -63,7 +63,6 @@
             background-color: #6c757d;
         }
 
-        /* Grade centralizada e bem distribuída para os itens */
         .lista-itens-pedido {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -236,12 +235,10 @@
     <main class="container-pedidos">
         <section id="aba-pedidos">
             <h2>- Meus Pedidos -</h2>
-            <!-- ID exclusivo para impedir que site.js ou shopee.js sobrescrevam a lista -->
             <div id="lista-pedidos-exclusiva"></div>
         </section>
     </main>
 
-    <!-- MODAL DE RASTREIO -->
     <dialog id="modal-rastreio" class="modalRastreio">
         <h2 id="titulo-rastreio" class="titulo-rastreio">- Rastreamento -</h2>
         <p id="codigo-rastreio" style="color: #bbb; font-size: 14px; margin-bottom: 15px;"></p>
@@ -251,7 +248,6 @@
         </div>
     </dialog>
 
-    <!-- MODAL DE CONFIRMAÇÃO DE CANCELAMENTO -->
     <dialog id="modal-cancelar" class="modalRastreio">
         <h2 style="text-align: center; margin-bottom: 15px;">- Cancelar Pedido -</h2>
         <p id="texto-modal-cancelar" style="color: #ddd; font-size: 15px; line-height: 1.5; text-align: center;">
@@ -280,13 +276,34 @@
 
             function obterUsuarioAtivo() {
                 const logadoOficial = localStorage.getItem('usuarioLogado') === 'true';
-                const emailOficial = localStorage.getItem('usuarioAtual');
-                if (logadoOficial && emailOficial) return { identificador: emailOficial };
+                const emailOficial = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
+                const clienteLocal = JSON.parse(localStorage.getItem('clienteLogado') || 'null');
 
-                const clienteLocal = JSON.parse(localStorage.getItem('clienteLogado'));
-                if (clienteLocal && clienteLocal.cpf) return { identificador: clienteLocal.cpf };
+                if (logadoOficial && (emailOficial || (clienteLocal && clienteLocal.cpf))) {
+                    return {
+                        email: emailOficial || ((clienteLocal && clienteLocal.email) || '').toLowerCase(),
+                        cpf: (clienteLocal && clienteLocal.cpf) || ''
+                    };
+                }
 
                 return null;
+            }
+
+            function pertenceAoUsuario(pedido, usuarioAtivo) {
+                if (!usuarioAtivo) return false;
+                const emailPedido = (pedido.clienteEmail || '').trim().toLowerCase();
+                const cpfPedido = (pedido.clienteCpf || '').trim();
+
+                if (emailPedido && usuarioAtivo.email && emailPedido === usuarioAtivo.email) {
+                    return true;
+                }
+                if (cpfPedido && usuarioAtivo.cpf && cpfPedido === usuarioAtivo.cpf) {
+                    return true;
+                }
+                if (!emailPedido && !cpfPedido) {
+                    return true;
+                }
+                return false;
             }
 
             function lerPedidos() {
@@ -319,9 +336,7 @@
                     localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
                 }
 
-                const meusPedidos = todosPedidos.filter(
-                    p => !p.clienteCpf || p.clienteCpf === usuarioAtivo.identificador
-                );
+                const meusPedidos = todosPedidos.filter(p => pertenceAoUsuario(p, usuarioAtivo));
 
                 if (meusPedidos.length === 0) {
                     listaPedidosEl.innerHTML = `<p style="text-align: center;">Você ainda não realizou nenhum pedido.</p>`;
@@ -345,7 +360,7 @@
                             <img src="${item.imagem || 'imagens/produto.png'}" alt="${item.nome}">
                             <div>
                                 <p><strong>${item.nome}</strong></p>
-                                <p style="font-size: 14px; color: #ccc;">Qtd: ${item.quantidade} | R$ ${item.preco.toFixed(2).replace('.', ',')}</p>
+                                <p style="font-size: 14px; color: #ccc;">Qtd: ${item.quantidade} | R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</p>
                             </div>
                         </div>
                     `).join('');
@@ -382,7 +397,6 @@
                 });
             }
 
-            // Captura o clique na fase de captura (true) ANTES de qualquer outro script
             document.addEventListener('click', (e) => {
                 const botao = e.target.closest('button[data-acao]');
                 if (!botao) return;
