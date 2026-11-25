@@ -134,61 +134,73 @@ function cpfInvalido(rawCpf) {
 var usuarioEncontradoLogin = null;
 
 async function validaLogin() {
-    var email = document.frmlogin.txtemail.value.trim();
-    var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    var f = document.frmlogin;
+    var email = f.txtemail.value.trim().toLowerCase();
+    var senha = f.txtsenha.value;
 
+    var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!expRegemail.test(email)) {
         alert("Preencha o Campo Email ou formato inválido !!!");
-        document.frmlogin.txtemail.focus();
+        f.txtemail.focus();
         return false;
     }
 
-    var senha = document.frmlogin.txtsenha.value;
-    var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-
-    if (senha.trim() === "" || !expRegsenha.test(senha)) {
-        alert("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.");
-        document.frmlogin.txtsenha.focus();
+    if (senha.trim() === "") {
+        alert("Preencha o Campo Senha corretamente!");
+        f.txtsenha.focus();
         return false;
     }
 
-    var usuariosJSON = [];
-    var clientesJSON = [];
-
+    // 1. VERIFICA PRIMEIRO SE É UM ADMINISTRADOR (admin.json + localStorage)
+    var adminsLocais = [];
     try {
-        var respUsuarios = await fetch('usuarios.json');
-        if (respUsuarios.ok) usuariosJSON = await respUsuarios.json();
+        adminsLocais = JSON.parse(localStorage.getItem('administradoresShadowRealm')) || [];
     } catch (e) {}
 
+    var adminsJSON = [];
     try {
-        var respClientes = await fetch('clientes.json');
-        if (respClientes.ok) clientesJSON = await respClientes.json();
+        var respAdmin = await fetch('admin.json');
+        if (respAdmin.ok) adminsJSON = await respAdmin.json();
     } catch (e) {}
 
-    if (usuariosJSON.length === 0 && clientesJSON.length === 0) {
-        usuariosJSON = [
-            { nome: "Admin Shadow", email: "admin@shadowrealm.com", senha: "admin123", cpf: "111.111.111-11" },
-            { nome: "Cliente Teste", email: "teste@gmail.com", senha: "teste123", cpf: "222.222.222-22" },
-            { nome: "João da Silva", email: "joao.silva@example.com", senha: "senha123", cpf: "123.456.789-00" },
-            { nome: "Maria Oliveira", email: "maria.oliveira@example.com", senha: "senha456", cpf: "987.654.321-00" }
+    if (adminsJSON.length === 0) {
+        adminsJSON = [
+            {
+                id: "1",
+                nome: "Pedro Carvalho",
+                cpf: "",
+                email: "pedro_carvalho@gmail.com",
+                senha: "Pedro@1983",
+                admin: true
+            }
         ];
     }
 
-    var usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
-    var todosUsuarios = usuariosLocais.concat(usuariosJSON, clientesJSON);
-
-    var usuarioValido = todosUsuarios.find(function (u) {
-        return u.email && u.email.toLowerCase() === email.toLowerCase() && u.senha === senha;
+    var todosAdmins = adminsLocais.concat(adminsJSON);
+    var adminEncontrado = todosAdmins.find(function (a) {
+        return a.email && a.email.toLowerCase() === email && a.senha === senha;
     });
 
-    if (!usuarioValido) {
-        alert("E-mail ou senha incorretos, ou conta não encontrada!");
+    if (adminEncontrado) {
+        localStorage.setItem('usuarioLogado', 'true');
+        localStorage.setItem('usuarioAtual', adminEncontrado.email.toLowerCase());
+        localStorage.setItem('usuarioNome', adminEncontrado.nome);
+        localStorage.setItem('tipoUsuario', 'admin');
+
+        localStorage.setItem('clienteLogado', JSON.stringify({
+            nome: adminEncontrado.nome,
+            email: adminEncontrado.email.toLowerCase(),
+            cpf: adminEncontrado.cpf || '',
+            tipo: 'admin'
+        }));
+
+        alert("Login de administrador realizado com sucesso!");
+        window.location.href = "index.html";
         return false;
     }
 
-    usuarioEncontradoLogin = usuarioValido;
-    abreModalLogin();
-    return false;
+    // 2. SE NÃO FOR ADMIN, CONTINUA O FLUXO NORMAL DE CLIENTE ABAIXO...
+    // (Mantenha aqui o código que você já tem no site.js para buscar em clientes.json / localStorage)
 }
 
 function abreModalLogin() {
@@ -436,6 +448,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalFinal = subtotalComDesconto + frete;
         return { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal };
     }
+    
+    function obterEstoqueCarrinho(nomeProduto) {
+        if (typeof obterEstoque === 'function') {
+            return obterEstoque(nomeProduto);
+        }
+        try {
+            const est = JSON.parse(localStorage.getItem('estoqueShadowRealm'));
+            if (est && est[nomeProduto] !== undefined) {
+                return Number(est[nomeProduto]);
+            }
+        } catch {}
+        return 0;
+    }
 
     function renderizarCarrinho() {
         if (!productsList) return;
@@ -450,6 +475,9 @@ document.addEventListener('DOMContentLoaded', () => {
         productsList.innerHTML = '';
 
         carrinho.forEach((item, index) => {
+            const disponivel = obterEstoqueCarrinho(item.nome);
+            const atingiuLimite = item.quantidade >= disponivel;
+
             const card = document.createElement('article');
             card.className = 'product-card';
             card.innerHTML = `
@@ -459,9 +487,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="flex:1; margin-left: 20px;">
                     <h3 class="product-name" style="margin-left:0;">${item.nome}</h3>
                     <small style="color:#ffca28;">R$ ${(item.preco * item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
+                    <small style="display:block; margin-top:4px; font-size:12px; color:${atingiuLimite ? '#ff4d4d' : '#aaa'};">
+                        Disponível em estoque: ${disponivel} un.
+                    </small>
                 </div>
                 <div class="quantity-controls">
-                    <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)">+</button>
+                    <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)"
+                        ${atingiuLimite ? 'disabled style="opacity:0.35; cursor:not-allowed;" title="Limite máximo de estoque atingido"' : ''}>+</button>
                     <span class="qty-value">${item.quantidade}</span>
                     <button type="button" class="btn-minus" onclick="alterarQuantidade(${index}, -1)">-</button>
                 </div>
@@ -477,6 +509,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         atualizarResumo(carrinho);
     }
+    window.alterarQuantidade = function (index, delta) {
+        const carrinho = obterCarrinho();
+        if (!carrinho[index]) return;
+
+        if (delta > 0) {
+            const disponivel = obterEstoqueCarrinho(carrinho[index].nome);
+            if (carrinho[index].quantidade + delta > disponivel) {
+                alert(`Limite de estoque atingido! Temos apenas ${disponivel} unidade(s) de ${carrinho[index].nome}.`);
+                renderizarCarrinho();
+                return;
+            }
+        }
+
+        carrinho[index].quantidade += delta;
+        if (carrinho[index].quantidade <= 0) {
+            carrinho.splice(index, 1);
+        }
+
+        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+        renderizarCarrinho();
+        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+    };
 
     window.alterarQuantidade = function (index, delta) {
         const carrinho = obterCarrinho();
@@ -628,6 +682,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderizarCarrinho();
+    if (window.promessaEstoqueSR) {
+        window.promessaEstoqueSR.then(() => renderizarCarrinho());
+    }
 });
 
 const inputNumero = document.getElementById('numero');

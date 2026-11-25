@@ -1,6 +1,33 @@
 const CHAVE_ESTOQUE_SR = 'estoqueShadowRealm';
 
-// 1. Carrega o produtos.json e inicializa o estoque no localStorage sem apagar vendas já feitas
+// Lista reserva caso o navegador bloqueie o fetch('produtos.json') ao abrir direto da pasta
+const PRODUTOS_PADRAO_SR = [
+    { id: "1", nome: "Ichigo Kurosaki", preco: 340.00, estoque: 5, categoria: "Bleach", imagem: "imagens/bleach.png" },
+    { id: "2", nome: "Kisuke Urahara", preco: 460.00, estoque: 3, categoria: "Bleach", imagem: "imagens/kisuke.png" },
+    { id: "3", nome: "Renji Abarai", preco: 400.00, estoque: 4, categoria: "Bleach", imagem: "imagens/renje.png" },
+    { id: "4", nome: "Rukia Kuchiki", preco: 430.00, estoque: 6, categoria: "Bleach", imagem: "imagens/rukia.png" },
+    { id: "5", nome: "Toshiro Hitsugaya", preco: 200.00, estoque: 2, categoria: "Bleach", imagem: "imagens/toshiro.png" },
+    { id: "6", nome: "Levi Ackerman", preco: 250.00, estoque: 5, categoria: "Attack on Titan", imagem: "imagens/Levi.png" },
+    { id: "7", nome: "Maomao", preco: 300.00, estoque: 4, categoria: "Diário de uma Apotecária", imagem: "imagens/Maomao.png" },
+    { id: "8", nome: "Satoru Gojo", preco: 350.00, estoque: 3, categoria: "Jujutsu Kaisen", imagem: "imagens/Canva - download.png" },
+    { id: "9", nome: "Greninja", preco: 400.00, estoque: 2, categoria: "Pokémon", imagem: "imagens/Canva - download (1).png" },
+    { id: "10", nome: "Snorlax", preco: 450.00, estoque: 1, categoria: "Pokémon", imagem: "imagens/Snorlax.png" }
+];
+
+// Tenta ler o produtos.json; se falhar, usa a lista reserva automaticamente
+async function carregarProdutosSR() {
+    try {
+        const resp = await fetch('produtos.json');
+        if (resp.ok) {
+            const dados = await resp.json();
+            if (Array.isArray(dados) && dados.length > 0) return dados;
+        }
+    } catch {
+        // Ignora erro de CORS/arquivo local e usa o fallback abaixo
+    }
+    return PRODUTOS_PADRAO_SR;
+}
+
 window.promessaEstoqueSR = (async function inicializarEstoque() {
     let estoqueSalvo = null;
     try {
@@ -9,30 +36,22 @@ window.promessaEstoqueSR = (async function inicializarEstoque() {
         estoqueSalvo = null;
     }
 
-    try {
-        const resp = await fetch('produtos.json');
-        if (resp.ok) {
-            const produtos = await resp.json();
-            const estoqueAtualizado = estoqueSalvo && typeof estoqueSalvo === 'object' ? { ...estoqueSalvo } : {};
-            let mudou = !estoqueSalvo;
+    const produtos = await carregarProdutosSR();
+    const estoqueAtualizado = (estoqueSalvo && typeof estoqueSalvo === 'object') ? { ...estoqueSalvo } : {};
+    let mudou = Object.keys(estoqueAtualizado).length === 0;
 
-            produtos.forEach(prod => {
-                if (estoqueAtualizado[prod.nome] === undefined) {
-                    estoqueAtualizado[prod.nome] = typeof prod.estoque === 'number' ? prod.estoque : 5;
-                    mudou = true;
-                }
-            });
-
-            if (mudou) {
-                localStorage.setItem(CHAVE_ESTOQUE_SR, JSON.stringify(estoqueAtualizado));
-            }
-            return estoqueAtualizado;
+    produtos.forEach(prod => {
+        if (estoqueAtualizado[prod.nome] === undefined) {
+            estoqueAtualizado[prod.nome] = typeof prod.estoque === 'number' ? prod.estoque : 5;
+            mudou = true;
         }
-    } catch (erro) {
-        console.error('Erro ao carregar estoque do produtos.json:', erro);
+    });
+
+    if (mudou) {
+        localStorage.setItem(CHAVE_ESTOQUE_SR, JSON.stringify(estoqueAtualizado));
     }
 
-    return estoqueSalvo || {};
+    return estoqueAtualizado;
 })();
 
 function obterTodoEstoque() {
@@ -55,7 +74,6 @@ function definirEstoque(nomeProduto, novaQtd) {
     atualizarInterfaceEstoque();
 }
 
-// 2. Desconta os itens quando a compra é finalizada
 function darBaixaNoEstoque(carrinho) {
     const estoque = obterTodoEstoque();
 
@@ -77,7 +95,6 @@ function darBaixaNoEstoque(carrinho) {
     return { sucesso: true };
 }
 
-// 3. Devolve os itens ao estoque quando um pedido é cancelado
 function devolverAoEstoque(itens) {
     if (!Array.isArray(itens)) return;
     const estoque = obterTodoEstoque();
@@ -89,9 +106,7 @@ function devolverAoEstoque(itens) {
     localStorage.setItem(CHAVE_ESTOQUE_SR, JSON.stringify(estoque));
 }
 
-// 4. Atualiza os textos e botões nos cards e modais de produto
 function atualizarInterfaceEstoque() {
-    // Atualiza cards da vitrine (index.html e produtos.html)
     document.querySelectorAll('.destaques > div').forEach(card => {
         const nomeEl = card.querySelector('p');
         if (!nomeEl) return;
@@ -99,7 +114,6 @@ function atualizarInterfaceEstoque() {
         const nome = nomeEl.innerText.trim();
         const qtd = obterEstoque(nome);
 
-        // Aproveita o espaço já criado pelo shopee.js
         const textoShopee = card.querySelector('.shopee-estoque-texto');
         if (textoShopee) {
             if (qtd === 0) {
@@ -114,12 +128,9 @@ function atualizarInterfaceEstoque() {
             }
         }
 
-        if (qtd === 0) {
-            card.style.opacity = '0.7';
-        }
+        card.style.opacity = qtd === 0 ? '0.7' : '1';
     });
 
-    // Atualiza modais de detalhes (.modalProduto)
     document.querySelectorAll('.modalProduto').forEach(modal => {
         const tituloEl = modal.querySelector('.modalProduto-conteudo h2');
         if (!tituloEl) return;
@@ -159,5 +170,5 @@ function atualizarInterfaceEstoque() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await window.promessaEstoqueSR;
-    setTimeout(atualizarInterfaceEstoque, 60);
+    setTimeout(atualizarInterfaceEstoque, 80);
 });
