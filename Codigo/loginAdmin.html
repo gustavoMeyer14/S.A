@@ -1,102 +1,187 @@
-
 <!DOCTYPE html>
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
-    <meta name="author" content="Shadow Realm">
-    <title>Shadow Realm Store - Login Administrador</title>
-    <link rel="stylesheet" href="site.css">
-    <script src="site.js"></script>
-    <script src="admin.js" defer></script>
+    <title>Acesso Administrativo - Shadow Realm Store</title>
+    <link rel="stylesheet" href="melhorias.css">
+    <script src="modais-globais.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #151515;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: radial-gradient(circle at top, rgba(198, 40, 40, 0.18), transparent 60%);
+        }
+
+        .admin-login-card {
+            width: 100%;
+            max-width: 420px;
+            background-color: #0d0d0d;
+            border: 1px solid #C62828;
+            border-radius: 20px;
+            padding: 36px 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85);
+            text-align: center;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background-color: rgba(198, 40, 40, 0.18);
+            color: #ff4d4d;
+            border: 1px solid #C62828;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .admin-login-card h1 {
+            font-size: 26px;
+            margin-bottom: 6px;
+            color: #ffffff;
+        }
+
+        .admin-login-card p {
+            font-size: 14px;
+            color: #aaaaaa;
+            margin-bottom: 26px;
+        }
+
+        .campo-admin {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .campo-admin label {
+            display: block;
+            font-size: 13px;
+            color: #cccccc;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .campo-admin input {
+            width: 100%;
+            height: 46px;
+            padding: 0 44px 0 14px;
+            background-color: #151515;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 15px;
+            transition: 0.25s;
+            outline: none;
+        }
+
+        .campo-admin input:focus {
+            border-color: #C62828;
+            box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.25);
+        }
+
+        .btn-olho {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #aaaaaa;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .btn-olho:hover {
+            color: #ffffff;
+        }
+
+        .btn-entrar-admin {
+            width: 100%;
+            height: 48px;
+            margin-top: 8px;
+            background-color: #C62828;
+            color: #ffffff;
+            border: 1px solid #C62828;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn-entrar-admin:hover {
+            background-color: #151515;
+            box-shadow: 0 6px 20px rgba(198, 40, 40, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .link-voltar-loja {
+            display: inline-block;
+            margin-top: 22px;
+            color: #aaaaaa;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .link-voltar-loja:hover {
+            color: #ff4d4d;
+        }
+    </style>
 </head>
-
 <body>
-    <header id="topo">
-        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
-        <h1>- Shadow Realm Store -</h1>
-        <div class="nav">
-            <nav>
-                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
-                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
-                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
-                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
-                        src="imagens/Usuario.png" alt="Usuário"></button>
-            </nav>
-        </div>
-    </header>
+    <main class="admin-login-card">
+        <span class="admin-badge">🔒 Área Restrita</span>
+        <h1>Shadow Realm Admin</h1>
+        <p>Faça login para gerenciar estoque, pedidos e produtos.</p>
 
-    <div class="modalCliente" id="modalCliente">
-        <div class="modalCliente-conteudo">
-            <h2>- Menu do usuário -</h2>
-            <nav class="nav-usuario">
-                <a href="cadastroAdmin.html">Cadastro do Administrador</a>
-                <a href="loginAdmin.html">Login Adm</a>
-                <a href="cadastro.html">Cadastro</a>
-                <a href="cliente.html">Login</a>
-                <a href="cadastrocartao.html">Cadastrar cartão</a>
-                <a href="pedidos.html">Meus Pedidos</a>
-            </nav>
-            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
-        </div>
-    </div>
+        <form id="form-login-admin">
+            <div class="campo-admin">
+                <label for="admin-user">Usuário ou E-mail</label>
+                <input type="text" id="admin-user" placeholder="Digite seu usuário admin" required autocomplete="username">
+            </div>
 
-    <h2 style="font-size: 35px; margin: 20px;">Login do Administrador</h2>
-
-    <form name="frmLoginAdmin" method="post" action="#"
-        onsubmit="return validaLoginAdmin()" class="formLogin"
-        style="height: 360px; width: 925px;">
-
-        <fieldset class="login">
-
-            <div class="colunas">
-
-                <label for="emailAdmin">Email:</label>
-                <input type="email" name="txtemail" id="emailAdmin"
-                    placeholder="Digite seu email:">
-
-                <label for="senhaAdmin">Senha:</label>
-
-                <div style="position: relative; display: inline-block; width: 100%;">
-                    <input type="password" name="txtsenha" id="senhaAdmin"
-                        placeholder="Digite sua Senha:">
-
-                    <button type="button"
-                        onclick="toggleSenha('senhaAdmin', this)"
-                        style="position: absolute; right: 55px; top: 50%; transform: translateY(-50%); background: none; border: none; width: auto; height: auto; margin: 0; padding: 0; font-size: 20px; cursor: pointer;">
-                        👁️
-                    </button>
+            <div class="campo-admin">
+                <label for="admin-pass">Senha</label>
+                <div class="input-wrapper">
+                    <input type="password" id="admin-pass" placeholder="Digite sua senha" required autocomplete="current-password">
+                    <button type="button" class="btn-olho" id="toggle-senha" title="Mostrar/Ocultar senha">👁️</button>
                 </div>
-
             </div>
 
-            <div class="colunasBotao">
-                <button type="reset">Limpar</button>
-                <button type="submit">Entrar</button>
-            </div>
+            <button type="submit" class="btn-entrar-admin">Entrar no Painel</button>
+        </form>
 
-        </fieldset>
-    </form>
+        <a href="index.html" class="link-voltar-loja">← Voltar para a Shadow Realm Store</a>
+    </main>
 
-    <p class="cadastrar-se">
-        Ainda não tem conta?
-        <a class="linkcadastro" href="cadastroAdmin.html">
-            Cadastrar administrador
-        </a>
-    </p>
-
-    <p class="cadastrar-se">
-        É cliente?
-        <a class="linklogin" href="cliente.html">Login de cliente</a>
-    </p>
-
-    <footer>
-        <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>
-        <a href="#topo">Voltar ao topo</a>
-    </footer>
-
+    <script src="admin.js"></script>
+    <script>
+        const btnOlho = document.getElementById('toggle-senha');
+        const inputSenha = document.getElementById('admin-pass');
+        btnOlho.addEventListener('click', () => {
+            const mostrando = inputSenha.type === 'text';
+            inputSenha.type = mostrando ? 'password' : 'text';
+            btnOlho.textContent = mostrando ? '👁️' : '🙈';
+        });
+    </script>
 </body>
 </html>

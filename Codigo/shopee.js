@@ -80,13 +80,25 @@ function injetarElementosHome() {
                     </div>
                     <button type="button" onclick="copiarCupomShopee('GEEK15', this)">GEEK15 📋</button>
                 </div>
-                <div class="cupom-ticket">
+                            ${localStorage.getItem('vipShadowRealm') === 'true' ? `
+                <div class="cupom-ticket" id="ticket-vip-home" style="border-color: #ffca28;">
                     <div>
-                        <strong>50% OFF</strong>
-                        <small>Super Oferta</small>
+                        <strong>50% OFF 🔓</strong>
+                        <small>Cupom VIP: SHADOW50</small>
                     </div>
-                    <button type="button" onclick="copiarCupomShopee('SHADOW50', this)">SHADOW50 📋</button>
+                    <button type="button" onclick="copiarCupom('SHADOW50', this)">COPIAR</button>
                 </div>
+                ` : `
+                <div class="cupom-ticket" id="ticket-vip-home" style="border-color: #C62828;">
+                    <div>
+                        <strong>50% OFF 🔒</strong>
+                        <small>Exclusivo Clube VIP</small>
+                    </div>
+                    <button type="button" onclick="document.querySelector('.sr-newsletter')?.scrollIntoView({ behavior: 'smooth' })">
+                        DESBLOQUEAR ↓
+                    </button>
+                </div>
+                `}
             </div>
         </div>
 
