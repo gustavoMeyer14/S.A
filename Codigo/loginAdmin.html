@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store">
+    <meta name="author" content="Shadow Realm">
+    <title>Shadow Realm Store - Login Administrador</title>
+    <link rel="stylesheet" href="site.css">
+    <script src="site.js"></script>
+    <script src="admin.js" defer></script>
+</head>
+
+<body>
+    <header id="topo">
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <div class="nav">
+            <nav>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
+                        src="imagens/Usuario.png" alt="Usuário"></button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2>- Menu do usuário -</h2>
+            <nav class="nav-usuario">
+                <a href="cadastroAdmin.html">Cadastro do Administrador</a>
+                <a href="loginAdmin.html">Login Adm</a>
+                <a href="cadastro.html">Cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+                <a href="pedidos.html">Meus Pedidos</a>
+            </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+        </div>
+    </div>
+
+    <h2 style="font-size: 35px; margin: 20px;">Login do Administrador</h2>
+
+    <form name="frmLoginAdmin" method="post" action="#"
+        onsubmit="return validaLoginAdmin()" class="formLogin"
+        style="height: 360px; width: 925px;">
+
+        <fieldset class="login">
+
+            <div class="colunas">
+
+                <label for="emailAdmin">Email:</label>
+                <input type="email" name="txtemail" id="emailAdmin"
+                    placeholder="Digite seu email:">
+
+                <label for="senhaAdmin">Senha:</label>
+
+                <div style="position: relative; display: inline-block; width: 100%;">
+                    <input type="password" name="txtsenha" id="senhaAdmin"
+                        placeholder="Digite sua Senha:">
+
+                    <button type="button"
+                        onclick="toggleSenha('senhaAdmin', this)"
+                        style="position: absolute; right: 55px; top: 50%; transform: translateY(-50%); background: none; border: none; width: auto; height: auto; margin: 0; padding: 0; font-size: 20px; cursor: pointer;">
+                        👁️
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="colunasBotao">
+                <button type="reset">Limpar</button>
+                <button type="submit">Entrar</button>
+            </div>
+
+        </fieldset>
+    </form>
+
+    <p class="cadastrar-se">
+        Ainda não tem conta?
+        <a class="linkcadastro" href="cadastroAdmin.html">
+            Cadastrar administrador
+        </a>
+    </p>
+
+    <p class="cadastrar-se">
+        É cliente?
+        <a class="linklogin" href="cliente.html">Login de cliente</a>
+    </p>
+
+    <footer>
+        <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>
+        <a href="#topo">Voltar ao topo</a>
+    </footer>
+
+</body>
+</html>

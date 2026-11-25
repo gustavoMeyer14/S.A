@@ -1,6 +1,3 @@
-// ==========================================
-// INICIALIZAÇÃO DA VITRINE SHADOW REALM
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const produtosOriginais = [
         'ichigo kurosaki',
@@ -148,7 +145,6 @@ function injetarEstilosVitrine() {
             scrollbar-width: thin;
             scrollbar-color: #b82929 #1a1a1a;
         }
-
         #modalFavoritosSR[open]::-webkit-scrollbar {
             width: 6px;
         }
@@ -160,7 +156,6 @@ function injetarEstilosVitrine() {
             background: #b82929;
             border-radius: 10px;
         }
-        
         .item-fav-modal {
             display: flex;
             align-items: center;
@@ -182,9 +177,6 @@ function injetarEstilosVitrine() {
     document.head.appendChild(style);
 }
 
-// ==========================================
-// 1. LISTA DE FAVORITOS (❤️) E SELO DE ORIGINALIDADE
-// ==========================================
 function obterFavoritos() {
     try { return JSON.parse(localStorage.getItem('favoritosShadowRealm')) || []; }
     catch { return []; }
@@ -324,9 +316,6 @@ function processarCardsVitrine(produtosOriginais) {
     });
 }
 
-// ==========================================
-// 2. SISTEMA COMPLETO DE COMENTÁRIOS E AVALIAÇÕES
-// ==========================================
 const comentariosIniciaisPadrao = [
     { autorId: 'seed1', autor: 'Lucas Kenji', nota: 5, texto: 'Acabamento absurdo! A pintura da resina e os efeitos translúcidos superaram todas as expectativas.', data: '12/10/2026' },
     { autorId: 'seed2', autor: 'Mariana Souza', nota: 5, texto: 'Chegou super bem embalado na caixa original e sem nenhum arranhão. Recomendo demais a loja!', data: '28/10/2026' },
@@ -400,7 +389,7 @@ function inicializarComentariosHTML() {
             return salvos;
         }
 
-       function renderizar() {
+        function renderizar() {
             if (!lista) return;
             const salvos = obterListaComentarios();
             lista.innerHTML = '';

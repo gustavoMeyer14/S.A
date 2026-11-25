@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarBadgeCarrinho();
 });
 
-// 1. Barra superior estilo Shopee com contagem regressiva
-// 1. Barra superior estilo Shopee com contagem regressiva persistente entre páginas
 function injetarBarraTopo() {
     const header = document.querySelector('header');
     if (!header) return;
@@ -23,7 +21,6 @@ function injetarBarraTopo() {
     const duracaoOfertaMs = (2 * 3600 + 45 * 60 + 19) * 1000;
     let fimOferta = parseInt(localStorage.getItem('fimOfertaShopee'), 10);
 
-    // Se ainda não existe um fim salvo ou se o tempo já acabou, cria um novo
     if (!fimOferta || fimOferta <= Date.now()) {
         fimOferta = Date.now() + duracaoOfertaMs;
         localStorage.setItem('fimOfertaShopee', fimOferta);
@@ -47,11 +44,10 @@ function injetarBarraTopo() {
         if (el) el.textContent = `${h}:${m}:${s}`;
     }
 
-    atualizarCronometro(); // Atualiza imediatamente ao abrir a página (sem esperar 1s)
+    atualizarCronometro();
     setInterval(atualizarCronometro, 1000);
 }
 
-// 2. Banner de Cupons + Barra de Categorias na Home (index.html)
 function injetarElementosHome() {
     const secaoDestaques = document.querySelector('.destaques');
     const paginaAtual = window.location.pathname.split('/').pop();
@@ -62,7 +58,6 @@ function injetarElementosHome() {
     const vitrineShopee = document.createElement('section');
     vitrineShopee.className = 'shopee-vitrine-extras';
     vitrineShopee.innerHTML = `
-        <!-- Banner Principal Estilo Marketplace -->
         <div class="shopee-hero-banner">
             <div class="hero-texto">
                 <span class="tag-destaque">🔥 FESTIVAL GEEK 2026</span>
@@ -95,7 +90,6 @@ function injetarElementosHome() {
             </div>
         </div>
 
-        <!-- Categorias Rápidas (Atalhos visuais) -->
         <div class="shopee-categorias">
             <a href="produtos.html?busca=Bleach" class="cat-item">⚔️<span>Bleach</span></a>
             <a href="produtos.html?busca=Attack%20on%20Titan" class="cat-item">🛡️<span>Attack on Titan</span></a>
@@ -121,7 +115,6 @@ window.copiarCupomShopee = function (codigo, botao) {
     }, 2000);
 };
 
-// 3. Adiciona selos de desconto, estrelas, vendidos e Frete Grátis nos cards existentes
 function turbinarCardsProdutos() {
     const cards = document.querySelectorAll('.destaques > div');
     const descontos = ['15%', '20%', '25%', '30%', '10%'];
@@ -130,48 +123,44 @@ function turbinarCardsProdutos() {
     cards.forEach((card, index) => {
         card.classList.add('card-shopee-style');
 
-        // Selo de desconto no canto superior direito
-        const badgeOff = document.createElement('span');
-        badgeOff.className = 'shopee-badge-off';
-        badgeOff.innerHTML = `${descontos[index % descontos.length]}<br><small>OFF</small>`;
-        card.appendChild(badgeOff);
+        if (!card.querySelector('.shopee-badge-off')) {
+            const badgeOff = document.createElement('span');
+            badgeOff.className = 'shopee-badge-off';
+            badgeOff.innerHTML = `${descontos[index % descontos.length]}<br><small>OFF</small>`;
+            card.appendChild(badgeOff);
+        }
 
-        // Etiqueta de Frete Grátis e Avaliação logo abaixo do preço
         const precoEl = card.querySelector('h3');
-        if (precoEl) {
+        if (precoEl && !card.querySelector('.shopee-card-meta')) {
+            const valorNumerico = parseFloat(precoEl.innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            const parcela = (valorNumerico / 12).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-            // Parcelamento do produto 
             const parcelamento = document.createElement('p');
             parcelamento.className = 'shopee-parcelamento';
-            parcelamento.textContent = 'ou 12x de R$ 28,33 sem juros';
+            parcelamento.textContent = `ou 12x de R$ ${parcela} sem juros`;
             precoEl.insertAdjacentElement('afterend', parcelamento);
 
-            // Barra de últimas unidades( Recuerda hacer la barra esta en el css ayudaaaaa)
             const estoque = document.createElement('div');
             estoque.className = 'shopee-estoque';
             estoque.innerHTML = `
-        <div class="shopee-estoque-texto">🔥 85% vendido</div>
-        <div class="shopee-estoque-fundo">
-            <div class="shopee-estoque-progresso"></div>
-        </div> 
-    `;
+                <div class="shopee-estoque-texto">🔥 85% vendido</div>
+                <div class="shopee-estoque-fundo">
+                    <div class="shopee-estoque-progresso"></div>
+                </div>
+            `;
             parcelamento.insertAdjacentElement('afterend', estoque);
 
-            // Frete grátis e avaliações
             const metaInfo = document.createElement('div');
             metaInfo.className = 'shopee-card-meta';
             metaInfo.innerHTML = `
-        <span class="tag-frete">🚚 Frete Grátis</span>
-        <span class="rating-vendidos">⭐ 4.9 | ${vendidos[index % vendidos.length]} vendidos</span>
-    `;
+                <span class="tag-frete">🚚 Frete Grátis</span>
+                <span class="rating-vendidos">⭐ 4.9 | ${vendidos[index % vendidos.length]} vendidos</span>
+            `;
             estoque.insertAdjacentElement('afterend', metaInfo);
         }
-
     });
 }
 
-
-// 4. Contador de itens no ícone do carrinho no header
 window.atualizarBadgeCarrinho = function () {
     const linkCarrinho = document.querySelector('header nav a[href="carrinho.html"]');
     if (!linkCarrinho) return;
@@ -188,9 +177,8 @@ window.atualizarBadgeCarrinho = function () {
     }
     badge.textContent = totalItens;
     badge.style.display = totalItens > 0 ? 'flex' : 'none';
-}
+};
 
-// 5. Toast flutuante bonito
 function mostrarToastShopee(mensagem) {
     let toast = document.getElementById('shopee-toast');
     if (!toast) {
