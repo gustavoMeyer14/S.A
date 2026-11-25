@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -12,6 +13,76 @@
     <script src="shopee.js" defer></script>
     <script src="vitrini.js" defer></script>
     <script src="estoque.js" defer></script>
+
+    <style>
+        .modalRastreio[open] {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 2px solid #b82929;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modalRastreio::backdrop {
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+
+        .acoes-modal-cancelar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-rastrear {
+            background-color: #b82929;
+            color: #ffffff;
+            border: 1px solid #c62828;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 200px;
+            height: 50px;
+            margin: 0;
+        }
+
+        .btn-rastrear:hover {
+            background-color: #151515;
+            scale: 110%;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px #c62828;
+        }
+
+        .btn-cancelar-pedido {
+            background-color: transparent;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 200px;
+            height: 50px;
+            margin: 0;
+        }
+
+        .btn-cancelar-pedido:hover {
+            background-color: #ff4d4d;
+            color: #ffffff;
+            scale: 110%;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px #c62828;
+        }
+    </style>
 </head>
 
 <body>
@@ -370,6 +441,15 @@
         </footer>
     </dialog>
 
+    <dialog id="modalAvisoCarrinho" class="modalRastreio">
+        <h2 id="tituloAvisoCarrinho" style="text-align: center; margin-bottom: 15px;">- Produto Adicionado -</h2>
+        <p id="textoAvisoCarrinho" style="color: #ddd; font-size: 15px; line-height: 1.5; text-align: center;"></p>
+        <div class="acoes-modal-cancelar">
+            <button type="button" id="fecharAvisoCarrinho" class="btn-cancelar-pedido">Continuar</button>
+            <button type="button" id="btnIrCarrinho" class="btn-rastrear" onclick="window.location.href='carrinho.html'">Ver Carrinho</button>
+        </div>
+    </dialog>
+
     <script>
         for (let i = 1; i <= 10; i++) {
             const btnVerMais = document.getElementById(`card${i}`);
@@ -400,6 +480,36 @@
             btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
         }
 
+        const modalAvisoCarrinho = document.getElementById('modalAvisoCarrinho');
+        const tituloAvisoCarrinho = document.getElementById('tituloAvisoCarrinho');
+        const textoAvisoCarrinho = document.getElementById('textoAvisoCarrinho');
+        const btnFecharAvisoCarrinho = document.getElementById('fecharAvisoCarrinho');
+        const btnIrCarrinho = document.getElementById('btnIrCarrinho');
+
+        function abrirModalAviso(titulo, mensagemHTML, mostrarBotaoCarrinho = true) {
+            if (!modalAvisoCarrinho) return;
+            tituloAvisoCarrinho.textContent = titulo;
+            textoAvisoCarrinho.innerHTML = mensagemHTML;
+            btnFecharAvisoCarrinho.textContent = mostrarBotaoCarrinho ? 'Continuar' : 'Fechar';
+            btnIrCarrinho.style.display = mostrarBotaoCarrinho ? 'inline-block' : 'none';
+            modalAvisoCarrinho.showModal();
+        }
+
+        if (btnFecharAvisoCarrinho && modalAvisoCarrinho) {
+            btnFecharAvisoCarrinho.addEventListener('click', () => modalAvisoCarrinho.close());
+
+            modalAvisoCarrinho.addEventListener('click', (e) => {
+                const rect = modalAvisoCarrinho.getBoundingClientRect();
+                const clicouFora =
+                    e.clientX < rect.left ||
+                    e.clientX > rect.right ||
+                    e.clientY < rect.top ||
+                    e.clientY > rect.bottom;
+
+                if (clicouFora) modalAvisoCarrinho.close();
+            });
+        }
+
         function processarCompra(botao, irParaPagamento = false) {
             const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
             const modalAtual = botao.closest('dialog');
@@ -418,19 +528,21 @@
             const produtoExistente = carrinho.find(item => item.nome === nome);
 
             if (typeof obterEstoque === 'function') {
-            const disponivel = obterEstoque(nome);
-            const qtdNoCarrinho = produtoExistente ? produtoExistente.quantidade : 0;
+                const disponivel = obterEstoque(nome);
+                const qtdNoCarrinho = produtoExistente ? produtoExistente.quantidade : 0;
 
-            if (disponivel <= 0) {
-                alert(`Desculpe, ${nome} está esgotado!`);
-                return;
+                if (disponivel <= 0) {
+                    if (modalAtual) modalAtual.close();
+                    abrirModalAviso('- Produto Esgotado -', `Desculpe, <strong>${nome}</strong> está esgotado no momento!`, false);
+                    return;
+                }
+                if (qtdNoCarrinho + 1 > disponivel) {
+                    if (modalAtual) modalAtual.close();
+                    abrirModalAviso('- Estoque Insuficiente -', `Você já tem <strong>${qtdNoCarrinho}</strong> no carrinho e só restam <strong>${disponivel}</strong> unidade(s) disponíveis.`, true);
+                    return;
+                }
             }
-            if (qtdNoCarrinho + 1 > disponivel) {
-                alert(`Estoque insuficiente! Você já tem ${qtdNoCarrinho} no carrinho e só restam ${disponivel} unidade(s).`);
-                return;
-            }
-        }
-        
+
             if (produtoExistente) {
                 produtoExistente.quantidade += 1;
             } else {
@@ -444,7 +556,7 @@
                 window.location.href = 'carrinho.html#tela-pagamento';
             } else if (modalAtual) {
                 modalAtual.close();
-                alert(`${nome} foi adicionado ao carrinho!`);
+                abrirModalAviso('- Produto Adicionado -', `O produto <strong>${nome}</strong> foi adicionado ao seu carrinho!`, true);
             } else {
                 const iconeAnterior = botao.innerHTML;
                 botao.innerHTML = '✔';
