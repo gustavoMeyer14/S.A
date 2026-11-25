@@ -152,7 +152,7 @@ function validaLoginAdmin() {
 
     var email = f.txtemail.value.trim().toLowerCase();
 
-    var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; //No me acuerdo de dode saque esto..creo que era de geminis nose
+    var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/; //No me acuerdo de donde saque esto..creo que era de geminis nose
 
     if (!expRegemail.test(email)) {
         alert("Preencha o Campo Email ou formato inválido !!!");
