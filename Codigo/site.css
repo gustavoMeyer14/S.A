@@ -1273,30 +1273,51 @@ dialog::backdrop {
   border-radius: 10px;
 }
 
-.modalProduto img {
-  width: 200px;
-  height: 200px;
-  border: 1px solid #C62828;
-  border-radius: 20px;
-  float: left;
-  margin: 20px;
-}
-
-.modalProduto h2 {
-  font-size: 50px;
-  color: #ffffff;
-}
-
 .modalProduto-conteudo {
   width: 100%;
+  flex-shrink: 0; /* IMPEDE que a caixa da foto e descrição seja esmagada! */
   border-radius: 20px;
   background-color: #262626;
   border: 1px solid #C62828;
-  overflow: hidden; /* Contém a imagem flutuante sem vazar */
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.modalProduto-conteudo img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  flex-shrink: 0;
+  margin: 0; /* Remove o float: left antigo */
+}
+
+.modalProduto-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.modalProduto h2 {
+  font-size: 42px;
+  color: #ffffff;
+  margin: 0;
+}
+
+.modalProduto-conteudo p {
+  font-size: 20px;
+  line-height: 1.5;
+  color: #e0e0e0;
+  margin: 0;
 }
 
 .modalProduto-comentarios {
   width: 100%;
+  flex-shrink: 0; /* Garante que os comentários também não sejam cortados */
   height: auto;
   border-radius: 20px;
   background-color: #262626;
