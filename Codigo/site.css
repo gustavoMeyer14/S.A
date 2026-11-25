@@ -1175,6 +1175,8 @@ option:hover {
   margin: 20px;
   margin-left: 27px;
   background-color: #151515;
+  text-align: left;
+  padding: 2px;
 }
 
 .faq-item:hover {
