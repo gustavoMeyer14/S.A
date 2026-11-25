@@ -597,6 +597,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const cidade = document.getElementById('input-cidade')?.value.trim() || '';
             const estado = document.getElementById('input-estado')?.value.trim() || '';
 
+            if (typeof darBaixaNoEstoque === 'function') {
+                const resultadoEstoque = darBaixaNoEstoque(carrinho);
+                if (!resultadoEstoque.sucesso) {
+                    alert(resultadoEstoque.mensagem);
+                    return;
+                }
+            }
+
             const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
             const proximoNumero = pedidos.length > 0
                 ? Math.max(...pedidos.map(p => Number(p.numeroPedido) || 1000)) + 1
@@ -820,3 +828,26 @@ if (btnConfirmar) {
 }
 
 renderizarCartoesSalvos();
+
+//=========== ESTOQUE ===========//
+window.alterarQuantidade = function (index, delta) {
+    const carrinho = obterCarrinho();
+    if (!carrinho[index]) return;
+
+    if (delta > 0 && typeof obterEstoque === 'function') {
+        const disponivel = obterEstoque(carrinho[index].nome);
+        if (carrinho[index].quantidade + delta > disponivel) {
+            alert(`Limite de estoque atingido! Temos apenas ${disponivel} unidade(s) de ${carrinho[index].nome}.`);
+            return;
+        }
+    }
+
+    carrinho[index].quantidade += delta;
+    if (carrinho[index].quantidade <= 0) {
+        carrinho.splice(index, 1);
+    }
+
+    localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+    renderizarCarrinho();
+    if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+};
