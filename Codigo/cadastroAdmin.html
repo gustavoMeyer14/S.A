@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -29,7 +28,7 @@
         </div>
     </header>
 
-     <div class="modalCliente" id="modalCliente">
+    <div class="modalCliente" id="modalCliente">
         <div class="modalCliente-conteudo">
             <h2>- Menu do usuário -</h2>
             <nav class="nav-usuario">
@@ -45,7 +44,7 @@
     <h2 style="font-size: 35px; margin: 20px;">Cadastro do Administrador</h2>
 
     <form name="frmCadastroAdmin" method="post" class="formLogin"
-        action="#" onsubmit="return validaCadastroAdmin()">
+        action="#" onsubmit="event.preventDefault(); validaCadastroAdmin();">
 
         <fieldset class="login">
 
@@ -93,7 +92,7 @@
 
     <p class="cadastrar-se">
         Já tem Login?
-        <a class="linklogin" href="loginAdmin.html">Logar-se</a>
+        <a class="linklogin" href="cliente.html">Logar-se</a>
     </p>
 
     <p class="cadastrar-se">

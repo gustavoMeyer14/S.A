@@ -1,6 +1,58 @@
 var administradorEncontrado = null;
 
-//y Aka es el cadastro del administrador
+// ==========================================
+// Guarda de Rota e Menu Dinâmico de Admin
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+    const ehPaginaCadastroAdmin = window.location.pathname.toLowerCase().includes("cadastroadmin.html");
+    const usuarioLogado = localStorage.getItem("usuarioLogado") === "true";
+    const tipoUsuario = localStorage.getItem("tipoUsuario");
+
+    // 1. Bloqueia qualquer pessoa que não esteja logada como administrador
+    if (ehPaginaCadastroAdmin && (!usuarioLogado || tipoUsuario !== "admin")) {
+        alert("Acesso negado! Apenas administradores logados podem cadastrar novos administradores.");
+        window.location.replace("index.html");
+        return;
+    }
+
+    // 2. Injeta links exclusivos no menu do usuário apenas se estiver logado como admin
+    const navUsuario = document.querySelector("#modalCliente .nav-usuario");
+    if (navUsuario && usuarioLogado && tipoUsuario === "admin") {
+        if (!navUsuario.querySelector('a[href="estoque.html"]')) {
+            const linkEstoque = document.createElement("a");
+            linkEstoque.href = "estoque.html";
+            linkEstoque.textContent = "📦 Gerenciar Estoque";
+            navUsuario.prepend(linkEstoque);
+        }
+
+        if (!navUsuario.querySelector('a[href="cadastroAdmin.html"]')) {
+            const linkNovoAdmin = document.createElement("a");
+            linkNovoAdmin.href = "cadastroAdmin.html";
+            linkNovoAdmin.textContent = "🛡️ Cadastrar Novo Admin";
+            navUsuario.prepend(linkNovoAdmin);
+        }
+    }
+
+    // 3. Formatação automática do CPF
+    var inputCpf = document.getElementById("cpfAdmin");
+    if (inputCpf) {
+        inputCpf.addEventListener("input", function (e) {
+            var v = e.target.value.replace(/\D/g, "").slice(0, 11);
+
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+            e.target.value = v;
+        });
+    }
+});
+
+// ==========================================
+// Cadastro do Administrador
+// ==========================================
+
 function lerAdministradores() {
     try {
         var administradores = JSON.parse(
@@ -14,7 +66,7 @@ function lerAdministradores() {
     }
 }
 
-function validaCadastroAdmin() {
+async function validaCadastroAdmin() {
 
     var f = document.frmCadastroAdmin;
 
@@ -53,10 +105,20 @@ function validaCadastroAdmin() {
         return false;
     }
 
-    var administradores = lerAdministradores();
+    // Verifica duplicidade no localStorage e no admin.json
+    var administradoresLocais = lerAdministradores();
+    var administradoresJSON = [];
+    try {
+        var resp = await fetch('admin.json');
+        if (resp.ok) {
+            administradoresJSON = await resp.json();
+        }
+    } catch (e) {}
 
-    var jaExiste = administradores.some(function (a) {
-        return a.email === email.toLowerCase() || a.cpf === cpf;
+    var todosAdmins = administradoresLocais.concat(administradoresJSON);
+
+    var jaExiste = todosAdmins.some(function (a) {
+        return (a.email && a.email.toLowerCase() === email.toLowerCase()) || (cpf && a.cpf === cpf);
     });
 
     if (jaExiste) {
@@ -101,33 +163,48 @@ function fechaModalAdmin() {
 
 }
 
-async function validaCadastroAdmin() {
+function confirmaCadastroAdmin() {
+
     var f = document.frmCadastroAdmin;
-    // ... (suas validações de nome, email, cpf, senha e chave mestra continuam iguais) ...
 
-    var administradoresLocais = lerAdministradores();
-    var administradoresJSON = [];
-    try {
-        var resp = await fetch('admin.json');
-        if (resp.ok) administradoresJSON = await resp.json();
-    } catch (e) {}
+    var novoAdmin = {
+        nome: f.txtnome.value.trim(),
+        email: f.txtemail.value.trim().toLowerCase(),
+        cpf: f.txtcpf.value.trim(),
+        senha: f.txtsenha.value,
+        tipo: "admin"
+    };
 
-    var todosAdmins = administradoresLocais.concat(administradoresJSON);
+    var administradores = lerAdministradores();
 
-    var jaExiste = todosAdmins.some(function (a) {
-        return (a.email && a.email.toLowerCase() === email.toLowerCase()) || (cpf && a.cpf === cpf);
+    var jaExiste = administradores.some(function (a) {
+        return a.email === novoAdmin.email || a.cpf === novoAdmin.cpf;
     });
 
     if (jaExiste) {
-        alert("Este e-mail ou CPF já está cadastrado como administrador!");
-        return false;
+        alert("Este e-mail ou CPF já está cadastrado!");
+        fechaModalAdmin();
+        return;
     }
 
-    // ... (restante da função que abre a modal continua igual) ...
+    administradores.push(novoAdmin);
+
+    localStorage.setItem(
+        'administradoresShadowRealm',
+        JSON.stringify(administradores)
+    );
+
+    alert("Cadastro de administrador realizado com sucesso!");
+
+    fechaModalAdmin();
+
+    f.reset();
+
+    window.location.href = "cliente.html";
 }
 
 // ==========================================
-// Aqui comiensa el login
+// Login do Administrador (com admin.json)
 // ==========================================
 
 async function validaLoginAdmin() {
@@ -209,30 +286,3 @@ async function validaLoginAdmin() {
 
     return false;
 }
-
-
-// ==========================================
-// A formatacção do CPF
-// ==========================================
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    var inputCpf = document.getElementById("cpfAdmin");
-
-    if (inputCpf) {
-
-        inputCpf.addEventListener("input", function (e) {
-
-            var v = e.target.value.replace(/\D/g, "").slice(0, 11);
-
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-
-            e.target.value = v;
-
-        });
-
-    }
-
-});

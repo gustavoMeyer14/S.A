@@ -203,6 +203,30 @@ async function validaLogin() {
     // (Mantenha aqui o código que você já tem no site.js para buscar em clientes.json / localStorage)
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+    const navUsuario = document.querySelector("#modalCliente .nav-usuario");
+    const usuarioLogado = localStorage.getItem("usuarioLogado") === "true";
+    const tipoUsuario = localStorage.getItem("tipoUsuario");
+
+    if (navUsuario && usuarioLogado && tipoUsuario === "admin") {
+        // Link para Gerenciar Estoque
+        if (!navUsuario.querySelector('a[href="estoque.html"]')) {
+            const linkEstoque = document.createElement("a");
+            linkEstoque.href = "estoque.html";
+            linkEstoque.textContent = "📦 Gerenciar Estoque";
+            navUsuario.prepend(linkEstoque);
+        }
+
+        // Link para Cadastrar Novo Admin
+        if (!navUsuario.querySelector('a[href="cadastroAdmin.html"]')) {
+            const linkNovoAdmin = document.createElement("a");
+            linkNovoAdmin.href = "cadastroAdmin.html";
+            linkNovoAdmin.textContent = "🛡️ Cadastrar Novo Admin";
+            navUsuario.prepend(linkNovoAdmin);
+        }
+    }
+});
+
 function abreModalLogin() {
     var f = document.frmlogin;
     var dados = [
