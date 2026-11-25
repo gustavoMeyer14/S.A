@@ -1,0 +1,10 @@
+[
+    {
+        "id": "1",
+        "nome": "Pedro Carvalho",
+        "cpf": "",
+        "email": "pedro_carvalho@gmail.com",
+        "senha": "Pedro@1983",
+        "admin": true
+    }
+]
