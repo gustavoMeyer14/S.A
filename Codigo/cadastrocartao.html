@@ -1,3 +1,6 @@
+### 7. `cadastrocartao.html`
+
+```html
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -35,7 +38,6 @@
                 <a href="cliente.html">Login</a>
                 <a href="cadastrocartao.html">Cadastrar cartão</a>
                 <a href="pedidos.html">Meus Pedidos</a>
-
             </nav>
             <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
         </div>
@@ -50,8 +52,6 @@
                     <label for="numero">Número do cartão:</label>
                     <input type="text" id="numero" maxlength="19" placeholder="Os 16 digitos da frente do cartão"
                         required>
-
-
 
                     <label for="titular">Nome do titular:</label>
                     <input type="text" id="titular" placeholder="Exatamente como impresso no cartão" required>
@@ -76,14 +76,12 @@
             </fieldset>
         </form>
 
-        <!-- Área onde os cartões cadastrados vão aparecer -->
         <section class="cartoes-salvos-container">
             <h2>Meus Cartões Cadastrados (Máx. 2)</h2>
             <div id="listaCartoesSalvos" class="lista-cartoes"></div>
         </section>
     </main>
 
-    <!-- Modal com os dados preenchidos -->
     <dialog class="menor" id="modalDados">
         <h3>Confira os Dados do Cartão</h3>
         <div id="conteudoModal">
@@ -98,7 +96,6 @@
             <button type="button" id="btnConfirmar" class="btnCartão">Confirmar Cadastro</button>
         </div>
     </dialog>
-
 
     <footer>
         <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>

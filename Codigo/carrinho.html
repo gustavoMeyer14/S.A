@@ -1,3 +1,7 @@
+
+### 4. `carrinho.html`
+
+```html
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -43,15 +47,12 @@
         </div>
     </div>
 
-    <!-- Área Principal (Fundo Escuro) -->
     <main class="cart-content">
 
-        <!-- Lista de Produtos (Lado Esquerdo) -->
         <section class="products-list" id="products-list">
             <p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>
         </section>
 
-        <!-- Resumo de Valores e Checkout (Lado Direito) -->
         <aside class="checkout-summary">
             <h2>Total:</h2>
 
@@ -80,9 +81,6 @@
 
     </main>
 
-    <!-- ==========================================
-     TELA 2: PAGAMENTO E FRETE (Abre via CSS)
-     ========================================== -->
     <div class="payment-screen-container" id="tela-pagamento">
         <div class="modal-container">
 
@@ -93,7 +91,6 @@
 
             <div class="modal-content">
 
-                <!-- Coluna Esquerda: Opções de Pagamento -->
                 <section class="payment-column">
                     <p class="modal-total-value">Valor Total: R$ 0,00</p>
 
@@ -119,7 +116,6 @@
 
                 <div class="vertical-divider"></div>
 
-                <!-- Coluna Direita: Inputs de Endereço -->
                 <form class="address-column">
                     <h3>Informe seu endereço:</h3>
 
@@ -147,12 +143,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. MOSTRAR CARTÕES CADASTRADOS AO SELECIONAR DÉBITO OU PARCELADO
             const radiosPagamento = document.querySelectorAll('input[name="payment-group"]');
             const fieldsetPagamento = document.querySelector('.payment-methods');
             const usuarioAtual = localStorage.getItem('usuarioAtual') || 'geral';
 
-            // Busca os cartões salvos (compatível com a chave por usuário ou geral)
             const cartoesSalvos = JSON.parse(localStorage.getItem(`cartoesShadowRealm_${usuarioAtual}`))
                 || JSON.parse(localStorage.getItem('cartoesShadowRealm'))
                 || [];
@@ -191,7 +185,6 @@
                 });
             }
 
-            // 2. AVISO DINÂMICO DE FRETE GRÁTIS (REGRA DO SHOPEE.JS: ACIMA DE R$ 250)
             const resumoAside = document.querySelector('.checkout-summary');
             if (resumoAside) {
                 const avisoFrete = document.createElement('p');
@@ -223,7 +216,6 @@
                 });
             }
 
-            // 3. FECHAR MODAL DE PAGAMENTO COM A TECLA ESC OU CLICANDO FORA
             const telaPagamento = document.getElementById('tela-pagamento');
             if (telaPagamento) {
                 document.addEventListener('keydown', (e) => {
