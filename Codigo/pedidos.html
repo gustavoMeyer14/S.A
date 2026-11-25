@@ -452,6 +452,9 @@
 
                 if (alvo) {
                     alvo.status = 'Pedido Cancelado';
+                    if (typeof devolverAoEstoque === 'function' && alvo.itens) {
+                        devolverAoEstoque(alvo.itens);
+                    }
                     localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
                 }
 

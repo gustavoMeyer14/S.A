@@ -531,6 +531,7 @@
             const produtoExistente = carrinho.find(item => item.nome === nome);
 
             if (typeof obterEstoque === 'function') {
+<<<<<<< HEAD
                 const disponivel = obterEstoque(nome);
                 const qtdNoCarrinho = produtoExistente ? produtoExistente.quantidade : 0;
 
@@ -546,6 +547,21 @@
                 }
             }
 
+=======
+            const disponivel = obterEstoque(nome);
+            const qtdNoCarrinho = produtoExistente ? produtoExistente.quantidade : 0;
+
+            if (disponivel <= 0) {
+                alert(`Desculpe, ${nome} está esgotado!`);
+                return;
+            }
+            if (qtdNoCarrinho + 1 > disponivel) {
+                alert(`Estoque insuficiente! Você já tem ${qtdNoCarrinho} no carrinho e só restam ${disponivel} unidade(s).`);
+                return;
+            }
+        }
+        
+>>>>>>> f0bc628bc7a00aab14237bd66302a1f13fe62718
             if (produtoExistente) {
                 produtoExistente.quantidade += 1;
             } else {
