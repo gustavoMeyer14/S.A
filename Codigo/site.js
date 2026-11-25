@@ -448,6 +448,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalFinal = subtotalComDesconto + frete;
         return { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal };
     }
+    
+    function obterEstoqueCarrinho(nomeProduto) {
+        if (typeof obterEstoque === 'function') {
+            return obterEstoque(nomeProduto);
+        }
+        try {
+            const est = JSON.parse(localStorage.getItem('estoqueShadowRealm'));
+            if (est && est[nomeProduto] !== undefined) {
+                return Number(est[nomeProduto]);
+            }
+        } catch {}
+        return 0;
+    }
 
     function renderizarCarrinho() {
         if (!productsList) return;
@@ -462,6 +475,9 @@ document.addEventListener('DOMContentLoaded', () => {
         productsList.innerHTML = '';
 
         carrinho.forEach((item, index) => {
+            const disponivel = obterEstoqueCarrinho(item.nome);
+            const atingiuLimite = item.quantidade >= disponivel;
+
             const card = document.createElement('article');
             card.className = 'product-card';
             card.innerHTML = `
@@ -471,9 +487,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="flex:1; margin-left: 20px;">
                     <h3 class="product-name" style="margin-left:0;">${item.nome}</h3>
                     <small style="color:#ffca28;">R$ ${(item.preco * item.quantidade).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
+                    <small style="display:block; margin-top:4px; font-size:12px; color:${atingiuLimite ? '#ff4d4d' : '#aaa'};">
+                        Disponível em estoque: ${disponivel} un.
+                    </small>
                 </div>
                 <div class="quantity-controls">
-                    <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)">+</button>
+                    <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)"
+                        ${atingiuLimite ? 'disabled style="opacity:0.35; cursor:not-allowed;" title="Limite máximo de estoque atingido"' : ''}>+</button>
                     <span class="qty-value">${item.quantidade}</span>
                     <button type="button" class="btn-minus" onclick="alterarQuantidade(${index}, -1)">-</button>
                 </div>
@@ -489,6 +509,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         atualizarResumo(carrinho);
     }
+    window.alterarQuantidade = function (index, delta) {
+        const carrinho = obterCarrinho();
+        if (!carrinho[index]) return;
+
+        if (delta > 0) {
+            const disponivel = obterEstoqueCarrinho(carrinho[index].nome);
+            if (carrinho[index].quantidade + delta > disponivel) {
+                alert(`Limite de estoque atingido! Temos apenas ${disponivel} unidade(s) de ${carrinho[index].nome}.`);
+                renderizarCarrinho();
+                return;
+            }
+        }
+
+        carrinho[index].quantidade += delta;
+        if (carrinho[index].quantidade <= 0) {
+            carrinho.splice(index, 1);
+        }
+
+        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+        renderizarCarrinho();
+        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+    };
 
     window.alterarQuantidade = function (index, delta) {
         const carrinho = obterCarrinho();
@@ -640,6 +682,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderizarCarrinho();
+    if (window.promessaEstoqueSR) {
+        window.promessaEstoqueSR.then(() => renderizarCarrinho());
+    }
 });
 
 const inputNumero = document.getElementById('numero');
