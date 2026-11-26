@@ -249,7 +249,7 @@ async function validaLoginAdmin() {
         console.error("Erro ao ler admin.json:", e);
     }
 
-    // Fallback caso abra o HTML diretamente sem servidor local
+    
     if (administradoresJSON.length === 0) {
         administradoresJSON = [
             {
