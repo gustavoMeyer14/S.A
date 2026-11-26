@@ -2,52 +2,90 @@ document.addEventListener('DOMContentLoaded', () => {
     const formEndereco = document.querySelector('.address-column');
     if (!formEndereco) return;
 
-    const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
-    const chaveUsuario = usuarioAtual ? `cartoesShadowRealm_${usuarioAtual}` : 'cartoesShadowRealm';
-    const cartoesSalvos = JSON.parse(localStorage.getItem(chaveUsuario))
-        || JSON.parse(localStorage.getItem('cartoesShadowRealm'))
-        || [];
+    const cartoesSalvos = lerCartoesCheckout();
 
     injetarSelecaoCartoes(cartoesSalvos);
     injetarEnderecoAutomatico(formEndereco, cartoesSalvos);
     configurarFechamentoModalPagamento();
+    configurarSincronizacaoMetodosPagamento();
 });
 
-function injetarSelecaoCartoes(cartoesSalvos) {
-    const radiosPagamento = document.querySelectorAll('input[name="payment-group"]');
-    const fieldsetPagamento = document.querySelector('.payment-methods');
-    if (!fieldsetPagamento || document.getElementById('selecao-cartao-checkout')) return;
+function obterChaveCartoesCheckout() {
+    const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
+    return usuarioAtual ? `cartoesShadowRealm_${usuarioAtual}` : 'cartoesShadowRealm';
+}
 
-    const boxCartao = document.createElement('div');
-    boxCartao.id = 'selecao-cartao-checkout';
-    boxCartao.style.cssText = 'display: none; width: 100%; max-width: 350px; margin-top: 6px; padding: 10px; background: #151515; border: 1px solid #C62828; border-radius: 10px; text-align: left; font-size: 14px;';
+function lerCartoesCheckout() {
+    if (typeof lerCartoesUsuario === 'function') {
+        const viaSite = lerCartoesUsuario();
+        if (Array.isArray(viaSite)) return viaSite;
+    }
+
+    const chaveUsuario = obterChaveCartoesCheckout();
+    try {
+        const dadosUsuario = JSON.parse(localStorage.getItem(chaveUsuario));
+        if (Array.isArray(dadosUsuario) && dadosUsuario.length > 0) return dadosUsuario;
+    } catch {}
+
+    try {
+        const legado = JSON.parse(localStorage.getItem('cartoesShadowRealm'));
+        return Array.isArray(legado) ? legado : [];
+    } catch {
+        return [];
+    }
+}
+
+function montarHtmlOpcoesCartoes(cartoes) {
+    return cartoes.map((c, idx) => {
+        const rotulo = idx === 0 ? 'Principal' : 'Secundário';
+        const numero = c.numeroMascarado || (c.final ? `**** **** **** ${c.final}` : 'Cartão');
+        const titular = c.titular ? ` (${c.titular})` : '';
+        return `<option value="${idx}">${rotulo} - ${numero}${titular}</option>`;
+    }).join('');
+}
+
+function atualizarVisibilidadeCartaoCheckout() {
+    const boxCartao = document.getElementById('selecao-cartao-checkout');
+    if (!boxCartao) return;
+
+    const metodoSelecionado = document.querySelector('input[name="payment-group"]:checked')?.value || 'pix';
+    const precisaCartao = metodoSelecionado === 'debito' || metodoSelecionado === 'parcelado';
+    boxCartao.style.display = precisaCartao ? 'block' : 'none';
+}
+
+function injetarSelecaoCartoes(cartoesSalvos) {
+    const fieldsetPagamento = document.querySelector('.payment-methods');
+    if (!fieldsetPagamento) return;
+
+    let boxCartao = document.getElementById('selecao-cartao-checkout');
+    if (!boxCartao) {
+        boxCartao = document.createElement('div');
+        boxCartao.id = 'selecao-cartao-checkout';
+        boxCartao.style.cssText = 'display: none; width: 100%; max-width: 350px; margin-top: 8px; padding: 12px; background: #151515; border: 1px solid #C62828; border-radius: 12px; text-align: left; font-size: 14px;';
+        fieldsetPagamento.appendChild(boxCartao);
+    }
 
     if (cartoesSalvos.length > 0) {
-        const opcoes = cartoesSalvos.map((c, idx) =>
-            `<option value="${idx}">${idx === 0 ? 'Principal' : 'Secundário'} - ${c.numeroMascarado} (${c.titular})</option>`
-        ).join('');
-
         boxCartao.innerHTML = `
-            <label for="select-cartao-uso" style="display:block; margin-bottom:5px; color:#ffca28; font-weight:bold;">Escolha o cartão:</label>
-            <select id="select-cartao-uso" style="width:100%; height:36px; margin:0; padding:4px 8px; font-size:14px; border-radius:8px; background:#222; color:#fff; border:1px solid #C62828;">
-                ${opcoes}
+            <label for="select-cartao-uso" style="display:block; margin-bottom:6px; color:#ffca28; font-weight:bold;">Escolha o cartão:</label>
+            <select id="select-cartao-uso" style="width:100%; height:38px; margin:0; padding:4px 10px; font-size:14px; border-radius:8px; background:#222; color:#fff; border:1px solid #C62828; cursor:pointer;">
+                ${montarHtmlOpcoesCartoes(cartoesSalvos)}
             </select>
         `;
     } else {
         boxCartao.innerHTML = `
-            <p style="color:#ffaa00; margin-bottom:6px;">Nenhum cartão cadastrado.</p>
+            <p style="color:#ffaa00; margin:0 0 8px 0;">Nenhum cartão cadastrado na sua conta.</p>
             <a href="cadastrocartao.html" style="color:#ff4d4d; font-weight:bold; text-decoration:underline;">+ Cadastrar cartão agora</a>
         `;
     }
 
-    fieldsetPagamento.appendChild(boxCartao);
+    atualizarVisibilidadeCartaoCheckout();
+}
 
-    radiosPagamento.forEach(radio => {
-        radio.addEventListener('change', () => {
-            boxCartao.style.display = (radio.value === 'debito' || radio.value === 'parcelado')
-                ? 'block'
-                : 'none';
-        });
+function configurarSincronizacaoMetodosPagamento() {
+    const radiosPagamento = document.querySelectorAll('input[name="payment-group"]');
+    radiosPagamento.forEach((radio) => {
+        radio.addEventListener('change', atualizarVisibilidadeCartaoCheckout);
     });
 }
 
@@ -56,26 +94,35 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
     const inputEstado = document.getElementById('input-estado');
     const inputCidade = document.getElementById('input-cidade');
     const primeiroGrupo = formEndereco.querySelector('.form-group');
-    if (!inputRua || !primeiroGrupo || document.getElementById('input-cep')) return;
+    if (!inputRua || !primeiroGrupo) return;
 
-    const cartaoComEndereco = cartoesSalvos.find(c => c.endereco && c.endereco.trim() !== '');
-    if (cartaoComEndereco) {
+    const cartaoComEndereco = cartoesSalvos.find((c) => c.endereco && c.endereco.trim() !== '');
+    if (cartaoComEndereco && !document.getElementById('btn-usar-endereco-cartao')) {
         const btnEndereco = document.createElement('button');
         btnEndereco.type = 'button';
         btnEndereco.id = 'btn-usar-endereco-cartao';
         btnEndereco.textContent = '📍 Usar endereço do cartão cadastrado';
-        btnEndereco.style.cssText = 'width: 100%; margin-bottom: 10px; padding: 8px; background-color: #1e1e1e; color: #ffca28; border: 1px solid #ffca28; border-radius: 10px; font-weight: bold; cursor: pointer;';
+        btnEndereco.style.cssText = 'width: 100%; margin-bottom: 12px; padding: 9px 12px; background-color: #1e1e1e; color: #ffca28; border: 1px solid #ffca28; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;';
+
+        btnEndereco.addEventListener('mouseenter', () => {
+            btnEndereco.style.backgroundColor = '#2a2410';
+        });
+        btnEndereco.addEventListener('mouseleave', () => {
+            btnEndereco.style.backgroundColor = '#1e1e1e';
+        });
 
         btnEndereco.addEventListener('click', () => {
+            const listaAtual = lerCartoesCheckout();
             const selectCartao = document.getElementById('select-cartao-uso');
             const idx = selectCartao ? parseInt(selectCartao.value, 10) : 0;
-            const cartaoAlvo = cartoesSalvos[idx] || cartaoComEndereco;
+            const cartaoAlvo = listaAtual[idx] || listaAtual.find((c) => c.endereco && c.endereco.trim() !== '');
 
             if (cartaoAlvo && cartaoAlvo.endereco) {
-                const partes = cartaoAlvo.endereco.split(',').map(p => p.trim());
+                const partes = cartaoAlvo.endereco.split(',').map((p) => p.trim()).filter(Boolean);
                 inputRua.value = partes[0] || cartaoAlvo.endereco;
                 if (partes[1] && inputCidade) inputCidade.value = partes[1];
                 if (partes[2] && inputEstado) inputEstado.value = partes[2];
+
                 const statusEl = document.getElementById('status-cep');
                 if (statusEl) {
                     statusEl.style.color = '#00e676';
@@ -87,31 +134,44 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
         formEndereco.insertBefore(btnEndereco, primeiroGrupo);
     }
 
-    const grupoCep = document.createElement('div');
-    grupoCep.className = 'form-group';
-    grupoCep.innerHTML = `
-        <label for="input-cep">CEP:</label>
-        <div>
-            <input type="text" id="input-cep" maxlength="9" placeholder="Ex: 89201-000">
-            <small id="status-cep" style="display:block; font-size:12px; margin-top:3px; color:#bbb;"></small>
-        </div>
-    `;
-    formEndereco.insertBefore(grupoCep, primeiroGrupo);
+    if (!document.getElementById('input-cep')) {
+        const grupoCep = document.createElement('div');
+        grupoCep.className = 'form-group';
+        grupoCep.innerHTML = `
+            <label for="input-cep">CEP:</label>
+            <div style="width: 100%;">
+                <input type="text" id="input-cep" maxlength="9" inputmode="numeric" placeholder="Ex: 89201-000">
+                <small id="status-cep" style="display:block; font-size:12px; margin-top:4px; color:#bbb;"></small>
+            </div>
+        `;
+        formEndereco.insertBefore(grupoCep, primeiroGrupo);
 
-    const inputCep = document.getElementById('input-cep');
-    const statusCep = document.getElementById('status-cep');
+        const inputCep = document.getElementById('input-cep');
+        const statusCep = document.getElementById('status-cep');
+        let ultimoCepConsultado = '';
 
-    inputCep.addEventListener('input', async (e) => {
-        let cepLimpo = e.target.value.replace(/\D/g, '');
-        e.target.value = cepLimpo.length > 5
-            ? `${cepLimpo.slice(0, 5)}-${cepLimpo.slice(5, 8)}`
-            : cepLimpo;
+        inputCep.addEventListener('input', async (e) => {
+            const cepLimpo = e.target.value.replace(/\D/g, '').slice(0, 8);
+            e.target.value = cepLimpo.length > 5
+                ? `${cepLimpo.slice(0, 5)}-${cepLimpo.slice(5)}`
+                : cepLimpo;
 
-        if (cepLimpo.length === 8) {
+            if (cepLimpo.length < 8) {
+                statusCep.style.color = '#bbb';
+                statusCep.textContent = cepLimpo.length > 0 ? 'Digite os 8 dígitos do CEP...' : '';
+                return;
+            }
+
+            if (cepLimpo === ultimoCepConsultado) return;
+            ultimoCepConsultado = cepLimpo;
+
             statusCep.style.color = '#ffca28';
             statusCep.textContent = 'Buscando CEP...';
+
             try {
                 const resp = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+                if (!resp.ok) throw new Error('Falha na resposta do CEP');
+
                 const dados = await resp.json();
                 if (dados.erro) {
                     statusCep.style.color = '#ff4d4d';
@@ -128,8 +188,8 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
                 statusCep.style.color = '#ff4d4d';
                 statusCep.textContent = 'Erro ao consultar o CEP.';
             }
-        }
-    });
+        });
+    }
 }
 
 function configurarFechamentoModalPagamento() {
@@ -148,3 +208,10 @@ function configurarFechamentoModalPagamento() {
         }
     });
 }
+
+window.atualizarCartoesCheckoutSR = function () {
+    const formEndereco = document.querySelector('.address-column');
+    if (!formEndereco) return;
+    const cartoes = lerCartoesCheckout();
+    injetarSelecaoCartoes(cartoes);
+};

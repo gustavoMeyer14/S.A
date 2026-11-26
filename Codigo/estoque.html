@@ -7,10 +7,17 @@
     <title>Shadow Realm Store - Gerenciar Estoque</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js" defer></script>
+    <script src="admin.js" defer></script>
+    <script src="conta.js" defer></script>
     <script src="estoque.js" defer></script>
+    <link rel="stylesheet" href="melhorias.css">
+    <script src="modais-globais.js"></script>
+    <script src="favoritos.js" defer></script>
+    <script src="extras-loja.js" defer></script>
     <style>
         .painel-estoque {
             max-width: 1000px;
+            width: 92%;
             margin: 40px auto;
             padding: 30px;
             background-color: #0d0d0d;
@@ -27,8 +34,15 @@
             margin-bottom: 25px;
         }
 
+        .tabela-estoque-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
         .tabela-estoque {
             width: 100%;
+            min-width: 620px;
             border-collapse: collapse;
             background-color: #1b1b1b;
             border-radius: 12px;
@@ -60,6 +74,7 @@
             border-radius: 8px;
             font-weight: bold;
             font-size: 13px;
+            display: inline-block;
         }
 
         .status-ok {
@@ -96,6 +111,7 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
         .btn-est:hover {
@@ -110,6 +126,12 @@
             border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #151515;
+            outline: 1px solid #C62828;
         }
     </style>
     <script>
@@ -122,8 +144,31 @@
             const tipoUsuario = localStorage.getItem("tipoUsuario");
 
             if (!usuarioLogado || tipoUsuario !== "admin") {
-                alert("Acesso restrito! Esta área é exclusiva para administradores.");
-                window.location.replace("cliente.html"); // Redireciona para o login
+                const redirecionar = () => window.location.replace("cliente.html");
+                const exibirBloqueio = () => {
+                    if (window.srModal && typeof window.srModal.alerta === "function") {
+                        window.srModal.alerta(
+                            "Acesso restrito! Esta área é exclusiva para administradores.",
+                            "- Área Restrita -"
+                        );
+                        const btnOk = document.getElementById("sr-btn-ok");
+                        const dialog = document.getElementById("sr-modal-global");
+                        if (btnOk) {
+                            btnOk.addEventListener("click", redirecionar, { once: true });
+                        }
+                        if (dialog) {
+                            dialog.addEventListener("close", redirecionar, { once: true });
+                        }
+                    } else {
+                        redirecionar();
+                    }
+                };
+
+                if (document.readyState === "loading") {
+                    document.addEventListener("DOMContentLoaded", exibirBloqueio, { once: true });
+                } else {
+                    setTimeout(exibirBloqueio, 50);
+                }
             }
         })();
     </script>
@@ -131,7 +176,7 @@
 
 <body>
     <header id="topo">
-        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo"></a>
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
         <h1>- Shadow Realm Store -</h1>
         <div class="nav">
             <nav>
@@ -140,9 +185,24 @@
                 <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"
                         alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
+                        src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
     </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2>- Menu do usuário -</h2>
+            <nav class="nav-usuario">
+                <a href="cadastro.html">Cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+                <a href="pedidos.html">Meus Pedidos</a>
+            </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+        </div>
+    </div>
 
     <main class="painel-estoque">
         <div class="topo-estoque">
@@ -150,22 +210,25 @@
             <button type="button" class="btn-reset" id="btnResetarEstoque">Restaurar Estoque Padrão</button>
         </div>
 
-        <table class="tabela-estoque">
-            <thead>
-                <tr>
-                    <th>Imagem</th>
-                    <th>Produto</th>
-                    <th>Preço</th>
-                    <th>Status</th>
-                    <th>Em Estoque</th>
-                </tr>
-            </thead>
-            <tbody id="corpoTabelaEstoque"></tbody>
-        </table>
+        <div class="tabela-estoque-wrapper">
+            <table class="tabela-estoque">
+                <thead>
+                    <tr>
+                        <th>Imagem</th>
+                        <th>Produto</th>
+                        <th>Preço</th>
+                        <th>Status</th>
+                        <th>Em Estoque</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabelaEstoque"></tbody>
+            </table>
+        </div>
     </main>
 
     <footer>
         <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>
+        <a href="#topo">Voltar ao topo</a>
     </footer>
 
     <script>
@@ -173,6 +236,7 @@
             await window.promessaEstoqueSR;
             const produtos = await carregarProdutosSR();
             const tbody = document.getElementById('corpoTabelaEstoque');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             produtos.forEach(prod => {
@@ -189,9 +253,9 @@
                     <td>${statusHTML}</td>
                     <td>
                         <div class="controles-qtd">
-                            <button type="button" class="btn-est" onclick="ajustar('${prod.nome}', -1)">-</button>
+                            <button type="button" class="btn-est" onclick="ajustar('${prod.nome.replace(/'/g, "\\'")}', -1)">-</button>
                             <strong style="min-width: 28px; text-align: center; font-size: 18px;">${qtd}</strong>
-                            <button type="button" class="btn-est" onclick="ajustar('${prod.nome}', 1)">+</button>
+                            <button type="button" class="btn-est" onclick="ajustar('${prod.nome.replace(/'/g, "\\'")}', 1)">+</button>
                         </div>
                     </td>
                 `;
@@ -205,9 +269,19 @@
         }
 
         document.getElementById('btnResetarEstoque').addEventListener('click', () => {
-            if (confirm('Restaurar todas as quantidades iniciais?')) {
+            const executarReset = () => {
                 localStorage.removeItem(CHAVE_ESTOQUE_SR);
                 window.location.reload();
+            };
+
+            if (window.srModal && typeof window.srModal.confirmar === 'function') {
+                window.srModal.confirmar(
+                    'Deseja realmente restaurar todas as quantidades iniciais do estoque?',
+                    executarReset,
+                    '- Restaurar Estoque -'
+                );
+            } else {
+                executarReset();
             }
         });
 

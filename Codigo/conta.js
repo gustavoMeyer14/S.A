@@ -161,6 +161,14 @@ function obterPerfilLogado() {
     };
 }
 
+function formatarCampoCpf(valor) {
+    const v = String(valor || '').replace(/\D/g, '').slice(0, 11);
+    return v
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+}
+
 function anexarMedidorForcaSenha(inputSenha) {
     if (!inputSenha || inputSenha.dataset.medidorAtivo === 'true') return;
     inputSenha.dataset.medidorAtivo = 'true';
@@ -184,6 +192,7 @@ function anexarMedidorForcaSenha(inputSenha) {
         const val = inputSenha.value;
         if (!val) {
             fill.style.width = '0%';
+            fill.style.backgroundColor = '';
             texto.style.color = '#888';
             texto.textContent = 'Força da senha';
             return;
@@ -278,6 +287,8 @@ function injetarEsqueciSenhaLogin() {
         e.preventDefault();
         const emailDigitado = formLogin.querySelector('#email')?.value.trim() || '';
         dialogRec.querySelector('#rec-email').value = emailDigitado;
+        dialogRec.querySelector('#rec-nova-senha').value = '';
+        dialogRec.querySelector('#rec-confirma-senha').value = '';
         dialogRec.querySelector('#msg-recuperar-senha').textContent = '';
         dialogRec.showModal();
     });
@@ -313,7 +324,9 @@ function injetarEsqueciSenhaLogin() {
                 const resp = await fetch('clientes.json');
                 if (resp.ok) {
                     const clientesJSON = await resp.json();
-                    const clienteBase = clientesJSON.find(u => u.email && u.email.toLowerCase() === email);
+                    const clienteBase = Array.isArray(clientesJSON)
+                        ? clientesJSON.find(u => u.email && u.email.toLowerCase() === email)
+                        : null;
                     if (clienteBase) {
                         lista.push({ ...clienteBase, senha: novaSenha });
                         idx = lista.length - 1;
@@ -394,6 +407,13 @@ function injetarEditarPerfilNoMenu() {
         `;
         document.body.appendChild(dialogPerfil);
 
+        const inputCpfEdit = dialogPerfil.querySelector('#edit-perfil-cpf');
+        if (inputCpfEdit) {
+            inputCpfEdit.addEventListener('input', (e) => {
+                e.target.value = formatarCampoCpf(e.target.value);
+            });
+        }
+
         anexarMedidorForcaSenha(dialogPerfil.querySelector('#edit-perfil-senha'));
 
         dialogPerfil.querySelector('#btnFecharEditarPerfil').addEventListener('click', () => {
@@ -407,9 +427,15 @@ function injetarEditarPerfilNoMenu() {
 
             const novoNome = dialogPerfil.querySelector('#edit-perfil-nome').value.trim();
             const novoEmail = dialogPerfil.querySelector('#edit-perfil-email').value.trim().toLowerCase();
-            const novoCpf = dialogPerfil.querySelector('#edit-perfil-cpf').value.trim();
+            const novoCpf = formatarCampoCpf(dialogPerfil.querySelector('#edit-perfil-cpf').value.trim());
             const novaSenha = dialogPerfil.querySelector('#edit-perfil-senha').value;
             const msgEl = dialogPerfil.querySelector('#msg-editar-perfil');
+
+            if (!novoNome || !/^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/.test(novoEmail)) {
+                msgEl.style.color = '#ff4d4d';
+                msgEl.textContent = 'Preencha o nome e um e-mail válido.';
+                return;
+            }
 
             if (novaSenha && !/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(novaSenha)) {
                 msgEl.style.color = '#ff4d4d';
@@ -466,7 +492,7 @@ window.abrirModalEditarPerfil = function () {
 
     dialog.querySelector('#edit-perfil-nome').value = perfil.nome || '';
     dialog.querySelector('#edit-perfil-email').value = perfil.email || '';
-    dialog.querySelector('#edit-perfil-cpf').value = perfil.cpf || '';
+    dialog.querySelector('#edit-perfil-cpf').value = formatarCampoCpf(perfil.cpf || '');
     dialog.querySelector('#edit-perfil-senha').value = '';
     dialog.querySelector('#msg-editar-perfil').textContent = '';
     dialog.showModal();

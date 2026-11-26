@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -10,6 +9,8 @@
     <title>Shadow Realm Store - Produtos</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
+    <script src="admin.js" defer></script>
+    <script src="conta.js" defer></script>
     <script src="shopee.js" defer></script>
     <script src="vitrini.js" defer></script>
     <script src="estoque.js" defer></script>
@@ -99,7 +100,7 @@
                 <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
                         src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
@@ -167,20 +168,20 @@
     </div>
 
     <section class="destaques">
-        <h2> - Produtos - </h2>
+        <h2 style="order: -1;"> - Produtos - </h2>
 
         <div>
-            <img src="imagens/bleach.png" alt="Produto 1">
+            <img src="imagens/bleach.png" alt="Ichigo Kurosaki">
             <p>Ichigo Kurosaki</p>
             <h3><strong>R$ 340,00</strong></h3>
             <button type="button" id="card1">Ver mais</button>
         </div>
         <dialog id="modal-card1" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/bleach.png" alt="Imagem do Produto 1">
+                <img src="imagens/bleach.png" alt="Ichigo Kurosaki">
                 <div class="modalProduto-texto">
                     <h2>- Ichigo Kurosaki</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
                 </div>
             </div>
 
@@ -196,17 +197,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/kisuke.png" alt="Produto 2">
+            <img src="imagens/kisuke.png" alt="Kisuke Urahara">
             <p>Kisuke Urahara</p>
             <h3><strong>R$ 460,00</strong></h3>
             <button type="button" id="card2">Ver mais</button>
         </div>
         <dialog id="modal-card2" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/kisuke.png" alt="Produto 2">
+                <img src="imagens/kisuke.png" alt="Kisuke Urahara">
                 <div class="modalProduto-texto">
                     <h2>- Kisuke Urahara</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
                 </div>
             </div>
 
@@ -222,17 +223,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/renje.png" alt="Produto 3">
+            <img src="imagens/renje.png" alt="Renji Abarai">
             <p>Renji Abarai</p>
             <h3><strong>R$ 400,00</strong></h3>
             <button type="button" id="card3">Ver mais</button>
         </div>
         <dialog id="modal-card3" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/renje.png" alt="Produto 3">
+                <img src="imagens/renje.png" alt="Renji Abarai">
                 <div class="modalProduto-texto">
                     <h2>- Renji Abarai</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
                 </div>
             </div>
 
@@ -248,17 +249,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/rukia.png" alt="Produto 4">
+            <img src="imagens/rukia.png" alt="Rukia Kuchiki">
             <p>Rukia Kuchiki</p>
             <h3><strong>R$ 430,00</strong></h3>
             <button type="button" id="card4">Ver mais</button>
         </div>
         <dialog id="modal-card4" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/rukia.png" alt="Produto 4">
+                <img src="imagens/rukia.png" alt="Rukia Kuchiki">
                 <div class="modalProduto-texto">
                     <h2>- Rukia Kuchiki</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
                 </div>
             </div>
 
@@ -274,17 +275,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/toshiro.png" alt="Produto 5">
+            <img src="imagens/toshiro.png" alt="Toshiro Hitsugaya">
             <p>Toshiro Hitsugaya</p>
             <h3><strong>R$ 200,00</strong></h3>
             <button type="button" id="card5">Ver mais</button>
         </div>
         <dialog id="modal-card5" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/toshiro.png" alt="Produto 5">
+                <img src="imagens/toshiro.png" alt="Toshiro Hitsugaya">
                 <div class="modalProduto-texto">
                     <h2>- Toshiro Hitsugaya</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
                 </div>
             </div>
 
@@ -300,17 +301,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/Levi.png" alt="Produto 6">
+            <img src="imagens/Levi.png" alt="Levi Ackerman">
             <p>Levi Ackerman</p>
             <h3><strong>R$ 250,00</strong></h3>
             <button type="button" id="card6">Ver mais</button>
         </div>
         <dialog id="modal-card6" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Levi.png" alt="Produto 6">
+                <img src="imagens/Levi.png" alt="Levi Ackerman">
                 <div class="modalProduto-texto">
                     <h2>- Levi Ackerman</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Attack on Titan.</p>
                 </div>
             </div>
 
@@ -326,17 +327,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/Maomao.png" alt="Produto 7">
+            <img src="imagens/Maomao.png" alt="Maomao">
             <p>Maomao</p>
             <h3><strong>R$ 300,00</strong></h3>
             <button type="button" id="card7">Ver mais</button>
         </div>
         <dialog id="modal-card7" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Maomao.png" alt="Produto 7">
+                <img src="imagens/Maomao.png" alt="Maomao">
                 <div class="modalProduto-texto">
                     <h2>- Maomao</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Diário de uma Apotecária.</p>
                 </div>
             </div>
 
@@ -352,17 +353,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/Canva - download.png" alt="Produto 8">
+            <img src="imagens/Canva - download.png" alt="Satoru Gojo">
             <p>Satoru Gojo</p>
             <h3><strong>R$ 350,00</strong></h3>
             <button type="button" id="card8">Ver mais</button>
         </div>
         <dialog id="modal-card8" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download.png" alt="Produto 8">
+                <img src="imagens/Canva - download.png" alt="Satoru Gojo">
                 <div class="modalProduto-texto">
                     <h2>- Satoru Gojo</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Jujutsu Kaisen.</p>
                 </div>
             </div>
 
@@ -378,17 +379,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/Canva - download (1).png" alt="Produto 9">
+            <img src="imagens/Canva - download (1).png" alt="Greninja">
             <p>Greninja</p>
             <h3><strong>R$ 400,00</strong></h3>
             <button type="button" id="card9">Ver mais</button>
         </div>
         <dialog id="modal-card9" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download (1).png" alt="Produto 9">
+                <img src="imagens/Canva - download (1).png" alt="Greninja">
                 <div class="modalProduto-texto">
                     <h2>- Greninja</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da linha Pokémon.</p>
                 </div>
             </div>
 
@@ -404,17 +405,17 @@
         </dialog>
 
         <div>
-            <img src="imagens/Snorlax.png" alt="Produto 10">
+            <img src="imagens/Snorlax.png" alt="Snorlax">
             <p>Snorlax</p>
             <h3><strong>R$ 450,00</strong></h3>
             <button type="button" id="card10">Ver mais</button>
         </div>
         <dialog id="modal-card10" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Snorlax.png" alt="Produto 10">
+                <img src="imagens/Snorlax.png" alt="Snorlax">
                 <div class="modalProduto-texto">
                     <h2>- Snorlax</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina maciça de alto padrão da linha Pokémon.</p>
                 </div>
             </div>
 
@@ -435,7 +436,7 @@
         <a href="#topo">Voltar ao topo</a>
     </footer>
 
-    <dialog id="modalAvisoLogin">
+    <dialog id="modalAvisoLogin" style="width: 750px; max-width: 92vw;">
         <h2>Acesso Necessário</h2>
         <p>Você precisa estar logado ou cadastrado em sua conta para adicionar produtos ao carrinho.</p>
         <footer>
@@ -482,6 +483,15 @@
 
         if (btnFecharAviso && modalAvisoLogin) {
             btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+            modalAvisoLogin.addEventListener('click', (e) => {
+                const rect = modalAvisoLogin.getBoundingClientRect();
+                const clicouFora =
+                    e.clientX < rect.left ||
+                    e.clientX > rect.right ||
+                    e.clientY < rect.top ||
+                    e.clientY > rect.bottom;
+                if (clicouFora) modalAvisoLogin.close();
+            });
         }
 
         const modalAvisoCarrinho = document.getElementById('modalAvisoCarrinho');
@@ -594,112 +604,119 @@
         });
 
         async function conectarMeuJSON() {
+            let produtosJSON = [];
             try {
                 const resposta = await fetch('produtos.json');
-                const produtosJSON = await resposta.json();
+                if (resposta.ok) {
+                    produtosJSON = await resposta.json();
+                }
+            } catch (erro) {
+                if (Array.isArray(window.PRODUTOS_PADRAO_SR)) {
+                    produtosJSON = window.PRODUTOS_PADRAO_SR;
+                }
+            }
 
-                document.querySelectorAll('.modalProduto').forEach(modal => {
-                    const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
-                    const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
+            if (!Array.isArray(produtosJSON) || produtosJSON.length === 0) return;
 
-                    if (dados) {
-                        const paragrafo = modal.querySelector('.modalProduto-conteudo p');
-                        if (paragrafo && paragrafo.innerText.includes('llllllllllll')) {
-                            paragrafo.innerText = dados.descricao;
-                        }
+            document.querySelectorAll('.modalProduto').forEach(modal => {
+                const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
+                const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
+
+                if (dados && dados.descricao) {
+                    const paragrafo = modal.querySelector('.modalProduto-conteudo p');
+                    if (paragrafo) {
+                        paragrafo.innerText = dados.descricao;
+                    }
+                }
+            });
+
+            const selectCategoria = document.getElementById('filtroCategoria');
+            const selectPreco = document.getElementById('filtroPreco');
+            const selectOrdem = document.getElementById('ordenarPreco');
+            const btnLimpar = document.getElementById('btnLimparFiltros');
+            const inputPesquisa = document.getElementById('barraPesquisa');
+            const btnPesquisa = document.getElementById('enviarPesquisa');
+
+            function limparTexto(texto) {
+                return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            }
+
+            function aplicarTodosFiltros() {
+                const catEscolhida = selectCategoria ? selectCategoria.value : 'Todos';
+                const precoEscolhido = selectPreco ? selectPreco.value : 'todos';
+                const ordemEscolhida = selectOrdem ? selectOrdem.value : 'padrao';
+                const termoBusca = inputPesquisa ? limparTexto(inputPesquisa.value) : '';
+
+                const secao = document.querySelector('.destaques');
+                const cards = Array.from(secao.querySelectorAll(':scope > div'));
+                let visiveis = 0;
+
+                cards.forEach(card => {
+                    const nomeCard = card.querySelector('p').innerText;
+                    const dados = produtosJSON.find(p => p.nome.toLowerCase() === nomeCard.toLowerCase());
+                    if (!dados) return;
+
+                    const passaCategoria = (catEscolhida === 'Todos') || (dados.categoria === catEscolhida);
+
+                    let passaPreco = true;
+                    if (precoEscolhido === 'ate300') passaPreco = dados.preco <= 300;
+                    if (precoEscolhido === '300a400') passaPreco = dados.preco > 300 && dados.preco <= 400;
+                    if (precoEscolhido === 'acima400') passaPreco = dados.preco > 400;
+
+                    const passaBusca = termoBusca === '' ||
+                        limparTexto(dados.nome).includes(termoBusca) ||
+                        limparTexto(dados.categoria).includes(termoBusca);
+
+                    if (passaCategoria && passaPreco && passaBusca) {
+                        card.style.display = '';
+                        visiveis++;
+                    } else {
+                        card.style.display = 'none';
                     }
                 });
 
-                const selectCategoria = document.getElementById('filtroCategoria');
-                const selectPreco = document.getElementById('filtroPreco');
-                const selectOrdem = document.getElementById('ordenarPreco');
-                const btnLimpar = document.getElementById('btnLimparFiltros');
-                const inputPesquisa = document.getElementById('barraPesquisa');
-                const btnPesquisa = document.getElementById('enviarPesquisa');
-
-                function limparTexto(texto) {
-                    return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-                }
-
-                function aplicarTodosFiltros() {
-                    const catEscolhida = selectCategoria ? selectCategoria.value : 'Todos';
-                    const precoEscolhido = selectPreco ? selectPreco.value : 'todos';
-                    const ordemEscolhida = selectOrdem ? selectOrdem.value : 'padrao';
-                    const termoBusca = inputPesquisa ? limparTexto(inputPesquisa.value) : '';
-
-                    const secao = document.querySelector('.destaques');
-                    const cards = Array.from(secao.querySelectorAll(':scope > div'));
-                    let visiveis = 0;
-
-                    cards.forEach(card => {
-                        const nomeCard = card.querySelector('p').innerText;
-                        const dados = produtosJSON.find(p => p.nome.toLowerCase() === nomeCard.toLowerCase());
-                        if (!dados) return;
-
-                        const passaCategoria = (catEscolhida === 'Todos') || (dados.categoria === catEscolhida);
-
-                        let passaPreco = true;
-                        if (precoEscolhido === 'ate300') passaPreco = dados.preco <= 300;
-                        if (precoEscolhido === '300a400') passaPreco = dados.preco > 300 && dados.preco <= 400;
-                        if (precoEscolhido === 'acima400') passaPreco = dados.preco > 400;
-
-                        const passaBusca = termoBusca === '' ||
-                            limparTexto(dados.nome).includes(termoBusca) ||
-                            limparTexto(dados.categoria).includes(termoBusca);
-
-                        if (passaCategoria && passaPreco && passaBusca) {
-                            card.style.display = '';
-                            visiveis++;
-                        } else {
-                            card.style.display = 'none';
-                        }
+                if (ordemEscolhida !== 'padrao') {
+                    const cardsOrdenados = [...cards].sort((a, b) => {
+                        const dadosA = produtosJSON.find(p => p.nome.toLowerCase() === a.querySelector('p').innerText.toLowerCase());
+                        const dadosB = produtosJSON.find(p => p.nome.toLowerCase() === b.querySelector('p').innerText.toLowerCase());
+                        if (!dadosA || !dadosB) return 0;
+                        return ordemEscolhida === 'menor' ? dadosA.preco - dadosB.preco : dadosB.preco - dadosA.preco;
                     });
-
-                    if (ordemEscolhida !== 'padrao') {
-                        const cardsOrdenados = [...cards].sort((a, b) => {
-                            const dadosA = produtosJSON.find(p => p.nome.toLowerCase() === a.querySelector('p').innerText.toLowerCase());
-                            const dadosB = produtosJSON.find(p => p.nome.toLowerCase() === b.querySelector('p').innerText.toLowerCase());
-                            if (!dadosA || !dadosB) return 0;
-                            return ordemEscolhida === 'menor' ? dadosA.preco - dadosB.preco : dadosB.preco - dadosA.preco;
-                        });
-                        cardsOrdenados.forEach((card, pos) => card.style.order = pos);
-                    } else {
-                        cards.forEach(card => card.style.order = '');
-                    }
-
-                    let aviso = document.getElementById('aviso-pesquisa');
-                    if (!aviso) {
-                        aviso = document.createElement('p');
-                        aviso.id = 'aviso-pesquisa';
-                        aviso.style.cssText = 'color: white; width: 100%; text-align: center;';
-                        secao.appendChild(aviso);
-                    }
-                    aviso.innerText = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
+                    cardsOrdenados.forEach((card, pos) => card.style.order = pos);
+                } else {
+                    cards.forEach(card => card.style.order = '');
                 }
 
-                if (selectCategoria) selectCategoria.addEventListener('change', aplicarTodosFiltros);
-                if (selectPreco) selectPreco.addEventListener('change', aplicarTodosFiltros);
-                if (selectOrdem) selectOrdem.addEventListener('change', aplicarTodosFiltros);
-                if (inputPesquisa) inputPesquisa.addEventListener('input', aplicarTodosFiltros);
-                if (btnPesquisa) btnPesquisa.addEventListener('click', aplicarTodosFiltros);
-
-                if (btnLimpar) {
-                    btnLimpar.addEventListener('click', () => {
-                        if (selectCategoria) selectCategoria.value = 'Todos';
-                        if (selectPreco) selectPreco.value = 'todos';
-                        if (selectOrdem) selectOrdem.value = 'padrao';
-                        if (inputPesquisa) inputPesquisa.value = '';
-                        aplicarTodosFiltros();
-                    });
+                let aviso = document.getElementById('aviso-pesquisa');
+                if (!aviso) {
+                    aviso = document.createElement('p');
+                    aviso.id = 'aviso-pesquisa';
+                    aviso.style.cssText = 'color: white; width: 100%; text-align: center; order: 999;';
+                    secao.appendChild(aviso);
                 }
+                aviso.innerText = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
+            }
 
-                const buscaURL = new URLSearchParams(window.location.search).get('busca');
-                if (buscaURL && inputPesquisa) {
-                    inputPesquisa.value = buscaURL;
+            if (selectCategoria) selectCategoria.addEventListener('change', aplicarTodosFiltros);
+            if (selectPreco) selectPreco.addEventListener('change', aplicarTodosFiltros);
+            if (selectOrdem) selectOrdem.addEventListener('change', aplicarTodosFiltros);
+            if (inputPesquisa) inputPesquisa.addEventListener('input', aplicarTodosFiltros);
+            if (btnPesquisa) btnPesquisa.addEventListener('click', aplicarTodosFiltros);
+
+            if (btnLimpar) {
+                btnLimpar.addEventListener('click', () => {
+                    if (selectCategoria) selectCategoria.value = 'Todos';
+                    if (selectPreco) selectPreco.value = 'todos';
+                    if (selectOrdem) selectOrdem.value = 'padrao';
+                    if (inputPesquisa) inputPesquisa.value = '';
                     aplicarTodosFiltros();
-                }
-            } catch (erro) {
-                console.error('Erro ao ler produtos.json:', erro);
+                });
+            }
+
+            const buscaURL = new URLSearchParams(window.location.search).get('busca');
+            if (buscaURL && inputPesquisa) {
+                inputPesquisa.value = buscaURL;
+                aplicarTodosFiltros();
             }
         }
 

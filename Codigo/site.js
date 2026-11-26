@@ -14,10 +14,69 @@ function toggleSenha(inputId, btnElement) {
 
     if (input.type === 'password') {
         input.type = 'text';
-        btnElement.textContent = '🙈';
+        if (btnElement) btnElement.textContent = '🙈';
     } else {
         input.type = 'password';
-        btnElement.textContent = '👁️';
+        if (btnElement) btnElement.textContent = '👁️';
+    }
+}
+
+function exibirAvisoSite(mensagem, titulo = '- Shadow Realm Store -', aoFechar = null, isHTML = false) {
+    if (window.srModal && typeof window.srModal.alerta === 'function') {
+        window.srModal.alerta(mensagem, titulo, isHTML);
+        if (typeof aoFechar === 'function') {
+            const btnOk = document.getElementById('sr-btn-ok');
+            const dialog = document.getElementById('sr-modal-global');
+            if (btnOk) {
+                const handler = () => {
+                    btnOk.removeEventListener('click', handler);
+                    aoFechar();
+                };
+                btnOk.addEventListener('click', handler);
+            } else if (dialog) {
+                dialog.addEventListener('close', aoFechar, { once: true });
+            }
+        }
+        return;
+    }
+
+    const tentar = () => {
+        if (window.srModal && typeof window.srModal.alerta === 'function') {
+            window.srModal.alerta(mensagem, titulo, isHTML);
+            if (typeof aoFechar === 'function') {
+                const btnOk = document.getElementById('sr-btn-ok');
+                if (btnOk) btnOk.addEventListener('click', aoFechar, { once: true });
+            }
+        } else if (typeof aoFechar === 'function') {
+            aoFechar();
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tentar, { once: true });
+    } else {
+        setTimeout(tentar, 50);
+    }
+}
+
+function exibirConfirmacaoSite(mensagem, aoConfirmar, titulo = '- Confirmação -', isHTML = false) {
+    if (window.srModal && typeof window.srModal.confirmar === 'function') {
+        window.srModal.confirmar(mensagem, aoConfirmar, titulo, isHTML);
+        return;
+    }
+
+    const tentar = () => {
+        if (window.srModal && typeof window.srModal.confirmar === 'function') {
+            window.srModal.confirmar(mensagem, aoConfirmar, titulo, isHTML);
+        } else if (typeof aoConfirmar === 'function') {
+            aoConfirmar();
+        }
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tentar, { once: true });
+    } else {
+        setTimeout(tentar, 50);
     }
 }
 
@@ -25,9 +84,12 @@ function sairConta() {
     localStorage.removeItem('usuarioLogado');
     localStorage.removeItem('usuarioAtual');
     localStorage.removeItem('usuarioNome');
+    localStorage.removeItem('tipoUsuario');
     localStorage.removeItem('clienteLogado');
-    alert("Você saiu da sua conta.");
-    window.location.href = "index.html";
+
+    exibirAvisoSite("Você saiu da sua conta.", "- Até logo! -", function () {
+        window.location.href = "index.html";
+    });
 }
 
 function obterChaveCartoesUsuario() {
@@ -55,12 +117,13 @@ function salvarCartoesUsuario(lista) {
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-    const paginaAtual = window.location.pathname.split("/").pop();
+    const paginaAtual = window.location.pathname.split("/").pop().toLowerCase();
     const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
 
     if (estaLogado && paginaAtual === 'cliente.html') {
-        alert("Você já está logado em uma conta!");
-        window.location.href = "index.html";
+        exibirAvisoSite("Você já está logado em uma conta!", "- Conta Ativa -", function () {
+            window.location.href = "index.html";
+        });
         return;
     }
 
@@ -106,6 +169,13 @@ window.addEventListener("DOMContentLoaded", function () {
             e.target.value = v;
         });
     }
+
+    const modalCliente = document.getElementById('modalCliente');
+    if (modalCliente) {
+        modalCliente.addEventListener('click', (e) => {
+            if (e.target === modalCliente) fechaModalCliente();
+        });
+    }
 });
 
 function cpfInvalido(rawCpf) {
@@ -114,19 +184,19 @@ function cpfInvalido(rawCpf) {
 
     var soma = 0;
     for (var i = 0; i < 9; i++) {
-        soma += parseInt(cpf.charAt(i)) * (10 - i);
+        soma += parseInt(cpf.charAt(i), 10) * (10 - i);
     }
     var resto = 11 - (soma % 11);
     var digito1 = (resto === 10 || resto === 11) ? 0 : resto;
-    if (digito1 !== parseInt(cpf.charAt(9))) return true;
+    if (digito1 !== parseInt(cpf.charAt(9), 10)) return true;
 
     soma = 0;
     for (var j = 0; j < 10; j++) {
-        soma += parseInt(cpf.charAt(j)) * (11 - j);
+        soma += parseInt(cpf.charAt(j), 10) * (11 - j);
     }
     resto = 11 - (soma % 11);
     var digito2 = (resto === 10 || resto === 11) ? 0 : resto;
-    if (digito2 !== parseInt(cpf.charAt(10))) return true;
+    if (digito2 !== parseInt(cpf.charAt(10), 10)) return true;
 
     return false;
 }
@@ -135,19 +205,23 @@ var usuarioEncontradoLogin = null;
 
 async function validaLogin() {
     var f = document.frmlogin;
+    if (!f) return false;
+
     var email = f.txtemail.value.trim().toLowerCase();
     var senha = f.txtsenha.value;
 
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!expRegemail.test(email)) {
-        alert("Preencha o Campo Email ou formato inválido !!!");
-        f.txtemail.focus();
+        exibirAvisoSite("Preencha o Campo Email ou formato inválido!", "- Login -", function () {
+            f.txtemail.focus();
+        });
         return false;
     }
 
     if (senha.trim() === "") {
-        alert("Preencha o Campo Senha corretamente!");
-        f.txtsenha.focus();
+        exibirAvisoSite("Preencha o Campo Senha corretamente!", "- Login -", function () {
+            f.txtsenha.focus();
+        });
         return false;
     }
 
@@ -163,7 +237,7 @@ async function validaLogin() {
         if (respAdmin.ok) adminsJSON = await respAdmin.json();
     } catch (e) {}
 
-    if (adminsJSON.length === 0) {
+    if (!Array.isArray(adminsJSON) || adminsJSON.length === 0) {
         adminsJSON = [
             {
                 id: "1",
@@ -171,36 +245,61 @@ async function validaLogin() {
                 cpf: "",
                 email: "pedro_carvalho@gmail.com",
                 senha: "Pedro@1983",
-                admin: true
+                admin: true,
+                tipo: "admin"
             }
         ];
     }
 
     var todosAdmins = adminsLocais.concat(adminsJSON);
     var adminEncontrado = todosAdmins.find(function (a) {
-        return a.email && a.email.toLowerCase() === email && a.senha === senha;
+        return a.email && a.email.trim().toLowerCase() === email && a.senha === senha;
     });
 
     if (adminEncontrado) {
         localStorage.setItem('usuarioLogado', 'true');
-        localStorage.setItem('usuarioAtual', adminEncontrado.email.toLowerCase());
+        localStorage.setItem('usuarioAtual', adminEncontrado.email.trim().toLowerCase());
         localStorage.setItem('usuarioNome', adminEncontrado.nome);
         localStorage.setItem('tipoUsuario', 'admin');
 
         localStorage.setItem('clienteLogado', JSON.stringify({
             nome: adminEncontrado.nome,
-            email: adminEncontrado.email.toLowerCase(),
+            email: adminEncontrado.email.trim().toLowerCase(),
             cpf: adminEncontrado.cpf || '',
+            admin: true,
             tipo: 'admin'
         }));
 
-        alert("Login de administrador realizado com sucesso!");
-        window.location.href = "index.html";
+        exibirAvisoSite("Login de administrador realizado com sucesso!", "- Bem-vindo, Admin -", function () {
+            window.location.href = "index.html";
+        });
         return false;
     }
 
-    // 2. SE NÃO FOR ADMIN, CONTINUA O FLUXO NORMAL DE CLIENTE ABAIXO...
-    // (Mantenha aqui o código que você já tem no site.js para buscar em clientes.json / localStorage)
+    // 2. BUSCA CLIENTES CADASTRADOS NO LOCALSTORAGE E EM clientes.json
+    var usuariosLocais = [];
+    try {
+        usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
+    } catch (e) {}
+
+    var clientesJSON = [];
+    try {
+        var respClientes = await fetch('clientes.json');
+        if (respClientes.ok) clientesJSON = await respClientes.json();
+    } catch (e) {}
+
+    var todosClientes = usuariosLocais.concat(Array.isArray(clientesJSON) ? clientesJSON : []);
+    usuarioEncontradoLogin = todosClientes.find(function (u) {
+        return u.email && u.email.trim().toLowerCase() === email && u.senha === senha;
+    });
+
+    if (!usuarioEncontradoLogin) {
+        exibirAvisoSite("E-mail ou senha incorretos! Verifique seus dados ou cadastre-se.", "- Credenciais Inválidas -");
+        return false;
+    }
+
+    abreModalLogin();
+    return false;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -209,7 +308,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const tipoUsuario = localStorage.getItem("tipoUsuario");
 
     if (navUsuario && usuarioLogado && tipoUsuario === "admin") {
-        // Link para Gerenciar Estoque
         if (!navUsuario.querySelector('a[href="estoque.html"]')) {
             const linkEstoque = document.createElement("a");
             linkEstoque.href = "estoque.html";
@@ -217,7 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
             navUsuario.prepend(linkEstoque);
         }
 
-        // Link para Cadastrar Novo Admin
         if (!navUsuario.querySelector('a[href="cadastroAdmin.html"]')) {
             const linkNovoAdmin = document.createElement("a");
             linkNovoAdmin.href = "cadastroAdmin.html";
@@ -229,12 +326,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function abreModalLogin() {
     var f = document.frmlogin;
+    if (!f) return;
     var dados = [
-        ["Email", f.txtemail.value],
+        ["Email", f.txtemail.value.trim()],
         ["Senha", "•".repeat(f.txtsenha.value.length)]
     ];
     renderizarListaModal("listaDadosLogin", dados);
-    document.getElementById("modalDadosLogin").classList.add("aberto");
+    var modal = document.getElementById("modalDadosLogin");
+    if (modal) modal.classList.add("aberto");
 }
 
 function renderizarListaModal(idElemento, dados) {
@@ -250,26 +349,32 @@ function renderizarListaModal(idElemento, dados) {
 }
 
 function fechaModalLogin() {
-    document.getElementById("modalDadosLogin").classList.remove("aberto");
+    var modal = document.getElementById("modalDadosLogin");
+    if (modal) modal.classList.remove("aberto");
 }
 
 function confirmaLogin() {
-    var email = document.frmlogin.txtemail.value.trim().toLowerCase();
+    var f = document.frmlogin;
+    var email = f ? f.txtemail.value.trim().toLowerCase() : ((usuarioEncontradoLogin && usuarioEncontradoLogin.email) || "");
     var nomeUsuario = (usuarioEncontradoLogin && usuarioEncontradoLogin.nome) ? usuarioEncontradoLogin.nome : email.split('@')[0];
 
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', email);
     localStorage.setItem('usuarioNome', nomeUsuario);
+    localStorage.setItem('tipoUsuario', 'cliente');
     localStorage.setItem('clienteLogado', JSON.stringify({
         nome: nomeUsuario,
         email: email,
-        cpf: (usuarioEncontradoLogin && usuarioEncontradoLogin.cpf) || ''
+        cpf: (usuarioEncontradoLogin && usuarioEncontradoLogin.cpf) || '',
+        tipo: 'cliente'
     }));
 
-    alert("Login realizado com sucesso!");
     fechaModalLogin();
-    document.frmlogin.reset();
-    window.location.href = "index.html";
+    if (f) f.reset();
+
+    exibirAvisoSite("Login realizado com sucesso!", "- Bem-vindo -", function () {
+        window.location.href = "index.html";
+    });
 }
 
 function verificaMotivo() {
@@ -283,34 +388,41 @@ function verificaMotivo() {
 }
 
 function validaCadastro() {
-    var nome = document.frmcadastro.txtnome.value;
+    var f = document.frmcadastro;
+    if (!f) return false;
+
+    var nome = f.txtnome.value;
     var expRegnome = /^[A-ZÀ-Ú][a-zà-ú]+(\s+[A-ZÀ-Ú][a-zà-ú]+)+$/i;
     if (!expRegnome.test(nome.trim())) {
-        alert("Preencha o Campo Nome completo (nome e sobrenome)!!!");
-        document.frmcadastro.txtnome.focus();
+        exibirAvisoSite("Preencha o Campo Nome completo (nome e sobrenome)!", "- Cadastro -", function () {
+            f.txtnome.focus();
+        });
         return false;
     }
 
-    var email = document.frmcadastro.txtemail.value;
+    var email = f.txtemail.value;
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!expRegemail.test(email.trim())) {
-        alert("Preencha o Campo Email ou formato inválido !!!");
-        document.frmcadastro.txtemail.focus();
+        exibirAvisoSite("Preencha o Campo Email ou formato inválido!", "- Cadastro -", function () {
+            f.txtemail.focus();
+        });
         return false;
     }
 
-    var cpf = document.frmcadastro.txtcpf.value;
-    if (cpf.trim() === "" || cpfInvalido(cpf)) {
-        alert("CPF inválido! Verifique os números digitados.");
-        document.frmcadastro.txtcpf.focus();
+    var cpf = f.txtcpf.value.trim();
+    if (cpf === "" || cpfInvalido(cpf)) {
+        exibirAvisoSite("CPF inválido! Verifique os números digitados.", "- Cadastro -", function () {
+            f.txtcpf.focus();
+        });
         return false;
     }
 
-    var senha = document.frmcadastro.txtsenha.value;
+    var senha = f.txtsenha.value;
     var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
-        alert("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.");
-        document.frmcadastro.txtsenha.focus();
+        exibirAvisoSite("Preencha o Campo Senha corretamente! Ela deve ter no mínimo 8 caracteres, contendo letras e números.", "- Cadastro -", function () {
+            f.txtsenha.focus();
+        });
         return false;
     }
 
@@ -320,22 +432,27 @@ function validaCadastro() {
 
 function abreModalCadastro() {
     var f = document.frmcadastro;
+    if (!f) return;
     var dados = [
-        ["Nome Completo", f.txtnome.value],
-        ["Email", f.txtemail.value],
+        ["Nome Completo", f.txtnome.value.trim()],
+        ["Email", f.txtemail.value.trim()],
         ["Senha", "•".repeat(f.txtsenha.value.length)],
-        ["CPF", f.txtcpf.value]
+        ["CPF", f.txtcpf.value.trim()]
     ];
     renderizarListaModal("listaDadosCadastro", dados);
-    document.getElementById("modalDadosCadastro").classList.add("aberto");
+    var modal = document.getElementById("modalDadosCadastro");
+    if (modal) modal.classList.add("aberto");
 }
 
 function fechaModalCadastro() {
-    document.getElementById("modalDadosCadastro").classList.remove("aberto");
+    var modal = document.getElementById("modalDadosCadastro");
+    if (modal) modal.classList.remove("aberto");
 }
 
 function confirmaCadastro() {
     var f = document.frmcadastro;
+    if (!f) return;
+
     var novoUsuario = {
         nome: f.txtnome.value.trim(),
         email: f.txtemail.value.trim().toLowerCase(),
@@ -343,15 +460,18 @@ function confirmaCadastro() {
         senha: f.txtsenha.value
     };
 
-    var usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
+    var usuariosLocais = [];
+    try {
+        usuariosLocais = JSON.parse(localStorage.getItem('usuariosShadowRealm')) || [];
+    } catch (e) {}
 
     var jaExiste = usuariosLocais.some(function (u) {
-        return u.email === novoUsuario.email || u.cpf === novoUsuario.cpf;
+        return (u.email && u.email.toLowerCase() === novoUsuario.email) || (u.cpf && u.cpf === novoUsuario.cpf);
     });
 
     if (jaExiste) {
-        alert("Este e-mail ou CPF já está cadastrado!");
         fechaModalCadastro();
+        exibirAvisoSite("Este e-mail ou CPF já está cadastrado!", "- Cadastro Duplicado -");
         return;
     }
 
@@ -360,16 +480,20 @@ function confirmaCadastro() {
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', novoUsuario.email);
     localStorage.setItem('usuarioNome', novoUsuario.nome);
+    localStorage.setItem('tipoUsuario', 'cliente');
     localStorage.setItem('clienteLogado', JSON.stringify({
         nome: novoUsuario.nome,
         email: novoUsuario.email,
-        cpf: novoUsuario.cpf
+        cpf: novoUsuario.cpf,
+        tipo: 'cliente'
     }));
 
-    alert("Cadastro realizado com sucesso!");
     fechaModalCadastro();
     f.reset();
-    window.location.href = "index.html";
+
+    exibirAvisoSite("Cadastro realizado com sucesso!", "- Bem-vindo à Shadow Realm -", function () {
+        window.location.href = "index.html";
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -407,14 +531,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const carrinho = obterCarrinho();
             if (carrinho.length === 0) {
                 e.preventDefault();
-                alert('Seu carrinho está vazio! Adicione produtos antes de prosseguir.');
+                exibirAvisoSite('Seu carrinho está vazio! Adicione produtos antes de prosseguir.', '- Carrinho Vazio -');
                 return;
             }
             const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
             if (!estaLogado) {
                 e.preventDefault();
-                alert('Você precisa estar logado para finalizar a compra!');
-                window.location.href = 'cliente.html';
+                exibirAvisoSite('Você precisa estar logado para finalizar a compra!', '- Login Necessário -', function () {
+                    window.location.href = 'cliente.html';
+                });
             }
         };
     }
@@ -472,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalFinal = subtotalComDesconto + frete;
         return { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal };
     }
-    
+
     function obterEstoqueCarrinho(nomeProduto) {
         if (typeof obterEstoque === 'function') {
             return obterEstoque(nomeProduto);
@@ -533,6 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         atualizarResumo(carrinho);
     }
+
     window.alterarQuantidade = function (index, delta) {
         const carrinho = obterCarrinho();
         if (!carrinho[index]) return;
@@ -540,25 +666,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (delta > 0) {
             const disponivel = obterEstoqueCarrinho(carrinho[index].nome);
             if (carrinho[index].quantidade + delta > disponivel) {
-                alert(`Limite de estoque atingido! Temos apenas ${disponivel} unidade(s) de ${carrinho[index].nome}.`);
+                exibirAvisoSite(`Limite de estoque atingido! Temos apenas <strong>${disponivel}</strong> unidade(s) de <strong>${carrinho[index].nome}</strong>.`, "- Estoque Máximo -", null, true);
                 renderizarCarrinho();
                 return;
             }
         }
-
-        carrinho[index].quantidade += delta;
-        if (carrinho[index].quantidade <= 0) {
-            carrinho.splice(index, 1);
-        }
-
-        localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
-        renderizarCarrinho();
-        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
-    };
-
-    window.alterarQuantidade = function (index, delta) {
-        const carrinho = obterCarrinho();
-        if (!carrinho[index]) return;
 
         carrinho[index].quantidade += delta;
         if (carrinho[index].quantidade <= 0) {
@@ -638,15 +750,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const carrinho = obterCarrinho();
             if (carrinho.length === 0) {
-                alert('Seu carrinho está vazio!');
+                exibirAvisoSite('Seu carrinho está vazio!', '- Carrinho Vazio -');
                 return;
             }
 
             const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
             const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
             if (!estaLogado || !usuarioAtual) {
-                alert('Faça login para confirmar seu pedido!');
-                window.location.href = 'cliente.html';
+                exibirAvisoSite('Faça login para confirmar seu pedido!', '- Login Necessário -', function () {
+                    window.location.href = 'cliente.html';
+                });
+                return;
+            }
+
+            const rua = document.getElementById('input-rua')?.value.trim() || '';
+            const cidade = document.getElementById('input-cidade')?.value.trim() || '';
+            const estado = document.getElementById('input-estado')?.value.trim() || '';
+            if (!rua || !cidade || !estado) {
+                exibirAvisoSite('Preencha o endereço completo de entrega antes de confirmar.', '- Endereço Incompleto -');
                 return;
             }
 
@@ -657,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let descricaoPagamento = 'Pix';
             if (metodo === 'debito' || metodo === 'parcelado') {
                 if (cartoesSalvos.length === 0) {
-                    alert('Você não possui cartão cadastrado! Cadastre um cartão ou selecione Pix.');
+                    exibirAvisoSite('Você não possui cartão cadastrado! Cadastre um cartão ou selecione Pix.', '- Cartão Necessário -');
                     return;
                 }
                 const selectCartao = document.getElementById('select-cartao-uso');
@@ -668,14 +789,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const { totalFinal } = calcularTotaisCarrinho(carrinho);
-            const rua = document.getElementById('input-rua')?.value.trim() || '';
-            const cidade = document.getElementById('input-cidade')?.value.trim() || '';
-            const estado = document.getElementById('input-estado')?.value.trim() || '';
 
             if (typeof darBaixaNoEstoque === 'function') {
                 const resultadoEstoque = darBaixaNoEstoque(carrinho);
                 if (!resultadoEstoque.sucesso) {
-                    alert(resultadoEstoque.mensagem);
+                    exibirAvisoSite(resultadoEstoque.mensagem, '- Estoque Insuficiente -');
                     return;
                 }
             }
@@ -700,8 +818,14 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('pedidosShadowRealm', JSON.stringify(pedidos));
             localStorage.removeItem('carrinhoShadowRealm');
 
-            alert(`Pagamento confirmado com sucesso! Pedido #${proximoNumero} registrado.`);
-            window.location.href = 'pedidos.html';
+            exibirAvisoSite(
+                `Pagamento confirmado com sucesso! Pedido <strong>#${proximoNumero}</strong> registrado.`,
+                "- Pedido Confirmado -",
+                function () {
+                    window.location.href = 'pedidos.html';
+                },
+                true
+            );
         };
     }
 
@@ -811,12 +935,12 @@ function renderizarCartoesSalvos() {
 }
 
 window.removerCartao = function (index) {
-    if (!confirm('Deseja realmente remover este cartão?')) return;
-
-    const cartoes = lerCartoesUsuario();
-    cartoes.splice(index, 1);
-    salvarCartoesUsuario(cartoes);
-    renderizarCartoesSalvos();
+    exibirConfirmacaoSite('Deseja realmente remover este cartão?', function () {
+        const cartoes = lerCartoesUsuario();
+        cartoes.splice(index, 1);
+        salvarCartoesUsuario(cartoes);
+        renderizarCartoesSalvos();
+    }, '- Remover Cartão -');
 };
 
 window.definirCartaoPrincipal = function (index) {
@@ -834,33 +958,36 @@ if (form) {
 
         const cartoes = lerCartoesUsuario();
         if (cartoes.length >= 2) {
-            alert('Você já atingiu o limite de 2 cartões (Principal e Secundário). Remova um para cadastrar outro.');
+            exibirAvisoSite('Você já atingiu o limite de 2 cartões (Principal e Secundário). Remova um para cadastrar outro.', '- Limite de Cartões -');
             return;
         }
 
         const numeroLimpo = inputNumero.value.replace(/\s/g, '');
         if (numeroLimpo.length !== 16) {
-            alert('Por favor, insira os 16 dígitos do cartão.');
-            inputNumero.focus();
+            exibirAvisoSite('Por favor, insira os 16 dígitos do cartão.', '- Cartão Inválido -', function () {
+                inputNumero.focus();
+            });
             return;
         }
 
         const numeroMascarado = '**** **** **** ' + numeroLimpo.slice(-4);
         const jaCadastrado = cartoes.some(c => c.numeroMascarado === numeroMascarado && c.validade === inputValidade.value);
         if (jaCadastrado) {
-            alert('Este cartão já está cadastrado!');
+            exibirAvisoSite('Este cartão já está cadastrado!', '- Cartão Duplicado -');
             return;
         }
 
         if (!validarValidadeCartao(inputValidade.value)) {
-            alert('Data de validade inválida ou cartão vencido! Use o formato MM/AA.');
-            inputValidade.focus();
+            exibirAvisoSite('Data de validade inválida ou cartão vencido! Use o formato MM/AA.', '- Validade Inválida -', function () {
+                inputValidade.focus();
+            });
             return;
         }
 
         if (inputCvv.value.length !== 3) {
-            alert('O CVV deve conter exatamente 3 dígitos.');
-            inputCvv.focus();
+            exibirAvisoSite('O CVV deve conter exatamente 3 dígitos.', '- CVV Inválido -', function () {
+                inputCvv.focus();
+            });
             return;
         }
 
@@ -870,13 +997,13 @@ if (form) {
         resCvv.textContent = inputCvv.value;
         resEndereco.textContent = inputEndereco.value;
 
-        modal.showModal();
+        if (modal) modal.showModal();
     });
 }
 
 if (btnCorrigir) {
     btnCorrigir.addEventListener('click', () => {
-        modal.close();
+        if (modal) modal.close();
     });
 }
 
@@ -884,6 +1011,7 @@ if (btnConfirmar) {
     btnConfirmar.addEventListener('click', () => {
         const cartoes = lerCartoesUsuario();
         const numeroLimpo = inputNumero.value.replace(/\s/g, '');
+        const tipoCartaoTexto = cartoes.length === 0 ? 'Cartão Principal' : 'Cartão Secundário';
 
         cartoes.push({
             numeroMascarado: '**** **** **** ' + numeroLimpo.slice(-4),
@@ -895,34 +1023,12 @@ if (btnConfirmar) {
 
         salvarCartoesUsuario(cartoes);
 
-        modal.close();
-        alert(cartoes.length === 1 ? 'Cartão Principal cadastrado com sucesso!' : 'Cartão Secundário cadastrado com sucesso!');
+        if (modal) modal.close();
         form.reset();
         renderizarCartoesSalvos();
+
+        exibirAvisoSite(`${tipoCartaoTexto} cadastrado com sucesso!`, '- Cartão Salvo -');
     });
 }
 
 renderizarCartoesSalvos();
-
-//=========== ESTOQUE ===========//
-window.alterarQuantidade = function (index, delta) {
-    const carrinho = obterCarrinho();
-    if (!carrinho[index]) return;
-
-    if (delta > 0 && typeof obterEstoque === 'function') {
-        const disponivel = obterEstoque(carrinho[index].nome);
-        if (carrinho[index].quantidade + delta > disponivel) {
-            alert(`Limite de estoque atingido! Temos apenas ${disponivel} unidade(s) de ${carrinho[index].nome}.`);
-            return;
-        }
-    }
-
-    carrinho[index].quantidade += delta;
-    if (carrinho[index].quantidade <= 0) {
-        carrinho.splice(index, 1);
-    }
-
-    localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
-    renderizarCarrinho();
-    if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
-};

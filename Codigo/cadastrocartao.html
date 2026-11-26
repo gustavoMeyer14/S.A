@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -18,16 +17,16 @@
 
 <body>
     <header id="topo">
-        <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
         <h1>- Shadow Realm Store -</h1>
         <div class="nav">
             <nav>
-                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png"></a>
-                <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
-                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
-                        src="imagens/Usuario.png"></button>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
+                        src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
     </header>
@@ -47,12 +46,13 @@
 
     <main>
         <h2 style="margin: 20px;">Explore este mundo geek apenas se cadastrando!</h2>
+        <p id="statusLimiteCartoes" style="margin: 0 20px 15px 20px; color: #ffca28; font-size: 15px; font-weight: bold;"></p>
 
         <form id="formCartao" class="formLogin">
             <fieldset class="login">
                 <div class="colunas">
-                    <label for="numero">Número do cartão:</label>
-                    <input type="text" id="numero" maxlength="19" placeholder="Os 16 digitos da frente do cartão"
+                    <label for="numero">Número do cartão: <span id="bandeiraCartaoBadge" style="color: #ffca28; font-size: 13px; margin-left: 6px;"></span></label>
+                    <input type="text" id="numero" maxlength="19" inputmode="numeric" placeholder="Os 16 digitos da frente do cartão"
                         required>
 
                     <label for="titular">Nome do titular:</label>
@@ -61,17 +61,18 @@
 
                 <div class="colunas">
                     <label for="validade">Data de validade:</label>
-                    <input type="text" id="validade" maxlength="5" placeholder="Mês e ano (ex: 08/30)" required>
+                    <input type="text" id="validade" maxlength="5" inputmode="numeric" placeholder="Mês e ano (ex: 08/30)" required>
 
                     <label for="cvv">CVV:</label>
-                    <input type="text" id="cvv" maxlength="3" placeholder="3 Dígitos que fica no verso do cartão"
+                    <input type="text" id="cvv" maxlength="3" inputmode="numeric" placeholder="3 Dígitos que fica no verso do cartão"
                         required>
                 </div>
 
                 <div class="colunas" style="width: 300px;">
                     <label for="endereco">Endereço de cobrança:</label>
                     <input type="text" id="endereco" style="width: 250px;"
-                        placeholder="Solicitado para confirmar a segurança" required>
+                        placeholder="Rua, número, cidade, UF ou CEP" required>
+                    <small id="dicaEnderecoCartao" style="display: block; width: 250px; margin-top: 4px; font-size: 12px; color: #bbb;"></small>
                     <button type="submit" style="width: 235px;">Cadastrar Cartão</button>
                 </div>
 
@@ -87,6 +88,7 @@
     <dialog class="menor" id="modalDados">
         <h3>Confira os Dados do Cartão</h3>
         <div id="conteudoModal">
+            <p><strong>Bandeira:</strong> <span id="resBandeira"></span></p>
             <p><strong>Número do cartão:</strong> <span id="resNumero"></span></p>
             <p><strong>Nome do titular:</strong> <span id="resTitular"></span></p>
             <p><strong>Data de validade:</strong> <span id="resValidade"></span></p>
@@ -103,6 +105,135 @@
         <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>
         <a href="#topo">Voltar ao topo</a>
     </footer>
+
+    <script>
+        function detectarBandeiraCartao(numeroLimpo) {
+            const digitos = String(numeroLimpo || '').replace(/\D/g, '');
+            if (!digitos) return '';
+            if (/^4/.test(digitos)) return 'Visa';
+            if (/^(5[1-5]|2[2-7])/.test(digitos)) return 'Mastercard';
+            if (/^(4011|4312|4389|4514|4576|5041|5066|5067|6277|6362|6363|650|651|652|655)/.test(digitos)) return 'Elo';
+            if (/^3[47]/.test(digitos)) return 'Amex';
+            return 'Cartão';
+        }
+
+        function atualizarIndicadoresCartao() {
+            const inputNum = document.getElementById('numero');
+            const badgeBandeira = document.getElementById('bandeiraCartaoBadge');
+            const statusLimite = document.getElementById('statusLimiteCartoes');
+
+            if (inputNum && badgeBandeira) {
+                const bandeira = detectarBandeiraCartao(inputNum.value);
+                badgeBandeira.textContent = bandeira ? `[${bandeira}]` : '';
+            }
+
+            let totalSalvos = 0;
+            if (typeof lerCartoesUsuario === 'function') {
+                const lista = lerCartoesUsuario();
+                totalSalvos = Array.isArray(lista) ? lista.length : 0;
+            }
+
+            if (statusLimite) {
+                const restantes = Math.max(0, 2 - totalSalvos);
+                statusLimite.textContent = restantes > 0
+                    ? `💳 Você pode cadastrar até ${restantes} cartão(ões) agora (${totalSalvos}/2 em uso).`
+                    : '💳 Limite de 2 cartões atingido (Principal e Secundário). Remova um para adicionar outro.';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputNumero = document.getElementById('numero');
+            const inputEndereco = document.getElementById('endereco');
+            const dicaEndereco = document.getElementById('dicaEnderecoCartao');
+            const modalDados = document.getElementById('modalDados');
+            const resBandeira = document.getElementById('resBandeira');
+            const resNumero = document.getElementById('resNumero');
+            const btnConfirmar = document.getElementById('btnConfirmar');
+            const listaCartoesEl = document.getElementById('listaCartoesSalvos');
+
+            if (inputNumero) {
+                inputNumero.addEventListener('input', atualizarIndicadoresCartao);
+            }
+
+            if (inputEndereco) {
+                let ultimoCep = '';
+                inputEndereco.addEventListener('input', async (e) => {
+                    const texto = e.target.value.trim();
+                    const matchCep = texto.match(/^(\d{5})-?(\d{3})$/);
+                    if (!matchCep) {
+                        if (dicaEndereco) dicaEndereco.textContent = '';
+                        return;
+                    }
+
+                    const cepLimpo = `${matchCep[1]}${matchCep[2]}`;
+                    if (cepLimpo === ultimoCep) return;
+                    ultimoCep = cepLimpo;
+
+                    if (dicaEndereco) {
+                        dicaEndereco.style.color = '#ffca28';
+                        dicaEndereco.textContent = 'Buscando CEP...';
+                    }
+
+                    try {
+                        const resp = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+                        const dados = await resp.json();
+                        if (dados.erro) {
+                            if (dicaEndereco) {
+                                dicaEndereco.style.color = '#ff4d4d';
+                                dicaEndereco.textContent = 'CEP não encontrado.';
+                            }
+                            return;
+                        }
+                        const partes = [dados.logradouro, dados.localidade, dados.uf].filter(Boolean);
+                        if (partes.length > 0) {
+                            e.target.value = `${partes.join(', ')}, nº `;
+                            if (dicaEndereco) {
+                                dicaEndereco.style.color = '#00e676';
+                                dicaEndereco.textContent = '✔ Endereço preenchido! Complete o número.';
+                            }
+                        }
+                    } catch {
+                        if (dicaEndereco) {
+                            dicaEndereco.style.color = '#ff4d4d';
+                            dicaEndereco.textContent = 'Não foi possível consultar o CEP agora.';
+                        }
+                    }
+                });
+            }
+
+            if (modalDados && inputNumero) {
+                const formCartao = document.getElementById('formCartao');
+                formCartao?.addEventListener('submit', () => {
+                    const limpo = inputNumero.value.replace(/\s/g, '');
+                    if (resBandeira) {
+                        resBandeira.textContent = detectarBandeiraCartao(limpo) || 'Cartão';
+                    }
+                    if (resNumero && limpo.length === 16) {
+                        resNumero.textContent = `**** **** **** ${limpo.slice(-4)}`;
+                    }
+                }, true);
+            }
+
+            if (btnConfirmar) {
+                btnConfirmar.addEventListener('click', () => {
+                    setTimeout(atualizarIndicadoresCartao, 60);
+                });
+            }
+
+            if (listaCartoesEl) {
+                const obs = new MutationObserver(atualizarIndicadoresCartao);
+                obs.observe(listaCartoesEl, { childList: true, subtree: true });
+            }
+
+            if (modalDados) {
+                modalDados.addEventListener('click', (e) => {
+                    if (e.target === modalDados) modalDados.close();
+                });
+            }
+
+            atualizarIndicadoresCartao();
+        });
+    </script>
 </body>
 
 </html>
