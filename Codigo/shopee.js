@@ -1,3 +1,19 @@
+// =========================================================
+// VITRINE TURBO & OFERTAS - SHADOW REALM STORE
+// =========================================================
+
+const CONFIG_SHOPEE_SR = {
+    chaveFimOferta: 'fimOfertaShopee',
+    chaveCarrinho: 'carrinhoShadowRealm',
+    chaveVip: 'vipShadowRealm',
+    duracaoPadraoMs: (2 * 3600 + 45 * 60 + 19) * 1000,
+    duracaoRenovacaoMs: 3 * 3600 * 1000,
+    limiteFreteGratis: 250,
+    cupomDestaque: 'SHADOW26',
+    descontosCard: ['15%', '20%', '25%', '30%', '10%'],
+    vendidosCard: ['420', '1,1 mil', '890', '2,3 mil', '650', '980', '1,5 mil', '3,1 mil', '510', '1,8 mil']
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     injetarBarraTopo();
     injetarElementosHome();
@@ -5,33 +21,56 @@ document.addEventListener('DOMContentLoaded', () => {
     atualizarBadgeCarrinho();
 });
 
+function copiarTextoSeguroSR(texto) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        return navigator.clipboard.writeText(texto).catch(() => copiarPorExecCommandSR(texto));
+    }
+    return Promise.resolve(copiarPorExecCommandSR(texto));
+}
+
+function copiarPorExecCommandSR(texto) {
+    try {
+        const temp = document.createElement('textarea');
+        temp.value = texto;
+        temp.setAttribute('readonly', '');
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 function injetarBarraTopo() {
     const header = document.querySelector('header');
-    if (!header) return;
+    if (!header || document.querySelector('.shopee-topbar')) return;
 
     const topBar = document.createElement('div');
     topBar.className = 'shopee-topbar';
     topBar.innerHTML = `
-        <span>⚡ <strong>OFERTA RELÂMPAGO SHADOW REALM</strong> • Frete Grátis acima de R$ 250 •</span>
+        <span>⚡ <strong>OFERTA RELÂMPAGO SHADOW REALM</strong> • Frete Grátis acima de R$ ${CONFIG_SHOPEE_SR.limiteFreteGratis} •</span>
         <span class="shopee-timer">Termina em: <b id="cronometro-shopee">02:45:19</b></span>
-        <span>• Use o cupom <strong>SHADOW26</strong></span>
+        <span>• Use o cupom <strong>${CONFIG_SHOPEE_SR.cupomDestaque}</strong></span>
     `;
     document.body.insertBefore(topBar, header);
 
-    const duracaoOfertaMs = (2 * 3600 + 45 * 60 + 19) * 1000;
-    let fimOferta = parseInt(localStorage.getItem('fimOfertaShopee'), 10);
+    let fimOferta = parseInt(localStorage.getItem(CONFIG_SHOPEE_SR.chaveFimOferta), 10);
 
-    if (!fimOferta || fimOferta <= Date.now()) {
-        fimOferta = Date.now() + duracaoOfertaMs;
-        localStorage.setItem('fimOfertaShopee', fimOferta);
+    if (!fimOferta || Number.isNaN(fimOferta) || fimOferta <= Date.now()) {
+        fimOferta = Date.now() + CONFIG_SHOPEE_SR.duracaoPadraoMs;
+        localStorage.setItem(CONFIG_SHOPEE_SR.chaveFimOferta, String(fimOferta));
     }
 
     function atualizarCronometro() {
         let restanteMs = fimOferta - Date.now();
 
         if (restanteMs <= 0) {
-            fimOferta = Date.now() + (3 * 3600 * 1000);
-            localStorage.setItem('fimOfertaShopee', fimOferta);
+            fimOferta = Date.now() + CONFIG_SHOPEE_SR.duracaoRenovacaoMs;
+            localStorage.setItem(CONFIG_SHOPEE_SR.chaveFimOferta, String(fimOferta));
             restanteMs = fimOferta - Date.now();
         }
 
@@ -50,10 +89,12 @@ function injetarBarraTopo() {
 
 function injetarElementosHome() {
     const secaoDestaques = document.querySelector('.destaques');
-    const paginaAtual = window.location.pathname.split('/').pop();
+    const paginaAtual = window.location.pathname.split('/').pop().toLowerCase();
     const isHome = paginaAtual === '' || paginaAtual === 'index.html';
 
-    if (!secaoDestaques || !isHome) return;
+    if (!secaoDestaques || !isHome || document.querySelector('.shopee-vitrine-extras')) return;
+
+    const isVip = localStorage.getItem(CONFIG_SHOPEE_SR.chaveVip) === 'true';
 
     const vitrineShopee = document.createElement('section');
     vitrineShopee.className = 'shopee-vitrine-extras';
@@ -80,13 +121,13 @@ function injetarElementosHome() {
                     </div>
                     <button type="button" onclick="copiarCupomShopee('GEEK15', this)">GEEK15 📋</button>
                 </div>
-                            ${localStorage.getItem('vipShadowRealm') === 'true' ? `
+                ${isVip ? `
                 <div class="cupom-ticket" id="ticket-vip-home" style="border-color: #ffca28;">
                     <div>
                         <strong>50% OFF 🔓</strong>
                         <small>Cupom VIP: SHADOW50</small>
                     </div>
-                    <button type="button" onclick="copiarCupom('SHADOW50', this)">COPIAR</button>
+                    <button type="button" onclick="copiarCupomShopee('SHADOW50', this)">COPIAR</button>
                 </div>
                 ` : `
                 <div class="cupom-ticket" id="ticket-vip-home" style="border-color: #C62828;">
@@ -116,7 +157,9 @@ function injetarElementosHome() {
 }
 
 window.copiarCupomShopee = function (codigo, botao) {
-    navigator.clipboard?.writeText(codigo);
+    copiarTextoSeguroSR(codigo);
+    if (!botao) return;
+
     const original = botao.textContent;
     botao.textContent = 'COPIADO! ✔';
     botao.style.backgroundColor = '#28a745';
@@ -127,10 +170,12 @@ window.copiarCupomShopee = function (codigo, botao) {
     }, 2000);
 };
 
+window.copiarCupom = window.copiarCupomShopee;
+
 function turbinarCardsProdutos() {
     const cards = document.querySelectorAll('.destaques > div');
-    const descontos = ['15%', '20%', '25%', '30%', '10%'];
-    const vendidos = ['420', '1,1 mil', '890', '2,3 mil', '650', '980', '1,5 mil', '3,1 mil', '510', '1,8 mil'];
+    const descontos = CONFIG_SHOPEE_SR.descontosCard;
+    const vendidos = CONFIG_SHOPEE_SR.vendidosCard;
 
     cards.forEach((card, index) => {
         card.classList.add('card-shopee-style');
@@ -177,8 +222,16 @@ window.atualizarBadgeCarrinho = function () {
     const linkCarrinho = document.querySelector('header nav a[href="carrinho.html"]');
     if (!linkCarrinho) return;
 
-    const carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
-    const totalItens = carrinho.reduce((acc, item) => acc + (item.quantidade || 1), 0);
+    let carrinho = [];
+    try {
+        carrinho = JSON.parse(localStorage.getItem(CONFIG_SHOPEE_SR.chaveCarrinho)) || [];
+    } catch {
+        carrinho = [];
+    }
+
+    const totalItens = Array.isArray(carrinho)
+        ? carrinho.reduce((acc, item) => acc + (Number(item.quantidade) || 1), 0)
+        : 0;
 
     linkCarrinho.style.position = 'relative';
     let badge = linkCarrinho.querySelector('.shopee-cart-badge');
@@ -187,7 +240,7 @@ window.atualizarBadgeCarrinho = function () {
         badge.className = 'shopee-cart-badge';
         linkCarrinho.appendChild(badge);
     }
-    badge.textContent = totalItens;
+    badge.textContent = String(totalItens);
     badge.style.display = totalItens > 0 ? 'flex' : 'none';
 };
 
@@ -200,11 +253,12 @@ function mostrarToastShopee(mensagem) {
     }
     toast.textContent = mensagem;
     toast.classList.add('visivel');
-    setTimeout(() => toast.classList.remove('visivel'), 3000);
+    clearTimeout(toast._timerToast);
+    toast._timerToast = setTimeout(() => toast.classList.remove('visivel'), 3000);
 }
 
 window.addEventListener('storage', (e) => {
-    if (e.key === 'carrinhoShadowRealm') {
+    if (e.key === CONFIG_SHOPEE_SR.chaveCarrinho) {
         atualizarBadgeCarrinho();
     }
 });
