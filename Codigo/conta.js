@@ -11,6 +11,16 @@ if (document.readyState === 'loading') {
     iniciarContaShadowRealm();
 }
 
+function habilitarFechoBackdropDialog(dialog) {
+    if (!dialog || dialog.dataset.backdropBound === 'true') return;
+    dialog.dataset.backdropBound = 'true';
+    dialog.addEventListener('click', (e) => {
+        if (e.target === dialog) {
+            dialog.close();
+        }
+    });
+}
+
 function injetarEstilosConta() {
     if (document.getElementById('estilos-conta-sr')) return;
     const style = document.createElement('style');
@@ -279,6 +289,7 @@ function injetarEsqueciSenhaLogin() {
         </form>
     `;
     document.body.appendChild(dialogRec);
+    habilitarFechoBackdropDialog(dialogRec);
 
     const inputNovaSenhaRec = dialogRec.querySelector('#rec-nova-senha');
     anexarMedidorForcaSenha(inputNovaSenhaRec);
@@ -290,6 +301,7 @@ function injetarEsqueciSenhaLogin() {
         dialogRec.querySelector('#rec-nova-senha').value = '';
         dialogRec.querySelector('#rec-confirma-senha').value = '';
         dialogRec.querySelector('#msg-recuperar-senha').textContent = '';
+        inputNovaSenhaRec?.dispatchEvent(new Event('input'));
         dialogRec.showModal();
     });
 
@@ -406,6 +418,7 @@ function injetarEditarPerfilNoMenu() {
             </form>
         `;
         document.body.appendChild(dialogPerfil);
+        habilitarFechoBackdropDialog(dialogPerfil);
 
         const inputCpfEdit = dialogPerfil.querySelector('#edit-perfil-cpf');
         if (inputCpfEdit) {
@@ -414,7 +427,8 @@ function injetarEditarPerfilNoMenu() {
             });
         }
 
-        anexarMedidorForcaSenha(dialogPerfil.querySelector('#edit-perfil-senha'));
+        const inputSenhaEdit = dialogPerfil.querySelector('#edit-perfil-senha');
+        anexarMedidorForcaSenha(inputSenhaEdit);
 
         dialogPerfil.querySelector('#btnFecharEditarPerfil').addEventListener('click', () => {
             dialogPerfil.close();
@@ -490,10 +504,14 @@ window.abrirModalEditarPerfil = function () {
     const perfil = obterPerfilLogado();
     if (!dialog || !perfil) return;
 
+    const inputSenha = dialog.querySelector('#edit-perfil-senha');
     dialog.querySelector('#edit-perfil-nome').value = perfil.nome || '';
     dialog.querySelector('#edit-perfil-email').value = perfil.email || '';
     dialog.querySelector('#edit-perfil-cpf').value = formatarCampoCpf(perfil.cpf || '');
-    dialog.querySelector('#edit-perfil-senha').value = '';
+    if (inputSenha) {
+        inputSenha.value = '';
+        inputSenha.dispatchEvent(new Event('input'));
+    }
     dialog.querySelector('#msg-editar-perfil').textContent = '';
     dialog.showModal();
 };
