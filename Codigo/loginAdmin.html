@@ -6,6 +6,7 @@
     <title>Acesso Administrativo - Shadow Realm Store</title>
     <link rel="stylesheet" href="melhorias.css">
     <script src="modais-globais.js"></script>
+    <link rel="stylesheet" href="site.css">
     <style>
         :root {
             --sr-admin-bg: #151515;
@@ -231,5 +232,15 @@
             }
         });
     </script>
+
+    <div id="modalAvisoAdmin" class="modalAdminEdicao">
+        <div class="modalAdminEdicaoConteudo" style="text-align: center; max-width: 430px;">
+            <h2 id="modalAvisoAdminTitulo">- Bem-vindo, Admin! -</h2>
+            <p id="modalAvisoAdminMsg" style="font-size: 18px; color: #ffffff; margin: 20px 0 25px 0; line-height: 1.5;"></p>
+            <div class="botoesAdminEdicao">
+                <button type="button" id="btnFecharAvisoAdmin" style="background-color: #C62828; width: 200px;">OK</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

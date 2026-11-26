@@ -14,7 +14,8 @@ body {
 }
 
 header {
-  background-color: #C62828;
+  background: linear-gradient(90deg, #4a0404 0%, #C62828 35%, #ff2a2a 50%, #C62828 65%, #4a0404 100%);
+  border-bottom: 2px solid linear-gradient(90deg, #4a0404 0%, #C62828 35%, #ff2a2a 50%, #C62828 65%, #4a0404 100%);
   height: 100px;
   width: auto;
 }

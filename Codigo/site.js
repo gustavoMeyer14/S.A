@@ -241,6 +241,19 @@ window.addEventListener('DOMContentLoaded', () => {
             fechaModalCliente();
         }
     });
+
+    document.querySelectorAll('.nav .link, .nav .botaoUsuario').forEach((el) => {
+        const img = el.querySelector('img');
+        const textoTooltip = el.getAttribute('data-tooltip') ||
+            (img && img.getAttribute('alt')) ||
+            el.getAttribute('aria-label') ||
+            el.getAttribute('title');
+
+        if (textoTooltip) {
+            el.setAttribute('data-tooltip', textoTooltip);
+            el.removeAttribute('title');
+        }
+    });
 });
 
 function cpfInvalido(rawCpf) {

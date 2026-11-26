@@ -1,5 +1,40 @@
 var administradorEncontrado = null;
 
+function exibirModalAdmin(titulo, mensagem, aoFechar) {
+    let modal = document.getElementById("modalAvisoAdmin");
+
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "modalAvisoAdmin";
+        modal.className = "modalAdminEdicao";
+        modal.innerHTML = `
+            <div class="modalAdminEdicaoConteudo" style="text-align: center; max-width: 430px;">
+                <h2 id="modalAvisoAdminTitulo"></h2>
+                <p id="modalAvisoAdminMsg" style="font-size: 18px; color: #ffffff; margin: 20px 0 25px 0; line-height: 1.5;"></p>
+                <div class="botoesAdminEdicao">
+                    <button type="button" id="btnFecharAvisoAdmin" style="background-color: #C62828; width: 200px;">OK</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById("modalAvisoAdminTitulo").textContent = titulo;
+    document.getElementById("modalAvisoAdminMsg").textContent = mensagem;
+    modal.classList.add("aberto");
+
+    const btnOk = document.getElementById("btnFecharAvisoAdmin");
+    const fechar = () => {
+        modal.classList.remove("aberto");
+        if (typeof aoFechar === "function") aoFechar();
+    };
+
+    btnOk.onclick = fechar;
+    modal.onclick = (e) => {
+        if (e.target === modal) fechar();
+    };
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const nomePagina = window.location.pathname.split("/").pop().toLowerCase();
     const ehPaginaCadastroAdmin = nomePagina === "cadastroadmin.html";
@@ -258,10 +293,13 @@ async function validaLoginAdmin() {
         tipo: "admin"
     }));
 
-    alert("Login de administrador realizado com sucesso!");
-
-    // Redireciona para o painel administrativo
-    window.location.href = "admin.html";
+    exibirModalAdmin(
+        "- Bem-vindo, Admin! -",
+        `Login de administrador (${administradorEncontrado.nome}) realizado com sucesso!`,
+        () => {
+            window.location.href = "admin.html";
+        }
+    );
 
     return false;
 }
