@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -153,17 +154,22 @@
         <h1>Shadow Realm Admin</h1>
         <p>Faça login para gerenciar estoque, pedidos e produtos.</p>
 
-        <form id="form-login-admin">
+        <form id="form-login-admin" name="frmLoginAdmin"
+            onsubmit="event.preventDefault(); validaLoginAdmin();">
+
             <div class="campo-admin">
-                <label for="admin-user">Usuário ou E-mail</label>
-                <input type="text" id="admin-user" placeholder="Digite seu usuário admin" required autocomplete="username">
+                <label for="admin-user">E-mail</label>
+                <input type="email" id="admin-user" name="txtemail"
+                    placeholder="Digite seu e-mail admin" required autocomplete="username">
             </div>
 
             <div class="campo-admin">
                 <label for="admin-pass">Senha</label>
                 <div class="input-wrapper">
-                    <input type="password" id="admin-pass" placeholder="Digite sua senha" required autocomplete="current-password">
-                    <button type="button" class="btn-olho" id="toggle-senha" title="Mostrar/Ocultar senha">👁️</button>
+                    <input type="password" id="admin-pass" name="txtsenha"
+                        placeholder="Digite sua senha" required autocomplete="current-password">
+                    <button type="button" class="btn-olho" id="toggle-senha"
+                        title="Mostrar/Ocultar senha">👁️</button>
                 </div>
             </div>
 
@@ -177,6 +183,7 @@
     <script>
         const btnOlho = document.getElementById('toggle-senha');
         const inputSenha = document.getElementById('admin-pass');
+
         btnOlho.addEventListener('click', () => {
             const mostrando = inputSenha.type === 'text';
             inputSenha.type = mostrando ? 'password' : 'text';

@@ -1,5 +1,7 @@
+
 var administradorEncontrado = null;
 
+<<<<<<< HEAD
 // ==========================================
 // Auxiliar de Modal (Sem alert() nativo)
 // ==========================================
@@ -50,11 +52,20 @@ function exibirAvisoAdmin(mensagem, titulo = '- Shadow Realm Admin -', aoFechar 
 document.addEventListener("DOMContentLoaded", function () {
     const caminhoAtual = window.location.pathname.toLowerCase();
     const ehPaginaCadastroAdmin = caminhoAtual.includes("cadastroadmin.html");
+=======
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const nomePagina = window.location.pathname.split("/").pop().toLowerCase();
+    const ehPaginaCadastroAdmin = nomePagina === "cadastroadmin.html";
+
+>>>>>>> 41301bba362397f339da70329bfb33e014680707
     const usuarioLogado = localStorage.getItem("usuarioLogado") === "true";
     const tipoUsuario = localStorage.getItem("tipoUsuario");
 
-    // 1. Bloqueia qualquer pessoa que não esteja logada como administrador
+    // Bloqueia o cadastro de administrador para quem não é administrador
     if (ehPaginaCadastroAdmin && (!usuarioLogado || tipoUsuario !== "admin")) {
+<<<<<<< HEAD
         exibirAvisoAdmin(
             "Acesso negado! Apenas administradores logados podem cadastrar novos administradores.",
             "- Acesso Restrito -",
@@ -62,11 +73,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.location.replace("index.html");
             }
         );
+=======
+        alert("Acesso negado! Apenas administradores logados podem cadastrar novos administradores.");
+        window.location.replace("loginAdmin.html");
+>>>>>>> 41301bba362397f339da70329bfb33e014680707
         return;
     }
 
-    // 2. Injeta links exclusivos no menu do usuário apenas se estiver logado como admin
+    // Adiciona links exclusivos no menu quando um administrador está logado
     const navUsuario = document.querySelector("#modalCliente .nav-usuario");
+
     if (navUsuario && usuarioLogado && tipoUsuario === "admin") {
         if (!navUsuario.querySelector('a[href="estoque.html"]')) {
             const linkEstoque = document.createElement("a");
@@ -81,10 +97,18 @@ document.addEventListener("DOMContentLoaded", function () {
             linkNovoAdmin.textContent = "🛡️ Cadastrar Novo Admin";
             navUsuario.prepend(linkNovoAdmin);
         }
+
+        if (!navUsuario.querySelector('a[href="admin.html"]')) {
+            const linkPainelAdmin = document.createElement("a");
+            linkPainelAdmin.href = "admin.html";
+            linkPainelAdmin.textContent = "⚙️ Painel de Admin";
+            navUsuario.prepend(linkPainelAdmin);
+        }
     }
 
-    // 3. Formatação automática do CPF
+    // Formatação automática do CPF
     var inputCpf = document.getElementById("cpfAdmin");
+
     if (inputCpf) {
         inputCpf.addEventListener("input", function (e) {
             var v = e.target.value.replace(/\D/g, "").slice(0, 11);
@@ -121,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function lerAdministradores() {
     try {
         var administradores = JSON.parse(
-            localStorage.getItem('administradoresShadowRealm')
+            localStorage.getItem("administradoresShadowRealm")
         );
 
         return Array.isArray(administradores) ? administradores : [];
@@ -204,12 +228,32 @@ async function validaCadastroAdmin() {
         return false;
     }
 
+<<<<<<< HEAD
     var todosAdmins = await obterTodosAdministradores();
 
     var jaExiste = todosAdmins.some(function (a) {
         var emailAdmin = (a.email || "").trim().toLowerCase();
         var cpfAdmin = (a.cpf || "").trim();
         return (emailAdmin && emailAdmin === email) || (cpfAdmin && cpfAdmin === cpf);
+=======
+    // Verifica duplicidade no localStorage e no admin.json
+    var administradoresLocais = lerAdministradores();
+    var administradoresJSON = [];
+
+    try {
+        var resp = await fetch("admin.json");
+
+        if (resp.ok) {
+            administradoresJSON = await resp.json();
+        }
+    } catch (e) { }
+
+    var todosAdmins = administradoresLocais.concat(administradoresJSON);
+
+    var jaExiste = todosAdmins.some(function (a) {
+        return (a.email && a.email.toLowerCase() === email.toLowerCase()) ||
+            (cpf && a.cpf === cpf);
+>>>>>>> 41301bba362397f339da70329bfb33e014680707
     });
 
     if (jaExiste) {
@@ -281,7 +325,7 @@ async function confirmaCadastroAdmin() {
     administradores.push(novoAdmin);
 
     localStorage.setItem(
-        'administradoresShadowRealm',
+        "administradoresShadowRealm",
         JSON.stringify(administradores)
     );
 
@@ -294,7 +338,7 @@ async function confirmaCadastroAdmin() {
 }
 
 // ==========================================
-// Login do Administrador (com admin.json)
+// Login do Administrador
 // ==========================================
 
 async function validaLoginAdmin(dadosAlternativos) {
@@ -327,10 +371,49 @@ async function validaLoginAdmin(dadosAlternativos) {
         return false;
     }
 
+<<<<<<< HEAD
     var todosAdmins = await obterTodosAdministradores();
 
     administradorEncontrado = todosAdmins.find(function (a) {
         return a.email && a.email.trim().toLowerCase() === email && a.senha === senha;
+=======
+    // Busca os administradores do arquivo admin.json
+    var administradoresJSON = [];
+
+    try {
+        var resposta = await fetch("admin.json");
+
+        if (resposta.ok) {
+            administradoresJSON = await resposta.json();
+        }
+
+    } catch (e) {
+        console.error("Erro ao ler admin.json:", e);
+    }
+
+    
+    if (administradoresJSON.length === 0) {
+        administradoresJSON = [
+            {
+                id: "1",
+                nome: "Pedro Carvalho",
+                cpf: "",
+                email: "pedro_carvalho@gmail.com",
+                senha: "Pedro@1983",
+                admin: true
+            }
+        ];
+    }
+
+    // Junta os administradores do JSON com os salvos no localStorage
+    var administradoresLocais = lerAdministradores();
+    var todosAdmins = administradoresLocais.concat(administradoresJSON);
+
+    administradorEncontrado = todosAdmins.find(function (a) {
+        return a.email &&
+            a.email.toLowerCase() === email &&
+            a.senha === senha;
+>>>>>>> 41301bba362397f339da70329bfb33e014680707
     });
 
     if (!administradorEncontrado) {
@@ -338,13 +421,22 @@ async function validaLoginAdmin(dadosAlternativos) {
         return false;
     }
 
+<<<<<<< HEAD
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', administradorEncontrado.email.trim().toLowerCase());
     localStorage.setItem('usuarioNome', administradorEncontrado.nome);
     localStorage.setItem('tipoUsuario', 'admin');
+=======
+    // Salva a sessão do administrador
+    localStorage.setItem("usuarioLogado", "true");
+    localStorage.setItem("usuarioAtual", administradorEncontrado.email.toLowerCase());
+    localStorage.setItem("usuarioNome", administradorEncontrado.nome);
+    localStorage.setItem("tipoUsuario", "admin");
+>>>>>>> 41301bba362397f339da70329bfb33e014680707
 
-    localStorage.setItem('clienteLogado', JSON.stringify({
+    localStorage.setItem("clienteLogado", JSON.stringify({
         nome: administradorEncontrado.nome,
+<<<<<<< HEAD
         email: administradorEncontrado.email.trim().toLowerCase(),
         cpf: administradorEncontrado.cpf || '',
         admin: true,
@@ -354,6 +446,17 @@ async function validaLoginAdmin(dadosAlternativos) {
     exibirAvisoAdmin("Login de administrador realizado com sucesso!", "- Bem-vindo, Admin -", function () {
         window.location.href = "index.html";
     });
+=======
+        email: administradorEncontrado.email.toLowerCase(),
+        cpf: administradorEncontrado.cpf || "",
+        tipo: "admin"
+    }));
+
+    alert("Login de administrador realizado com sucesso!");
+
+    // Redireciona para o painel administrativo
+    window.location.href = "admin.html";
+>>>>>>> 41301bba362397f339da70329bfb33e014680707
 
     return false;
 }
