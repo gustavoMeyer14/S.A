@@ -432,58 +432,80 @@
         });
 
         async function conectarMeuJSON() {
-            let produtosJSON = [];
             try {
-                const resposta = await fetch('produtos.json');
-                if (resposta.ok) {
-                    produtosJSON = await resposta.json();
+                const produtos = await carregarProdutosSR();
+                const destaques = produtos.filter(p => p.destaque);
+                const secao = document.querySelector('.destaques');
+                if (!secao || destaques.length === 0) return;
+
+                secao.innerHTML = '<h2> - Destaques - </h2>';
+
+                destaques.forEach((prod, idx) => {
+                    const num = idx + 1;
+                    const precoFormatado = Number(prod.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                    const card = document.createElement('div');
+                    card.innerHTML = `
+                        <img src="${prod.imagem}" alt="${prod.nome}">
+                        <p>${prod.nome}</p>
+                        <h3><strong>R$ ${precoFormatado}</strong></h3>
+                        <button type="button" id="card${num}">Ver mais</button>
+                    `;
+
+                    const modal = document.createElement('dialog');
+                    modal.id = `modal-card${num}`;
+                    modal.className = 'modalProduto';
+                    modal.innerHTML = `
+                        <div class="modalProduto-conteudo">
+                            <img src="${prod.imagem}" alt="${prod.nome}">
+                            <div class="modalProduto-texto">
+                                <h2>- ${prod.nome}</h2>
+                                <p>${prod.descricao}</p>
+                            </div>
+                        </div>
+                        <div class="modalProduto-comentarios"></div>
+                        <footer class="modal-footer">
+                            <button type="button" id="fechar-card${num}" class="btn-fechar">Fechar</button>
+                            <button type="button" class="btn-carrinho" data-nome="${prod.nome}" data-preco="${prod.preco}"
+                                data-imagem="${prod.imagem}">+ Carrinho</button>
+                            <button type="button" class="btn-comprar-agora" data-nome="${prod.nome}" data-preco="${prod.preco}"
+                                data-imagem="${prod.imagem}">Comprar Agora</button>
+                        </footer>
+                    `;
+
+                    secao.appendChild(card);
+                    secao.appendChild(modal);
+
+                    const btnVerMais = card.querySelector(`#card${num}`);
+                    const btnFechar = modal.querySelector(`#fechar-card${num}`);
+
+                    btnVerMais.addEventListener('click', () => modal.showModal());
+                    btnFechar.addEventListener('click', () => modal.close());
+                    modal.addEventListener('click', (e) => {
+                        const rect = modal.getBoundingClientRect();
+                        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+                            modal.close();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.btn-carrinho').forEach(btn => {
+                    btn.addEventListener('click', function () { processarCompra(this, false); });
+                });
+                document.querySelectorAll('.btn-comprar-agora').forEach(btn => {
+                    btn.addEventListener('click', function () { processarCompra(this, true); });
+                });
+
+                if (typeof turbinarCardsProdutos === 'function') turbinarCardsProdutos();
+                if (typeof processarCardsVitrine === 'function') {
+                    processarCardsVitrine(['ichigo kurosaki', 'kisuke urahara', 'renji abarai', 'rukia kuchiki', 'toshiro hitsugaya']);
                 }
+                if (typeof inicializarComentariosHTML === 'function') inicializarComentariosHTML();
+                if (typeof injetarCalculadoraFrete === 'function') injetarCalculadoraFrete();
+                if (typeof atualizarInterfaceEstoque === 'function') atualizarInterfaceEstoque();
             } catch (erro) {
-                if (Array.isArray(window.PRODUTOS_PADRAO_SR)) {
-                    produtosJSON = window.PRODUTOS_PADRAO_SR;
-                }
+                console.error('Erro ao carregar catálogo na Home:', erro);
             }
-
-            if (!Array.isArray(produtosJSON) || produtosJSON.length === 0) return;
-
-            const modais = document.querySelectorAll('.modalProduto');
-            modais.forEach(modal => {
-                const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
-                const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
-
-                if (dados && dados.descricao) {
-                    const paragrafo = modal.querySelector('.modalProduto-conteudo p');
-                    if (paragrafo) {
-                        paragrafo.innerText = dados.descricao;
-                    }
-                }
-            });
-        }
-
-        conectarMeuJSON();
-
-        const btnPesquisaIndex = document.getElementById('enviarPesquisa');
-        const inputPesquisaIndex = document.getElementById('barraPesquisa');
-
-        function irParaProdutos() {
-            const termo = inputPesquisaIndex.value.trim();
-
-            if (termo !== '') {
-                window.location.href = `produtos.html?busca=${encodeURIComponent(termo)}`;
-            } else {
-                window.location.href = 'produtos.html';
-            }
-        }
-
-        if (btnPesquisaIndex && inputPesquisaIndex) {
-            btnPesquisaIndex.addEventListener('click', irParaProdutos);
-
-            inputPesquisaIndex.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    irParaProdutos();
-                }
-            });
         }
     </script>
 </body>
