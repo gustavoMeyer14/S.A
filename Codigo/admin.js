@@ -1,9 +1,7 @@
 
 var administradorEncontrado = null;
 
-// ==========================================
-// Guarda de Rota e Menu Dinâmico de Admin
-// ==========================================
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const nomePagina = window.location.pathname.split("/").pop().toLowerCase();
@@ -258,7 +256,7 @@ async function validaLoginAdmin() {
         console.error("Erro ao ler admin.json:", e);
     }
 
-    // Fallback caso abra o HTML diretamente sem servidor local
+    
     if (administradoresJSON.length === 0) {
         administradoresJSON = [
             {
