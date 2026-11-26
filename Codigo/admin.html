@@ -9,29 +9,38 @@
 
     <link rel="stylesheet" href="site.css">
     <script src="admin.js" defer></script>
+    <script src="site.js"></script>
 </head>
 
 <body>
 
     <header id="topo">
-
-        <a href="index.html">
-            <img src="imagens/logo.png" alt="Logo Shadow Realm Store" class="logo">
-        </a>
-
-        <h1>Shadow Realm Store</h1>
-
-        <nav class="nav">
-            <a href="index.html" class="link">Início</a>
-
-            <a href="produtos.html" class="link">Produtos</a>
-
-            <button type="button" class="link" onclick="sairAdmin()">
-                Sair
-            </button>
-        </nav>
-
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <div class="nav">
+            <nav>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
+                        src="imagens/Usuario.png" alt="Usuário"></button>
+            </nav>
+        </div>
     </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2>- Menu do usuário -</h2>
+            <nav class="nav-usuario">
+                <a href="cadastro.html">Cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+                <a href="pedidos.html">Meus Pedidos</a>
+            </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+        </div>
+    </div>
 
     <main>
 
