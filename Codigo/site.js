@@ -290,43 +290,6 @@ async function validaLogin() {
         return false;
     }
 
-    const adminsLocais = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.admins, []);
-    let adminsJSON = [];
-    try {
-        const respAdmin = await fetch('admin.json');
-        if (respAdmin.ok) adminsJSON = await respAdmin.json();
-    } catch {}
-
-    if (!Array.isArray(adminsJSON) || adminsJSON.length === 0) {
-        adminsJSON = CONFIG_SITE_SR.adminFallback;
-    }
-
-    const todosAdmins = (Array.isArray(adminsLocais) ? adminsLocais : []).concat(adminsJSON);
-    const adminEncontrado = todosAdmins.find((a) =>
-        a.email && a.email.trim().toLowerCase() === email && a.senha === senha
-    );
-
-    if (adminEncontrado) {
-        const emailLimpo = adminEncontrado.email.trim().toLowerCase();
-        localStorage.setItem(CONFIG_SITE_SR.chaves.usuarioLogado, 'true');
-        localStorage.setItem(CONFIG_SITE_SR.chaves.usuarioAtual, emailLimpo);
-        localStorage.setItem(CONFIG_SITE_SR.chaves.usuarioNome, adminEncontrado.nome);
-        localStorage.setItem(CONFIG_SITE_SR.chaves.tipoUsuario, 'admin');
-
-        localStorage.setItem(CONFIG_SITE_SR.chaves.clienteLogado, JSON.stringify({
-            nome: adminEncontrado.nome,
-            email: emailLimpo,
-            cpf: adminEncontrado.cpf || '',
-            admin: true,
-            tipo: 'admin'
-        }));
-
-        exibirAvisoSite('Login de administrador realizado com sucesso!', '- Bem-vindo, Admin -', () => {
-            window.location.href = 'index.html';
-        });
-        return false;
-    }
-
     const usuariosLocais = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.usuarios, []);
     let clientesJSON = [];
     try {
