@@ -1,3 +1,4 @@
+
 var administradorEncontrado = null;
 
 // ==========================================
@@ -5,19 +6,22 @@ var administradorEncontrado = null;
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", function () {
-    const ehPaginaCadastroAdmin = window.location.pathname.toLowerCase().includes("cadastroadmin.html");
+    const nomePagina = window.location.pathname.split("/").pop().toLowerCase();
+    const ehPaginaCadastroAdmin = nomePagina === "cadastroadmin.html";
+
     const usuarioLogado = localStorage.getItem("usuarioLogado") === "true";
     const tipoUsuario = localStorage.getItem("tipoUsuario");
 
-    // 1. Bloqueia qualquer pessoa que não esteja logada como administrador
+    // Bloqueia o cadastro de administrador para quem não é administrador
     if (ehPaginaCadastroAdmin && (!usuarioLogado || tipoUsuario !== "admin")) {
         alert("Acesso negado! Apenas administradores logados podem cadastrar novos administradores.");
-        window.location.replace("index.html");
+        window.location.replace("loginAdmin.html");
         return;
     }
 
-    // 2. Injeta links exclusivos no menu do usuário apenas se estiver logado como admin
+    // Adiciona links exclusivos no menu quando um administrador está logado
     const navUsuario = document.querySelector("#modalCliente .nav-usuario");
+
     if (navUsuario && usuarioLogado && tipoUsuario === "admin") {
         if (!navUsuario.querySelector('a[href="estoque.html"]')) {
             const linkEstoque = document.createElement("a");
@@ -34,8 +38,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 3. Formatação automática do CPF
+    // Formatação automática do CPF
     var inputCpf = document.getElementById("cpfAdmin");
+
     if (inputCpf) {
         inputCpf.addEventListener("input", function (e) {
             var v = e.target.value.replace(/\D/g, "").slice(0, 11);
@@ -56,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function lerAdministradores() {
     try {
         var administradores = JSON.parse(
-            localStorage.getItem('administradoresShadowRealm')
+            localStorage.getItem("administradoresShadowRealm")
         );
 
         return Array.isArray(administradores) ? administradores : [];
@@ -108,8 +113,10 @@ async function validaCadastroAdmin() {
     // Verifica duplicidade no localStorage e no admin.json
     var administradoresLocais = lerAdministradores();
     var administradoresJSON = [];
+
     try {
-        var resp = await fetch('admin.json');
+        var resp = await fetch("admin.json");
+
         if (resp.ok) {
             administradoresJSON = await resp.json();
         }
@@ -118,7 +125,8 @@ async function validaCadastroAdmin() {
     var todosAdmins = administradoresLocais.concat(administradoresJSON);
 
     var jaExiste = todosAdmins.some(function (a) {
-        return (a.email && a.email.toLowerCase() === email.toLowerCase()) || (cpf && a.cpf === cpf);
+        return (a.email && a.email.toLowerCase() === email.toLowerCase()) ||
+            (cpf && a.cpf === cpf);
     });
 
     if (jaExiste) {
@@ -190,7 +198,7 @@ function confirmaCadastroAdmin() {
     administradores.push(novoAdmin);
 
     localStorage.setItem(
-        'administradoresShadowRealm',
+        "administradoresShadowRealm",
         JSON.stringify(administradores)
     );
 
@@ -204,7 +212,7 @@ function confirmaCadastroAdmin() {
 }
 
 // ==========================================
-// Login do Administrador (com admin.json)
+// Login do Administrador
 // ==========================================
 
 async function validaLoginAdmin() {
@@ -229,18 +237,21 @@ async function validaLoginAdmin() {
         return false;
     }
 
-    // 1. Busca os administradores do arquivo admin.json
+    // Busca os administradores do arquivo admin.json
     var administradoresJSON = [];
+
     try {
-        var resposta = await fetch('admin.json');
+        var resposta = await fetch("admin.json");
+
         if (resposta.ok) {
             administradoresJSON = await resposta.json();
         }
+
     } catch (e) {
         console.error("Erro ao ler admin.json:", e);
     }
 
-    // Fallback caso abra o HTML direto sem servidor local (file://)
+    // Fallback caso abra o HTML diretamente sem servidor local
     if (administradoresJSON.length === 0) {
         administradoresJSON = [
             {
@@ -254,12 +265,14 @@ async function validaLoginAdmin() {
         ];
     }
 
-    // 2. Junta os admins do admin.json com os salvos no localStorage
+    // Junta os administradores do JSON com os salvos no localStorage
     var administradoresLocais = lerAdministradores();
     var todosAdmins = administradoresLocais.concat(administradoresJSON);
 
     administradorEncontrado = todosAdmins.find(function (a) {
-        return a.email && a.email.toLowerCase() === email && a.senha === senha;
+        return a.email &&
+            a.email.toLowerCase() === email &&
+            a.senha === senha;
     });
 
     if (!administradorEncontrado) {
@@ -267,22 +280,23 @@ async function validaLoginAdmin() {
         return false;
     }
 
-    // 3. Salva a sessão do administrador logado
-    localStorage.setItem('usuarioLogado', 'true');
-    localStorage.setItem('usuarioAtual', administradorEncontrado.email.toLowerCase());
-    localStorage.setItem('usuarioNome', administradorEncontrado.nome);
-    localStorage.setItem('tipoUsuario', 'admin');
+    // Salva a sessão do administrador
+    localStorage.setItem("usuarioLogado", "true");
+    localStorage.setItem("usuarioAtual", administradorEncontrado.email.toLowerCase());
+    localStorage.setItem("usuarioNome", administradorEncontrado.nome);
+    localStorage.setItem("tipoUsuario", "admin");
 
-    localStorage.setItem('clienteLogado', JSON.stringify({
+    localStorage.setItem("clienteLogado", JSON.stringify({
         nome: administradorEncontrado.nome,
         email: administradorEncontrado.email.toLowerCase(),
-        cpf: administradorEncontrado.cpf || '',
-        tipo: 'admin'
+        cpf: administradorEncontrado.cpf || "",
+        tipo: "admin"
     }));
 
     alert("Login de administrador realizado com sucesso!");
 
-    window.location.href = "index.html";
+    // Redireciona para o painel administrativo
+    window.location.href = "admin.html";
 
     return false;
 }

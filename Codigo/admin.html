@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Realm Store - Administração</title>
+
+    <link rel="stylesheet" href="site.css">
+    <script src="admin.js" defer></script>
+</head>
+
+<body>
+
+    <header id="topo">
+
+        <a href="index.html">
+            <img src="imagens/logo.png" alt="Logo Shadow Realm Store" class="logo">
+        </a>
+
+        <h1>Shadow Realm Store</h1>
+
+        <nav class="nav">
+            <a href="index.html" class="link">Início</a>
+
+            <a href="produtos.html" class="link">Produtos</a>
+
+            <button type="button" class="link" onclick="sairAdmin()">
+                Sair
+            </button>
+        </nav>
+
+    </header>
+
+    <main>
+
+        <section class="destaques">
+
+            <h2>Painel Administrativo</h2>
+
+            <div>
+                <h3>Cadastro de Administrador</h3>
+
+                <p>
+                    Cadastre novos administradores para terem acesso
+                    à área administrativa da loja.
+                </p>
+
+                <button type="button"
+                    onclick="window.location.href='cadastroAdmin.html'">
+                    Cadastrar
+                </button>
+            </div>
+
+            <div>
+                <h3>Gerenciamento de Estoque</h3>
+
+                <p>
+                    Acesse a área de gerenciamento e controle
+                    das quantidades dos produtos.
+                </p>
+
+                <button type="button"
+                    onclick="window.location.href='estoque.html'">
+                    Acessar
+                </button>
+            </div>
+
+            <div>
+                <h3>Produtos e Preços</h3>
+
+                <p>
+                    Consulte os produtos disponíveis na
+                    Shadow Realm Store.
+                </p>
+
+                <button type="button"
+                    onclick="window.location.href='produtos.html'">
+                    Consultar
+                </button>
+            </div>
+
+            <div>
+                <h3>Voltar para a Loja</h3>
+
+                <p>
+                    Retorne à página principal da loja.
+                </p>
+
+                <button type="button"
+                    onclick="window.location.href='index.html'">
+                    Acessar Loja
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>
+            &copy; Copyright. Shadow Realm 2026.
+            Todos os direitos reservados.
+        </p>
+
+        <a href="#topo">Voltar ao topo</a>
+    </footer>
+
+    <script>
+        // Verifica se o usuário está logado como administrador.
+        if (
+            localStorage.getItem("usuarioLogado") !== "true" ||
+            localStorage.getItem("tipoUsuario") !== "admin"
+        ) {
+            alert("Acesso restrito! Faça login como administrador.");
+            window.location.replace("loginAdmin.html");
+        }
+
+        // Encerra a sessão do administrador.
+        function sairAdmin() {
+            localStorage.removeItem("usuarioLogado");
+            localStorage.removeItem("usuarioAtual");
+            localStorage.removeItem("usuarioNome");
+            localStorage.removeItem("clienteLogado");
+            localStorage.removeItem("tipoUsuario");
+
+            window.location.href = "loginAdmin.html";
+        }
+    </script>
+
+</body>
+</html>

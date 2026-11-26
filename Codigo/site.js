@@ -1,3 +1,4 @@
+
 function abreModalCliente() {
     const modal = document.getElementById('modalCliente');
     if (modal) modal.classList.add('aberto');
@@ -26,6 +27,7 @@ function sairConta() {
     localStorage.removeItem('usuarioAtual');
     localStorage.removeItem('usuarioNome');
     localStorage.removeItem('clienteLogado');
+    localStorage.removeItem('tipoUsuario');
     alert("Você saiu da sua conta.");
     window.location.href = "index.html";
 }
@@ -138,7 +140,7 @@ async function validaLogin() {
     var email = f.txtemail.value.trim().toLowerCase();
     var senha = f.txtsenha.value;
 
-    var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    var expRegemail = /^[\w.-]+@([\w-]+\.)+[\w-]{2,}$/;
     if (!expRegemail.test(email)) {
         alert("Preencha o Campo Email ou formato inválido !!!");
         f.txtemail.focus();
@@ -151,56 +153,32 @@ async function validaLogin() {
         return false;
     }
 
-    // 1. VERIFICA PRIMEIRO SE É UM ADMINISTRADOR (admin.json + localStorage)
-    var adminsLocais = [];
-    try {
-        adminsLocais = JSON.parse(localStorage.getItem('administradoresShadowRealm')) || [];
-    } catch (e) {}
+    // O LOGIN DO CLIENTE VERIFICA SOMENTE OS CADASTROS DE CLIENTES.
+    // Os administradores são verificados exclusivamente em loginAdmin.html.
 
-    var adminsJSON = [];
-    try {
-        var respAdmin = await fetch('admin.json');
-        if (respAdmin.ok) adminsJSON = await respAdmin.json();
-    } catch (e) {}
+    var usuariosLocais = [];
 
-    if (adminsJSON.length === 0) {
-        adminsJSON = [
-            {
-                id: "1",
-                nome: "Pedro Carvalho",
-                cpf: "",
-                email: "pedro_carvalho@gmail.com",
-                senha: "Pedro@1983",
-                admin: true
-            }
-        ];
+    try {
+        usuariosLocais = JSON.parse(
+            localStorage.getItem('usuariosShadowRealm')
+        ) || [];
+    } catch (e) {
+        usuariosLocais = [];
     }
 
-    var todosAdmins = adminsLocais.concat(adminsJSON);
-    var adminEncontrado = todosAdmins.find(function (a) {
-        return a.email && a.email.toLowerCase() === email && a.senha === senha;
+    usuarioEncontradoLogin = usuariosLocais.find(function (u) {
+        return u.email &&
+            u.email.toLowerCase() === email &&
+            u.senha === senha;
     });
 
-    if (adminEncontrado) {
-        localStorage.setItem('usuarioLogado', 'true');
-        localStorage.setItem('usuarioAtual', adminEncontrado.email.toLowerCase());
-        localStorage.setItem('usuarioNome', adminEncontrado.nome);
-        localStorage.setItem('tipoUsuario', 'admin');
-
-        localStorage.setItem('clienteLogado', JSON.stringify({
-            nome: adminEncontrado.nome,
-            email: adminEncontrado.email.toLowerCase(),
-            cpf: adminEncontrado.cpf || '',
-            tipo: 'admin'
-        }));
-
-        alert("Login de administrador realizado com sucesso!");
-        window.location.href = "index.html";
+    if (!usuarioEncontradoLogin) {
+        alert("E-mail ou senha de cliente incorretos!");
         return false;
     }
 
-    // 2. SE NÃO FOR ADMIN, CONTINUA O FLUXO NORMAL DE CLIENTE ABAIXO...
-    // (Mantenha aqui o código que você já tem no site.js para buscar em clientes.json / localStorage)
+    abreModalLogin();
+    return false;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -260,10 +238,13 @@ function confirmaLogin() {
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', email);
     localStorage.setItem('usuarioNome', nomeUsuario);
+    localStorage.setItem('tipoUsuario', 'cliente');
+
     localStorage.setItem('clienteLogado', JSON.stringify({
         nome: nomeUsuario,
         email: email,
-        cpf: (usuarioEncontradoLogin && usuarioEncontradoLogin.cpf) || ''
+        cpf: (usuarioEncontradoLogin && usuarioEncontradoLogin.cpf) || '',
+        tipo: 'cliente'
     }));
 
     alert("Login realizado com sucesso!");
@@ -360,10 +341,13 @@ function confirmaCadastro() {
     localStorage.setItem('usuarioLogado', 'true');
     localStorage.setItem('usuarioAtual', novoUsuario.email);
     localStorage.setItem('usuarioNome', novoUsuario.nome);
+    localStorage.setItem('tipoUsuario', 'cliente');
+
     localStorage.setItem('clienteLogado', JSON.stringify({
         nome: novoUsuario.nome,
         email: novoUsuario.email,
-        cpf: novoUsuario.cpf
+        cpf: novoUsuario.cpf,
+        tipo: 'cliente'
     }));
 
     alert("Cadastro realizado com sucesso!");
@@ -472,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalFinal = subtotalComDesconto + frete;
         return { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal };
     }
-    
+
     function obterEstoqueCarrinho(nomeProduto) {
         if (typeof obterEstoque === 'function') {
             return obterEstoque(nomeProduto);
@@ -533,6 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         atualizarResumo(carrinho);
     }
+
     window.alterarQuantidade = function (index, delta) {
         const carrinho = obterCarrinho();
         if (!carrinho[index]) return;
