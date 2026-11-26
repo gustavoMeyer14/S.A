@@ -18,7 +18,9 @@
     <script src="modais-globais.js"></script>
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
-    <script src="loja-turbo.js" defer></script>
+    <link rel="stylesheet" href="ajustes-seguros.css">
+<script src="loja-turbo.js" defer></script>
+<script src="integracao-segura.js" defer></script>
 
     <style>
         .modalRastreio[open] {
@@ -132,7 +134,7 @@
         <div>
             <img src="imagens/Levi.png" alt="Levi Ackerman">
             <p>Levi Ackerman</p>
-            <h3><strong>R\$ 250,00</strong></h3>
+            <h3><strong>R$ 250,00</strong></h3>
             <button type="button" id="card1">Ver mais</button>
         </div>
         <dialog id="modal-card1" class="modalProduto">
@@ -143,7 +145,9 @@
                     <p>Escala 1/6 em resina de alto padrão da Tropa de Exploração.</p>
                 </div>
             </div>
+
             <div class="modalProduto-comentarios"></div>
+
             <footer class="modal-footer">
                 <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
@@ -156,7 +160,7 @@
         <div>
             <img src="imagens/Maomao.png" alt="Maomao">
             <p>Maomao</p>
-            <h3><strong>R\$ 300,00</strong></h3>
+            <h3><strong>R$ 300,00</strong></h3>
             <button type="button" id="card2">Ver mais</button>
         </div>
         <dialog id="modal-card2" class="modalProduto">
@@ -167,7 +171,9 @@
                     <p>Escala 1/6 em resina de alto padrão com acessórios de boticária.</p>
                 </div>
             </div>
+
             <div class="modalProduto-comentarios"></div>
+
             <footer class="modal-footer">
                 <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
@@ -180,7 +186,7 @@
         <div>
             <img src="imagens/Canva - download.png" alt="Satoru Gojo">
             <p>Satoru Gojo</p>
-            <h3><strong>R\$ 350,00</strong></h3>
+            <h3><strong>R$ 350,00</strong></h3>
             <button type="button" id="card3">Ver mais</button>
         </div>
         <dialog id="modal-card3" class="modalProduto">
@@ -191,7 +197,9 @@
                     <p>Escala 1/6 em resina de alto padrão com efeito de Energia Amaldiçoada.</p>
                 </div>
             </div>
+
             <div class="modalProduto-comentarios"></div>
+
             <footer class="modal-footer">
                 <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="350.00"
@@ -204,7 +212,7 @@
         <div>
             <img src="imagens/Canva - download (1).png" alt="Greninja">
             <p>Greninja</p>
-            <h3><strong>R\$ 400,00</strong></h3>
+            <h3><strong>R$ 400,00</strong></h3>
             <button type="button" id="card4">Ver mais</button>
         </div>
         <dialog id="modal-card4" class="modalProduto">
@@ -215,7 +223,9 @@
                     <p>Escala 1/6 em resina de alto padrão com Water Shurikens em destaque.</p>
                 </div>
             </div>
+
             <div class="modalProduto-comentarios"></div>
+
             <footer class="modal-footer">
                 <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
@@ -228,7 +238,7 @@
         <div>
             <img src="imagens/Snorlax.png" alt="Snorlax">
             <p>Snorlax</p>
-            <h3><strong>R\$ 450,00</strong></h3>
+            <h3><strong>R$ 450,00</strong></h3>
             <button type="button" id="card5">Ver mais</button>
         </div>
         <dialog id="modal-card5" class="modalProduto">
@@ -239,7 +249,9 @@
                     <p>Escala 1/6 em resina maciça de alto padrão com Poké Flauta e Berries.</p>
                 </div>
             </div>
+
             <div class="modalProduto-comentarios"></div>
+
             <footer class="modal-footer">
                 <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
@@ -422,26 +434,57 @@
             });
         });
 
-        // Pesquisa na Home redireciona para o catálogo filtrado
-        const btnPesquisaHome = document.getElementById('enviarPesquisa');
-        const inputPesquisaHome = document.getElementById('barraPesquisa');
+        async function conectarMeuJSON() {
+            let produtosJSON = [];
+            try {
+                const resposta = await fetch('produtos.json');
+                if (resposta.ok) {
+                    produtosJSON = await resposta.json();
+                }
+            } catch (erro) {
+                if (Array.isArray(window.PRODUTOS_PADRAO_SR)) {
+                    produtosJSON = window.PRODUTOS_PADRAO_SR;
+                }
+            }
 
-        function irParaCatalogoPesquisa() {
-            const termo = inputPesquisaHome ? inputPesquisaHome.value.trim() : '';
-            window.location.href = termo
-                ? `produtos.html?busca=${encodeURIComponent(termo)}`
-                : 'produtos.html';
+            if (!Array.isArray(produtosJSON) || produtosJSON.length === 0) return;
+
+            const modais = document.querySelectorAll('.modalProduto');
+            modais.forEach(modal => {
+                const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
+                const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
+
+                if (dados && dados.descricao) {
+                    const paragrafo = modal.querySelector('.modalProduto-conteudo p');
+                    if (paragrafo) {
+                        paragrafo.innerText = dados.descricao;
+                    }
+                }
+            });
         }
 
-        if (btnPesquisaHome) {
-            btnPesquisaHome.addEventListener('click', irParaCatalogoPesquisa);
+        conectarMeuJSON();
+
+        const btnPesquisaIndex = document.getElementById('enviarPesquisa');
+        const inputPesquisaIndex = document.getElementById('barraPesquisa');
+
+        function irParaProdutos() {
+            const termo = inputPesquisaIndex.value.trim();
+
+            if (termo !== '') {
+                window.location.href = `produtos.html?busca=${encodeURIComponent(termo)}`;
+            } else {
+                window.location.href = 'produtos.html';
+            }
         }
 
-        if (inputPesquisaHome) {
-            inputPesquisaHome.addEventListener('keypress', (e) => {
+        if (btnPesquisaIndex && inputPesquisaIndex) {
+            btnPesquisaIndex.addEventListener('click', irParaProdutos);
+
+            inputPesquisaIndex.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    irParaCatalogoPesquisa();
+                    irParaProdutos();
                 }
             });
         }
