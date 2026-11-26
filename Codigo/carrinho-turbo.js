@@ -12,7 +12,7 @@ const CONFIG_CARRINHO_SR = {
     codigoPix: '00020126580014BR.GOV.BCB.PIX0128shadowrealmstore@pix.com5204000053039865802BR5918SHADOW REALM STORE6009JOINVILLE62070503***6304SR26'
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const productsList = document.getElementById('products-list');
     if (!productsList) return;
 
@@ -20,8 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
     injetarBarraFreteGratis();
     injetarBotaoLimparCarrinho();
     injetarExtrasPagamento();
-    injetarSugestoesProdutos();
     configurarAcoesCarrinhoSemReload();
+
+    reRenderizarCarrinhoSemReload();
+    await injetarSugestoesProdutos();
+
+    if (window.promessaEstoqueSR) {
+        try {
+            await window.promessaEstoqueSR;
+            reRenderizarCarrinhoSemReload();
+        } catch {}
+    }
 
     const observer = new MutationObserver(() => {
         atualizarBarraFrete();
@@ -34,8 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (priceBreakdown) {
         observer.observe(priceBreakdown, { childList: true, subtree: true });
     }
-
-    reRenderizarCarrinhoSemReload();
 });
 
 function formatarMoedaSR(valor) {
@@ -208,7 +215,14 @@ function injetarEstilosCarrinhoTurbo() {
 function lerCarrinhoTurbo() {
     try {
         const dados = JSON.parse(localStorage.getItem(CONFIG_CARRINHO_SR.chaveCarrinho));
-        return Array.isArray(dados) ? dados : [];
+        if (!Array.isArray(dados)) return [];
+        return dados.map((item) => ({
+            ...item,
+            nome: String(item?.nome || 'Produto'),
+            preco: Number(item?.preco) || 0,
+            quantidade: Math.max(1, parseInt(item?.quantidade, 10) || 1),
+            imagem: item?.imagem || 'imagens/logo.png'
+        }));
     } catch {
         return [];
     }
@@ -220,12 +234,21 @@ function salvarCarrinhoTurbo(carrinho) {
 
 function obterEstoqueTurbo(nomeProduto) {
     if (typeof obterEstoque === 'function') {
-        return obterEstoque(nomeProduto);
+        const val = Number(obterEstoque(nomeProduto));
+        if (Number.isFinite(val)) return val;
     }
     try {
         const est = JSON.parse(localStorage.getItem(CONFIG_CARRINHO_SR.chaveEstoque));
-        if (est && est[nomeProduto] !== undefined) {
-            return Number(est[nomeProduto]);
+        if (est && typeof est === 'object') {
+            if (est[nomeProduto] !== undefined && Number.isFinite(Number(est[nomeProduto]))) {
+                return Number(est[nomeProduto]);
+            }
+            const chaveEncontrada = Object.keys(est).find(
+                (k) => k.trim().toLowerCase() === String(nomeProduto || '').trim().toLowerCase()
+            );
+            if (chaveEncontrada !== undefined && Number.isFinite(Number(est[chaveEncontrada]))) {
+                return Number(est[chaveEncontrada]);
+            }
         }
     } catch {}
     return Infinity;
@@ -246,13 +269,14 @@ function reRenderizarCarrinhoSemReload() {
                 const disponivel = obterEstoqueTurbo(item.nome);
                 const temLimite = Number.isFinite(disponivel);
                 const atingiuLimite = temLimite && item.quantidade >= disponivel;
-                const subtotalItem = (Number(item.preco) || 0) * (Number(item.quantidade) || 0);
+                const subtotalItem = item.preco * item.quantidade;
 
                 const card = document.createElement('article');
                 card.className = 'product-card';
+                card.dataset.index = String(index);
                 card.innerHTML = `
                     <div class="product-thumb">
-                        <img src="${item.imagem || 'imagens/logo.png'}" alt="${item.nome}">
+                        <img src="${item.imagem}" alt="${item.nome}">
                     </div>
                     <div style="flex:1; margin-left: 20px;">
                         <h3 class="product-name" style="margin-left:0;">${item.nome}</h3>
@@ -261,9 +285,11 @@ function reRenderizarCarrinhoSemReload() {
                     </div>
                     <div class="quantity-controls">
                         <button type="button" class="btn-plus" data-index="${index}" data-delta="1"
+                            aria-label="Aumentar quantidade de ${item.nome}"
                             ${atingiuLimite ? 'disabled style="opacity:0.35; cursor:not-allowed;" title="Limite máximo de estoque atingido"' : ''}>+</button>
                         <span class="qty-value">${item.quantidade}</span>
-                        <button type="button" class="btn-minus" data-index="${index}" data-delta="-1">-</button>
+                        <button type="button" class="btn-minus" data-index="${index}" data-delta="-1"
+                            aria-label="Diminuir quantidade de ${item.nome}">-</button>
                     </div>
                     <button type="button" class="btn-remove" data-index="${index}" title="Remover item" aria-label="Remover ${item.nome}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -278,7 +304,7 @@ function reRenderizarCarrinhoSemReload() {
     }
 
     if (priceBreakdown) {
-        const subtotal = carrinho.reduce((acc, item) => acc + ((Number(item.preco) || 0) * (Number(item.quantidade) || 0)), 0);
+        const subtotal = carrinho.reduce((acc, item) => acc + (item.preco * item.quantidade), 0);
         const frete = subtotal === 0 ? 0 : (subtotal >= CONFIG_CARRINHO_SR.limiteFreteGratis ? 0 : CONFIG_CARRINHO_SR.valorFretePadrao);
         const totalFinal = subtotal + frete;
 
@@ -288,7 +314,7 @@ function reRenderizarCarrinhoSemReload() {
         } else {
             carrinho.forEach((item, idx) => {
                 const prefixo = idx === 0 ? '' : '+ ';
-                const sub = (Number(item.preco) || 0) * (Number(item.quantidade) || 0);
+                const sub = item.preco * item.quantidade;
                 html += `<p class="price-item">${prefixo}R$ ${formatarMoedaSR(sub)}</p>`;
             });
             html += frete === 0
@@ -345,7 +371,7 @@ function atualizarBarraFrete() {
     if (!box || !texto || !fill) return;
 
     const carrinho = lerCarrinhoTurbo();
-    const subtotal = carrinho.reduce((acc, i) => acc + ((Number(i.preco) || 0) * (Number(i.quantidade) || 0)), 0);
+    const subtotal = carrinho.reduce((acc, i) => acc + (i.preco * i.quantidade), 0);
 
     if (subtotal === 0) {
         box.style.display = 'none';
@@ -557,16 +583,31 @@ async function injetarSugestoesProdutos() {
     }
 }
 
-function configurarAcoesCarrinhoSemReload() {
-    const productsList = document.getElementById('products-list');
+function resolverIndiceCardCarrinho(alvo) {
+    const attrIdx = alvo?.getAttribute('data-index');
+    if (attrIdx !== null && attrIdx !== '' && !Number.isNaN(parseInt(attrIdx, 10))) {
+        return parseInt(attrIdx, 10);
+    }
 
+    const card = alvo?.closest('.product-card');
+    const productsList = document.getElementById('products-list');
+    if (card && productsList) {
+        const cards = Array.from(productsList.querySelectorAll('.product-card'));
+        const pos = cards.indexOf(card);
+        if (pos >= 0) return pos;
+    }
+    return -1;
+}
+
+function configurarAcoesCarrinhoSemReload() {
     window.alterarQuantidade = function (index, delta) {
         const carrinho = lerCarrinhoTurbo();
         if (!carrinho[index]) return;
 
-        if (delta > 0) {
+        const passo = Number(delta) || 0;
+        if (passo > 0) {
             const disponivel = obterEstoqueTurbo(carrinho[index].nome);
-            if (Number.isFinite(disponivel) && carrinho[index].quantidade + delta > disponivel) {
+            if (Number.isFinite(disponivel) && carrinho[index].quantidade + passo > disponivel) {
                 window.srModal?.alerta(
                     `Limite de estoque atingido! Temos apenas <strong>${disponivel}</strong> unidade(s) de <strong>${carrinho[index].nome}</strong>.`,
                     '- Estoque Máximo -',
@@ -576,7 +617,7 @@ function configurarAcoesCarrinhoSemReload() {
             }
         }
 
-        carrinho[index].quantidade += delta;
+        carrinho[index].quantidade += passo;
         if (carrinho[index].quantidade <= 0) {
             carrinho.splice(index, 1);
         }
@@ -595,16 +636,23 @@ function configurarAcoesCarrinhoSemReload() {
         if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
     };
 
-    if (productsList && productsList.dataset.turboDelegacaoAtiva !== 'true') {
-        productsList.dataset.turboDelegacaoAtiva = 'true';
-        productsList.addEventListener('click', (e) => {
-            const btnQtd = e.target.closest('.btn-plus, .btn-minus');
+    if (document.body.dataset.srCarrinhoCapturaAtiva !== 'true') {
+        document.body.dataset.srCarrinhoCapturaAtiva = 'true';
+        document.addEventListener('click', (e) => {
+            const productsList = document.getElementById('products-list');
+            if (!productsList || !productsList.contains(e.target)) return;
+
+            const btnPlus = e.target.closest('.btn-plus');
+            const btnMinus = e.target.closest('.btn-minus');
+            const btnQtd = btnPlus || btnMinus;
+
             if (btnQtd) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                const idx = parseInt(btnQtd.getAttribute('data-index'), 10);
-                const delta = parseInt(btnQtd.getAttribute('data-delta'), 10);
-                if (!Number.isNaN(idx) && !Number.isNaN(delta)) {
+                const idx = resolverIndiceCardCarrinho(btnQtd);
+                const rawDelta = btnQtd.getAttribute('data-delta');
+                const delta = rawDelta !== null ? parseInt(rawDelta, 10) : (btnPlus ? 1 : -1);
+                if (idx >= 0 && !Number.isNaN(delta)) {
                     window.alterarQuantidade(idx, delta);
                 }
                 return;
@@ -614,8 +662,8 @@ function configurarAcoesCarrinhoSemReload() {
             if (btnRem) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                const idx = parseInt(btnRem.getAttribute('data-index'), 10);
-                if (!Number.isNaN(idx)) {
+                const idx = resolverIndiceCardCarrinho(btnRem);
+                if (idx >= 0) {
                     window.removerProduto(idx);
                 }
             }
