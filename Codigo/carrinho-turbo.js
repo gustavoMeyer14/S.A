@@ -469,9 +469,7 @@ async function injetarSugestoesProdutos() {
     if (!mainCart || document.getElementById('sr-sugestoes-carrinho')) return;
 
     try {
-        const resp = await fetch('produtos.json');
-        if (!resp.ok) return;
-        const produtos = await resp.json();
+        const produtos = typeof carregarProdutosSR === 'function' ? await carregarProdutosSR() : [];
         if (!Array.isArray(produtos)) return;
 
         const carrinho = lerCarrinhoTurbo();
