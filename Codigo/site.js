@@ -1,4 +1,3 @@
-
 function abreModalCliente() {
     const modal = document.getElementById('modalCliente');
     if (modal) modal.classList.add('aberto');
@@ -87,9 +86,10 @@ function sairConta() {
     localStorage.removeItem('usuarioNome');
     localStorage.removeItem('tipoUsuario');
     localStorage.removeItem('clienteLogado');
-    localStorage.removeItem('tipoUsuario');
-    alert("Você saiu da sua conta.");
-    window.location.href = "index.html";
+
+    exibirAvisoSite("Você saiu da sua conta.", "- Até logo! -", function () {
+        window.location.href = "index.html";
+    });
 }
 
 function obterChaveCartoesUsuario() {
@@ -125,31 +125,6 @@ window.addEventListener("DOMContentLoaded", function () {
             window.location.href = "index.html";
         });
         return;
-    }
-
-    // Tooltips nos ícones do cabeçalho
-    const tooltipsNav = {
-        "index.html": "Início",
-        "produtos.html": "Produtos",
-        "contato.html": "Contato",
-        "carrinho.html": "Carrinho"
-    };
-
-    document.querySelectorAll(".nav .link").forEach(function (link) {
-        const href = link.getAttribute("href");
-        const nomePagina = tooltipsNav[href] || link.querySelector("img")?.getAttribute("alt");
-        if (nomePagina) {
-            link.setAttribute("data-tooltip", nomePagina);
-            link.setAttribute("title", nomePagina);
-        }
-    });
-
-    const btnUsuarioNav = document.querySelector(".nav .botaoUsuario");
-    if (btnUsuarioNav) {
-        const estaLogadoNav = localStorage.getItem("usuarioLogado") === "true";
-        const textoUsuario = estaLogadoNav ? "Minha Conta" : "Usuário";
-        btnUsuarioNav.setAttribute("data-tooltip", textoUsuario);
-        btnUsuarioNav.setAttribute("title", textoUsuario);
     }
 
     const modalConteudo = document.querySelector('.modalCliente-conteudo');
@@ -235,7 +210,7 @@ async function validaLogin() {
     var email = f.txtemail.value.trim().toLowerCase();
     var senha = f.txtsenha.value;
 
-    var expRegemail = /^[\w.-]+@([\w-]+\.)+[\w-]{2,}$/;
+    var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!expRegemail.test(email)) {
         exibirAvisoSite("Preencha o Campo Email ou formato inválido!", "- Login -", function () {
             f.txtemail.focus();
@@ -250,10 +225,17 @@ async function validaLogin() {
         return false;
     }
 
-    // O LOGIN DO CLIENTE VERIFICA SOMENTE OS CADASTROS DE CLIENTES.
-    // Os administradores são verificados exclusivamente em loginAdmin.html.
+    // 1. VERIFICA PRIMEIRO SE É UM ADMINISTRADOR (admin.json + localStorage)
+    var adminsLocais = [];
+    try {
+        adminsLocais = JSON.parse(localStorage.getItem('administradoresShadowRealm')) || [];
+    } catch (e) {}
 
-    var usuariosLocais = [];
+    var adminsJSON = [];
+    try {
+        var respAdmin = await fetch('admin.json');
+        if (respAdmin.ok) adminsJSON = await respAdmin.json();
+    } catch (e) {}
 
     if (!Array.isArray(adminsJSON) || adminsJSON.length === 0) {
         adminsJSON = [
@@ -338,14 +320,6 @@ document.addEventListener("DOMContentLoaded", function () {
             linkNovoAdmin.href = "cadastroAdmin.html";
             linkNovoAdmin.textContent = "🛡️ Cadastrar Novo Admin";
             navUsuario.prepend(linkNovoAdmin);
-        }
-
-        // Link para Painel Administrativo
-        if (!navUsuario.querySelector('a[href="admin.html"]')) {
-            const linkPainelAdmin = document.createElement("a");
-            linkPainelAdmin.href = "admin.html";
-            linkPainelAdmin.textContent = "⚙️ Painel de Admin";
-            navUsuario.prepend(linkPainelAdmin);
         }
     }
 });
@@ -1058,26 +1032,3 @@ if (btnConfirmar) {
 }
 
 renderizarCartoesSalvos();
-
-//=========== ESTOQUE ===========//
-window.alterarQuantidade = function (index, delta) {
-    const carrinho = obterCarrinho();
-    if (!carrinho[index]) return;
-
-    if (delta > 0 && typeof obterEstoque === 'function') {
-        const disponivel = obterEstoque(carrinho[index].nome);
-        if (carrinho[index].quantidade + delta > disponivel) {
-            alert(`Limite de estoque atingido! Temos apenas ${disponivel} unidade(s) de ${carrinho[index].nome}.`);
-            return;
-        }
-    }
-
-    carrinho[index].quantidade += delta;
-    if (carrinho[index].quantidade <= 0) {
-        carrinho.splice(index, 1);
-    }
-
-    localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
-    renderizarCarrinho();
-    if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
-};
