@@ -836,7 +836,7 @@ dialog.menor[open] {
   gap: 20px;
 }
 
-dialog.menor > div:last-child {
+dialog.menor>div:last-child {
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -1173,7 +1173,8 @@ option:hover {
   margin-top: 35px;
   padding: 20px 25px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* Força os 5 itens na mesma linha */
+  grid-template-columns: repeat(5, 1fr);
+  /* Força os 5 itens na mesma linha */
   gap: 14px;
   align-items: stretch;
   clear: both;
@@ -1188,7 +1189,8 @@ option:hover {
 
 .faq-item {
   width: 100%;
-  min-width: 0; /* Impede que o conteúdo estoure a coluna */
+  min-width: 0;
+  /* Impede que o conteúdo estoure a coluna */
   height: auto;
   float: none;
   margin: 0;
@@ -1264,11 +1266,11 @@ dialog::backdrop {
   flex-direction: column;
   justify-content: flex-start;
   gap: 16px;
-  width: 1700px;       
-  max-width: 98vw;      
+  width: 1700px;
+  max-width: 98vw;
   height: auto;
-  min-height: 85vh;    
-  max-height: 96vh;    
+  min-height: 85vh;
+  max-height: 96vh;
   text-align: left;
   overflow-x: hidden;
   overflow-y: auto;
@@ -1282,10 +1284,12 @@ dialog::backdrop {
 .modalProduto::-webkit-scrollbar {
   width: 8px;
 }
+
 .modalProduto::-webkit-scrollbar-track {
   background: #151515;
   border-radius: 10px;
 }
+
 .modalProduto::-webkit-scrollbar-thumb {
   background: #C62828;
   border-radius: 10px;
@@ -1293,7 +1297,8 @@ dialog::backdrop {
 
 .modalProduto-conteudo {
   width: 100%;
-  flex-shrink: 0; /* IMPEDE que a caixa da foto e descrição seja esmagada! */
+  flex-shrink: 0;
+  /* IMPEDE que a caixa da foto e descrição seja esmagada! */
   border-radius: 20px;
   background-color: #262626;
   border: 1px solid #C62828;
@@ -1310,7 +1315,8 @@ dialog::backdrop {
   border: 1px solid #C62828;
   border-radius: 20px;
   flex-shrink: 0;
-  margin: 0; /* Remove o float: left antigo */
+  margin: 0;
+  /* Remove o float: left antigo */
 }
 
 .modalProduto-texto {
@@ -1335,7 +1341,8 @@ dialog::backdrop {
 
 .modalProduto-comentarios {
   width: 100%;
-  flex-shrink: 0; /* Garante que os comentários também não sejam cortados */
+  flex-shrink: 0;
+  /* Garante que os comentários também não sejam cortados */
   height: auto;
   border-radius: 20px;
   background-color: #262626;
@@ -1626,8 +1633,9 @@ dialog .btn-fechar {
   border-bottom: 1px solid #ff7043;
 }
 
-.shopee-topbar > span {
-  margin: 0; /* Anula o margin: 0 auto do seletor * */
+.shopee-topbar>span {
+  margin: 0;
+  /* Anula o margin: 0 auto do seletor * */
 }
 
 .shopee-timer b {
@@ -1734,7 +1742,7 @@ dialog .btn-fechar {
   gap: 15px;
 }
 
-.cupom-ticket > div {
+.cupom-ticket>div {
   margin: 0;
   text-align: left;
 }
@@ -1949,7 +1957,7 @@ dialog .btn-comprar-agora:hover {
   bottom: -34px;
   left: 50%;
   transform: translateX(-50%) translateY(-4px);
-  background-color: #151515;
+  background-color: #C62828;
   color: #ffffff;
   border: 1px solid #C62828;
   padding: 5px 12px;
@@ -1968,4 +1976,426 @@ dialog .btn-comprar-agora:hover {
 .nav .botaoUsuario:hover::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+@charset "UTF-8";
+
+/* ==========================================================================
+   PAINEL ADMINISTRATIVO EM DUAS COLUNAS (CLASSES EXCLUSIVAS)
+   Paleta e configurações base: #000000, #151515, #262626, #C62828, #ffffff
+   ========================================================================== */
+
+.PainelAdmin {
+  width: 94%;
+  max-width: 1500px;
+  height: auto;
+  min-height: 550px;
+  margin: 50px auto;
+  padding: 35px 30px;
+  background-color: #000000;
+  border: 2px solid #C62828;
+  border-radius: 20px;
+
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* ==========================================================================
+   COLUNA ESQUERDA: CONTROLES DO ADMINISTRADOR
+   ========================================================================== */
+
+.PainelControles {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.PainelControles > h2 {
+  grid-column: 1 / -1;
+  font-size: 30px;
+  color: #ffffff;
+  text-align: center;
+  border-bottom: 1px solid #C62828;
+  padding-bottom: 12px;
+  margin-bottom: 5px;
+}
+
+.adminOpcao {
+  width: 100%;
+  height: auto;
+  min-height: 245px;
+  float: none;
+  background-color: #262626;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  padding: 22px 18px;
+  font-size: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.adminOpcao:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px #C62828;
+}
+
+.adminOpcao h3 {
+  font-size: 20px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.adminOpcao p {
+  font-size: 15px;
+  color: #ffffff;
+  line-height: 1.45;
+  margin-bottom: 18px;
+}
+
+.adminOpcao button {
+  width: 100%;
+  max-width: 190px;
+  height: 48px;
+  background-color: #C62828;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.adminOpcao button:hover {
+  background-color: #151515;
+  border: 1px solid #C62828;
+  scale: 110%;
+  box-shadow: 0 10px 25px #C62828;
+}
+
+/* ==========================================================================
+   COLUNA DIREITA: GERENCIAMENTO CRUD DE ADMINISTRADORES
+   ========================================================================== */
+
+.PainelAdminCadastrados {
+  width: 100%;
+  min-height: 550px;
+  background-color: #151515;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  padding: 25px;
+  text-align: left;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.adminCrudTopo {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border-bottom: 1px solid #C62828;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.adminCrudTopo h2 {
+  font-size: 26px;
+  color: #ffffff;
+  margin: 0;
+}
+
+.adminCrudBusca {
+  width: 240px;
+  height: 42px;
+  margin: 0;
+  background-color: #262626;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  color: #ffffff;
+  padding: 0 16px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.adminCrudBusca:hover,
+.adminCrudBusca:focus {
+  border: 1px solid #ffffff;
+}
+
+.adminCrudLista {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.adminCrudCard {
+  width: 100%;
+  margin: 0;
+  background-color: #262626;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  transition: 0.3s;
+}
+
+.adminCrudCard:hover {
+  box-shadow: 0 10px 25px rgba(198, 40, 40, 0.45);
+}
+
+.adminCrudInfo {
+  margin: 0;
+  text-align: left;
+}
+
+.adminCrudBadge {
+  display: inline-block;
+  background-color: #C62828;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.adminCrudInfo h3 {
+  font-size: 20px;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.adminCrudInfo p {
+  font-size: 15px;
+  color: #ffffff;
+  margin: 2px 0;
+}
+
+.adminCrudAcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.btnAdminEditar,
+.btnAdminRemover {
+  width: 110px;
+  height: 42px;
+  margin: 0;
+  border-radius: 20px;
+  border: 1px solid #C62828;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btnAdminEditar {
+  background-color: #151515;
+}
+
+.btnAdminRemover {
+  background-color: #C62828;
+}
+
+.btnAdminEditar:hover,
+.btnAdminRemover:hover {
+  background-color: #151515;
+  border: 1px solid #C62828;
+  scale: 110%;
+  box-shadow: 0 10px 25px #C62828;
+}
+
+.adminCrudVazio {
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  margin-top: 30px;
+}
+
+/* ==========================================================================
+   MODAL EXCLUSIVO DE EDIÇÃO DO ADMINISTRADOR
+   ========================================================================== */
+
+.modalAdminEdicao {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.modalAdminEdicao.aberto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalAdminEdicaoConteudo {
+  background-color: #000000;
+  border: 1px solid #C62828;
+  color: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  width: 90%;
+  max-width: 460px;
+  text-align: left;
+}
+
+.modalAdminEdicaoConteudo h2 {
+  font-size: 26px;
+  color: #ffffff;
+  border-bottom: 1px solid #C62828;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.campoAdminEdicao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.campoAdminEdicao label {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+  margin: 0;
+}
+
+.campoAdminEdicao input {
+  width: 100%;
+  height: 45px;
+  margin: 0;
+  border-radius: 20px;
+  background-color: #151515;
+  border: 1px solid #C62828;
+  color: #ffffff;
+  padding: 0 16px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.campoAdminEdicao input:hover,
+.campoAdminEdicao input:focus {
+  border: 1px solid #ffffff;
+}
+
+.botoesAdminEdicao {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.botoesAdminEdicao button {
+  width: 160px;
+  height: 45px;
+  margin: 0;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.botoesAdminEdicao button:first-child {
+  background-color: #151515;
+}
+
+.botoesAdminEdicao button:last-child {
+  background-color: #C62828;
+}
+
+.botoesAdminEdicao button:hover {
+  background-color: #151515;
+  scale: 110%;
+  box-shadow: 0 10px 25px #C62828;
+}
+
+.adminCrudRodape {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #C62828;
+  display: flex;
+  justify-content: center;
+}
+
+.btnAdminCadastrarNovo {
+  width: 100%;
+  max-width: 320px;
+  height: 48px;
+  margin: 0;
+  background-color: #C62828;
+  border: 1px solid #C62828;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btnAdminCadastrarNovo:hover {
+  background-color: #151515;
+  border: 1px solid #C62828;
+  scale: 105%;
+  box-shadow: 0 10px 25px #C62828;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
+
+@media (max-width: 1100px) {
+  .PainelAdmin {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .PainelControles {
+    grid-template-columns: 1fr;
+  }
+
+  .adminCrudCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .adminCrudBusca {
+    width: 100%;
+  }
 }

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Realm Store - Painel Administrativo</title>
+    <link rel="stylesheet" href="site.css">
+    <link rel="stylesheet" href="melhorias.css">
+    <script src="modais-globais.js"></script>
+    <script src="site.js" defer></script>
+    <script src="admin.js" defer></script>
+    <script src="estoque.js" defer></script>
+    <script src="perfil-vip.js" defer></script>
+    <style>
+        .admin-dashboard {
+            max-width: 1200px;
+            width: 94%;
+            margin: 35px auto;
+            padding: 28px;
+            background-color: #0d0d0d;
+            border: 2px solid #C62828;
+            border-radius: 20px;
+            text-align: left;
+        }
+
+        .admin-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid #C62828;
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+        }
+
+        .admin-header-bar h2 {
+            font-size: 28px;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .admin-atalhos {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 0;
+        }
+
+        .admin-atalhos a {
+            background-color: #C62828;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid #C62828;
+            transition: 0.25s;
+        }
+
+        .admin-atalhos a:hover {
+            background-color: #151515;
+            box-shadow: 0 6px 18px rgba(198, 40, 40, 0.5);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            width: 100%;
+            background-color: #1b1b1b;
+            border: 1px solid #C62828;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .kpi-card small {
+            color: #bbbbbb;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .kpi-card strong {
+            font-size: 26px;
+            color: #ffca28;
+        }
+
+        .secao-admin {
+            background-color: #161616;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 28px;
+        }
+
+        .secao-admin h3 {
+            font-size: 21px;
+            color: #ffffff;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .tabela-admin {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .tabela-admin th,
+        .tabela-admin td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #2c2c2c;
+            text-align: left;
+        }
+
+        .tabela-admin th {
+            background-color: #C62828;
+            color: #ffffff;
+        }
+
+        .select-status-admin {
+            width: auto !important;
+            height: 36px !important;
+            margin: 0 !important;
+            padding: 4px 10px !important;
+            background-color: #151515 !important;
+            color: #ffffff !important;
+            border: 1px solid #C62828 !important;
+            border-radius: 10px !important;
+            font-size: 13px !important;
+            cursor: pointer;
+        }
+
+        .form-novo-produto {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+        }
+
+        .form-novo-produto .campo {
+            width: 100%;
+            margin: 0;
+        }
+
+        .form-novo-produto label {
+            display: block;
+            font-size: 13px;
+            color: #cccccc;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-novo-produto input,
+        .form-novo-produto select,
+        .form-novo-produto textarea {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 10px 12px !important;
+            height: 42px;
+            border-radius: 10px !important;
+            background-color: #0d0d0d !important;
+            border: 1px solid #C62828 !important;
+            color: #ffffff !important;
+            font-size: 14px;
+            text-align: left !important;
+        }
+
+        .form-novo-produto textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .lista-custom-produtos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .chip-prod-custom {
+            background-color: #222;
+            border: 1px solid #C62828;
+            border-radius: 12px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="topo">
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
+        <h1>- Shadow Realm Store -</h1>
+        <div class="nav">
+            <nav>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png" alt="Usuário"></button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="modalCliente" id="modalCliente">
+        <div class="modalCliente-conteudo">
+            <h2>- Menu do usuário -</h2>
+            <nav class="nav-usuario">
+                <a href="cadastro.html">Cadastro</a>
+                <a href="cliente.html">Login</a>
+                <a href="cadastrocartao.html">Cadastrar cartão</a>
+                <a href="pedidos.html">Meus Pedidos</a>
+            </nav>
+            <button type="button" onclick="fechaModalCliente()" class="botaoFecharCliente">Fechar</button>
+        </div>
+    </div>
+
+    <main class="admin-dashboard">
+        <div class="admin-header-bar">
+            <h2>📊 Painel Administrativo - Shadow Realm</h2>
+            <div class="admin-atalhos">
+                <a href="estoque.html">📦 Gerenciar Estoque</a>
+                <a href="cadastroAdmin.html">🛡️ Novo Administrador</a>
+                <a href="produtos.html">🛍️ Ver Vitrine</a>
+            </div>
+        </div>
+
+        <section class="kpi-grid" id="kpiGridAdmin"></section>
+
+        <section class="secao-admin">
+            <h3>🧾 Gerenciamento de Pedidos dos Clientes</h3>
+            <div style="overflow-x: auto;">
+                <table class="tabela-admin">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Data</th>
+                            <th>Itens</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPedidosAdmin"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="secao-admin">
+            <h3>➕ Adicionar Nova Figure ao Catálogo</h3>
+            <form id="formNovoProdutoAdmin" class="form-novo-produto">
+                <div class="campo">
+                    <label for="npNome">Nome da Figure:</label>
+                    <input type="text" id="npNome" placeholder="Ex: Roronoa Zoro" required>
+                </div>
+                <div class="campo">
+                    <label for="npCategoria">Anime / Categoria:</label>
+                    <select id="npCategoria">
+                        <option value="Bleach">Bleach</option>
+                        <option value="Attack on Titan">Attack on Titan</option>
+                        <option value="Jujutsu Kaisen">Jujutsu Kaisen</option>
+                        <option value="Pokémon">Pokémon</option>
+                        <option value="Diário de uma Apotecária">Diário de uma Apotecária</option>
+                        <option value="One Piece">One Piece</option>
+                        <option value="Demon Slayer">Demon Slayer</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="npPreco">Preço (R$):</label>
+                    <input type="number" id="npPreco" step="0.01" min="10" placeholder="Ex: 380.00" required>
+                </div>
+                <div class="campo">
+                    <label for="npEstoque">Estoque Inicial:</label>
+                    <input type="number" id="npEstoque" min="1" value="5" required>
+                </div>
+                <div class="campo">
+                    <label for="npImagem">Caminho da Imagem:</label>
+                    <select id="npImagem">
+                        <option value="imagens/bleach.png">Ichigo (bleach.png)</option>
+                        <option value="imagens/kisuke.png">Kisuke (kisuke.png)</option>
+                        <option value="imagens/Levi.png">Levi (Levi.png)</option>
+                        <option value="imagens/Canva - download.png">Gojo (Canva - download.png)</option>
+                        <option value="imagens/Snorlax.png">Snorlax (Snorlax.png)</option>
+                        <option value="imagens/produto.png">Padrão Loja (produto.png)</option>
+                    </select>
+                </div>
+                <div class="campo" style="grid-column: 1 / -1;">
+                    <label for="npDescricao">Descrição Detalhada:</label>
+                    <textarea id="npDescricao" placeholder="Escala 1/6, resina de alto padrão, base diorama..." required></textarea>
+                </div>
+                <div class="campo" style="grid-column: 1 / -1;">
+                    <button type="submit" class="sr-btn-primario">Cadastrar Figure na Loja</button>
+                </div>
+            </form>
+
+            <div class="lista-custom-produtos" id="listaCustomProdutos"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Copyright. Shadow Realm 2026. Todos os direitos reservados.</p>
+        <a href="#topo">Voltar ao topo</a>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const logado = localStorage.getItem('usuarioLogado') === 'true';
+            const tipo = localStorage.getItem('tipoUsuario');
+
+            if (!logado || tipo !== 'admin') {
+                srModal.alerta(
+                    'Acesso restrito! Apenas administradores logados podem acessar o painel.',
+                    '- Acesso Negado -',
+                    false,
+                    () => window.location.replace('loginAdmin.html')
+                );
+                return;
+            }
+
+            await window.promessaEstoqueSR;
+            renderizarPainelAdmin();
+
+            document.getElementById('formNovoProdutoAdmin').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nome = document.getElementById('npNome').value.trim();
+                const categoria = document.getElementById('npCategoria').value;
+                const preco = parseFloat(document.getElementById('npPreco').value);
+                const estoque = parseInt(document.getElementById('npEstoque').value, 10) || 1;
+                const imagem = document.getElementById('npImagem').value;
+                const descricao = document.getElementById('npDescricao').value.trim();
+
+                const custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
+                if (custom.some(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+                    srModal.alerta('Já existe um produto customizado com este nome!', '- Aviso -');
+                    return;
+                }
+
+                custom.push({
+                    id: 'custom_' + Date.now(),
+                    nome,
+                    preco,
+                    estoque,
+                    categoria,
+                    descricao,
+                    imagem
+                });
+
+                localStorage.setItem('produtosCustomShadowRealm', JSON.stringify(custom));
+                if (typeof definirEstoque === 'function') {
+                    definirEstoque(nome, estoque);
+                }
+
+                e.target.reset();
+                renderizarPainelAdmin();
+                srModal.alerta(`A figure <strong>${nome}</strong> foi adicionada ao catálogo da loja!`, '- Produto Cadastrado -', true);
+            });
+        });
+
+        async function renderizarPainelAdmin() {
+            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            const produtos = await carregarProdutosSR();
+            const custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
+            const todosProdutos = [...produtos, ...custom];
+
+            const faturamento = pedidos
+                .filter(p => p.status !== 'Pedido Cancelado')
+                .reduce((acc, p) => acc + (Number(p.total) || 0), 0);
+
+            const estoqueBaixo = todosProdutos.filter(p => obterEstoque(p.nome) <= 2).length;
+
+            document.getElementById('kpiGridAdmin').innerHTML = `
+                <div class="kpi-card">
+                    <small>💰 Faturamento Ativo</small>
+                    <strong>R$ ${faturamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                </div>
+                <div class="kpi-card">
+                    <small>📦 Total de Pedidos</small>
+                    <strong>${pedidos.length}</strong>
+                </div>
+                <div class="kpi-card">
+                    <small>🗿 Figures no Catálogo</small>
+                    <strong>${todosProdutos.length}</strong>
+                </div>
+                <div class="kpi-card">
+                    <small>⚠️ Estoque Baixo / Esgotado</small>
+                    <strong style="color: ${estoqueBaixo > 0 ? '#ff4d4d' : '#00e676'};">${estoqueBaixo} itens</strong>
+                </div>
+            `;
+
+            const tbody = document.getElementById('tabelaPedidosAdmin');
+            if (pedidos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#aaa;">Nenhum pedido registrado ainda.</td></tr>';
+            } else {
+                const statusOpcoes = [
+                    'Pedido Confirmado',
+                    'Em Separação no Estoque',
+                    'Em Trânsito',
+                    'Entregue',
+                    'Pedido Cancelado'
+                ];
+
+                tbody.innerHTML = pedidos.slice().reverse().map(ped => {
+                    const qtdItens = (ped.itens || []).reduce((s, i) => s + (i.quantidade || 1), 0);
+                    const opcoesHTML = statusOpcoes.map(st =>
+                        `<option value="${st}" ${ped.status === st ? 'selected' : ''}>${st}</option>`
+                    ).join('');
+
+                    return `
+                        <tr>
+                            <td><strong>#${ped.numeroPedido}</strong></td>
+                            <td>${ped.clienteEmail || 'Cliente'}</td>
+                            <td>${ped.data}</td>
+                            <td>${qtdItens} un.</td>
+                            <td style="color:#ffca28; font-weight:bold;">R$ ${Number(ped.total || 0).toFixed(2).replace('.', ',')}</td>
+                            <td>
+                                <select class="select-status-admin" onchange="alterarStatusPedidoAdmin(${ped.numeroPedido}, this.value)">
+                                    ${opcoesHTML}
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const listaCustom = document.getElementById('listaCustomProdutos');
+            if (custom.length === 0) {
+                listaCustom.innerHTML = '<small style="color:#888;">Nenhum produto extra cadastrado manualmente ainda.</small>';
+            } else {
+                listaCustom.innerHTML = custom.map((p, idx) => `
+                    <div class="chip-prod-custom">
+                        <span><strong>${p.nome}</strong> (${p.categoria}) - R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</span>
+                        <button type="button" class="sr-btn-secundario" style="padding:3px 10px; font-size:12px;" onclick="removerProdutoCustom(${idx})">Excluir</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.alterarStatusPedidoAdmin = function (numeroPedido, novoStatus) {
+            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            const alvo = pedidos.find(p => Number(p.numeroPedido) === Number(numeroPedido));
+            if (!alvo) return;
+
+            const statusAnterior = alvo.status;
+            alvo.status = novoStatus;
+
+            if (novoStatus === 'Pedido Cancelado' && statusAnterior !== 'Pedido Cancelado' && typeof devolverAoEstoque === 'function') {
+                devolverAoEstoque(alvo.itens || []);
+            }
+
+            localStorage.setItem('pedidosShadowRealm', JSON.stringify(pedidos));
+            renderizarPainelAdmin();
+            srModal.toast?.(`Status do Pedido #${numeroPedido} alterado para "${novoStatus}".`);
+        };
+
+        window.removerProdutoCustom = function (idx) {
+            srModal.confirmar('Remover esta figure customizada do catálogo?', () => {
+                const custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
+                custom.splice(idx, 1);
+                localStorage.setItem('produtosCustomShadowRealm', JSON.stringify(custom));
+                renderizarPainelAdmin();
+            });
+        };
+    </script>
+</body>
+
+</html>
