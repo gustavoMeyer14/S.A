@@ -9,6 +9,8 @@
     <title>Shadow Realm Store - Inicio</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js"></script>
+    <script src="admin.js" defer></script>
+    <script src="conta.js" defer></script>
     <script src="shopee.js" defer></script>
     <script src="vitrini.js" defer></script>
     <script src="estoque.js" defer></script>
@@ -16,6 +18,7 @@
     <script src="modais-globais.js"></script>
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
+    <script src="loja-turbo.js" defer></script>
 
     <style>
         .modalRastreio[open] {
@@ -127,22 +130,20 @@
         <h2> - Destaques - </h2>
 
         <div>
-            <img src="imagens/Levi.png" alt="Produto 1">
+            <img src="imagens/Levi.png" alt="Levi Ackerman">
             <p>Levi Ackerman</p>
-            <h3><strong>R$ 250,00</strong></h3>
+            <h3><strong>R\$ 250,00</strong></h3>
             <button type="button" id="card1">Ver mais</button>
         </div>
         <dialog id="modal-card1" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Levi.png" alt="Produto 1">
+                <img src="imagens/Levi.png" alt="Levi Ackerman">
                 <div class="modalProduto-texto">
                     <h2>- Levi Ackerman</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão da Tropa de Exploração.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
@@ -153,22 +154,20 @@
         </dialog>
 
         <div>
-            <img src="imagens/Maomao.png" alt="Produto 2">
+            <img src="imagens/Maomao.png" alt="Maomao">
             <p>Maomao</p>
-            <h3><strong>R$ 300,00</strong></h3>
+            <h3><strong>R\$ 300,00</strong></h3>
             <button type="button" id="card2">Ver mais</button>
         </div>
         <dialog id="modal-card2" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Maomao.png" alt="Produto 2">
+                <img src="imagens/Maomao.png" alt="Maomao">
                 <div class="modalProduto-texto">
                     <h2>- Maomao</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão com acessórios de boticária.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
@@ -179,48 +178,44 @@
         </dialog>
 
         <div>
-            <img src="imagens/Canva - download.png" alt="Produto 3">
+            <img src="imagens/Canva - download.png" alt="Satoru Gojo">
             <p>Satoru Gojo</p>
-            <h3><strong>R$ 200,00</strong></h3>
+            <h3><strong>R\$ 350,00</strong></h3>
             <button type="button" id="card3">Ver mais</button>
         </div>
         <dialog id="modal-card3" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download.png" alt="Produto 3">
+                <img src="imagens/Canva - download.png" alt="Satoru Gojo">
                 <div class="modalProduto-texto">
                     <h2>- Satoru Gojo</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão com efeito de Energia Amaldiçoada.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="200.00"
+                <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="350.00"
                     data-imagem="imagens/Canva - download.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Satoru Gojo" data-preco="200.00"
+                <button type="button" class="btn-comprar-agora" data-nome="Satoru Gojo" data-preco="350.00"
                     data-imagem="imagens/Canva - download.png">Comprar Agora</button>
             </footer>
         </dialog>
 
         <div>
-            <img src="imagens/Canva - download (1).png" alt="Produto 4">
+            <img src="imagens/Canva - download (1).png" alt="Greninja">
             <p>Greninja</p>
-            <h3><strong>R$ 400,00</strong></h3>
+            <h3><strong>R\$ 400,00</strong></h3>
             <button type="button" id="card4">Ver mais</button>
         </div>
         <dialog id="modal-card4" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download (1).png" alt="Produto 4">
+                <img src="imagens/Canva - download (1).png" alt="Greninja">
                 <div class="modalProduto-texto">
                     <h2>- Greninja</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina de alto padrão com Water Shurikens em destaque.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
@@ -231,22 +226,20 @@
         </dialog>
 
         <div>
-            <img src="imagens/Snorlax.png" alt="Produto 5">
+            <img src="imagens/Snorlax.png" alt="Snorlax">
             <p>Snorlax</p>
-            <h3><strong>R$ 450,00</strong></h3>
+            <h3><strong>R\$ 450,00</strong></h3>
             <button type="button" id="card5">Ver mais</button>
         </div>
         <dialog id="modal-card5" class="modalProduto">
             <div class="modalProduto-conteudo">
-                <img src="imagens/Snorlax.png" alt="Produto 5">
+                <img src="imagens/Snorlax.png" alt="Snorlax">
                 <div class="modalProduto-texto">
                     <h2>- Snorlax</h2>
-                    <p>Exemplo: llllllllllll</p>
+                    <p>Escala 1/6 em resina maciça de alto padrão com Poké Flauta e Berries.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
@@ -262,7 +255,7 @@
         <a href="#topo">Voltar ao topo</a>
     </footer>
 
-    <dialog id="modalAvisoLogin" style="width: 750px;">
+    <dialog id="modalAvisoLogin" style="width: 750px; max-width: 92vw;">
         <h2>Acesso Necessário</h2>
         <p>Você precisa estar logado ou cadastrado em sua conta para adicionar produtos ao carrinho.</p>
         <footer>
@@ -309,6 +302,15 @@
 
         if (btnFecharAviso && modalAvisoLogin) {
             btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+            modalAvisoLogin.addEventListener('click', (e) => {
+                const rect = modalAvisoLogin.getBoundingClientRect();
+                const clicouFora =
+                    e.clientX < rect.left ||
+                    e.clientX > rect.right ||
+                    e.clientY < rect.top ||
+                    e.clientY > rect.bottom;
+                if (clicouFora) modalAvisoLogin.close();
+            });
         }
 
         const modalAvisoCarrinho = document.getElementById('modalAvisoCarrinho');
@@ -420,50 +422,26 @@
             });
         });
 
-        async function conectarMeuJSON() {
-            try {
-                const resposta = await fetch('produtos.json');
-                const produtosJSON = await resposta.json();
+        // Pesquisa na Home redireciona para o catálogo filtrado
+        const btnPesquisaHome = document.getElementById('enviarPesquisa');
+        const inputPesquisaHome = document.getElementById('barraPesquisa');
 
-                const modais = document.querySelectorAll('.modalProduto');
-                modais.forEach(modal => {
-                    const titulo = modal.querySelector('h2').innerText.replace('-', '').trim();
-                    const dados = produtosJSON.find(p => p.nome.toLowerCase() === titulo.toLowerCase());
-
-                    if (dados) {
-                        const paragrafo = modal.querySelector('.modalProduto-conteudo p');
-                        if (paragrafo && paragrafo.innerText.includes('llllllllllll')) {
-                            paragrafo.innerText = dados.descricao;
-                        }
-                    }
-                });
-            } catch (erro) {
-                console.error('Erro ao ler o arquivo produtos.json:', erro);
-            }
+        function irParaCatalogoPesquisa() {
+            const termo = inputPesquisaHome ? inputPesquisaHome.value.trim() : '';
+            window.location.href = termo
+                ? `produtos.html?busca=${encodeURIComponent(termo)}`
+                : 'produtos.html';
         }
 
-        conectarMeuJSON();
-
-        const btnPesquisaIndex = document.getElementById('enviarPesquisa');
-        const inputPesquisaIndex = document.getElementById('barraPesquisa');
-
-        function irParaProdutos() {
-            const termo = inputPesquisaIndex.value.trim();
-
-            if (termo !== '') {
-                window.location.href = `produtos.html?busca=${encodeURIComponent(termo)}`;
-            } else {
-                window.location.href = 'produtos.html';
-            }
+        if (btnPesquisaHome) {
+            btnPesquisaHome.addEventListener('click', irParaCatalogoPesquisa);
         }
 
-        if (btnPesquisaIndex && inputPesquisaIndex) {
-            btnPesquisaIndex.addEventListener('click', irParaProdutos);
-
-            inputPesquisaIndex.addEventListener('keypress', function (e) {
+        if (inputPesquisaHome) {
+            inputPesquisaHome.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    irParaProdutos();
+                    irParaCatalogoPesquisa();
                 }
             });
         }
@@ -471,11 +449,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-

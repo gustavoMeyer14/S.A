@@ -116,18 +116,7 @@ async function validaCadastroAdmin() {
     }
 
     // Verifica duplicidade no localStorage e no admin.json
-    var administradoresLocais = lerAdministradores();
-    var administradoresJSON = [];
-
-    try {
-        var resp = await fetch("admin.json");
-
-        if (resp.ok) {
-            administradoresJSON = await resp.json();
-        }
-    } catch (e) { }
-
-    var todosAdmins = administradoresLocais.concat(administradoresJSON);
+    var todosAdmins = await obterTodosAdministradores();
 
     var jaExiste = todosAdmins.some(function (a) {
         return (a.email && a.email.toLowerCase() === email.toLowerCase()) ||
@@ -242,36 +231,8 @@ async function validaLoginAdmin() {
         return false;
     }
 
-    // Busca os administradores do arquivo admin.json
-    var administradoresJSON = [];
-
-    try {
-        var resposta = await fetch("admin.json");
-
-        if (resposta.ok) {
-            administradoresJSON = await resposta.json();
-        }
-
-    } catch (e) {
-        console.error("Erro ao ler admin.json:", e);
-    }
-
-    if (administradoresJSON.length === 0) {
-        administradoresJSON = [
-            {
-                id: "1",
-                nome: "Pedro Carvalho",
-                cpf: "",
-                email: "pedro_carvalho@gmail.com",
-                senha: "Pedro@1983",
-                admin: true
-            }
-        ];
-    }
-
-    // Junta os administradores do JSON com os salvos no localStorage
-    var administradoresLocais = lerAdministradores();
-    var todosAdmins = administradoresLocais.concat(administradoresJSON);
+    // Junta os administradores do JSON (incluindo edições salvas) com os do localStorage
+    var todosAdmins = await obterTodosAdministradores();
 
     administradorEncontrado = todosAdmins.find(function (a) {
         return a.email &&
@@ -331,7 +292,6 @@ async function obterTodosAdministradores() {
         ];
     }
 
-    // Se o admin do JSON já foi editado e salvo no localStorage, usa a versão atualizada
     var locais = lerAdministradores();
     var listaFinal = [];
 
@@ -405,7 +365,6 @@ async function renderizarPainelAdminsCadastrados(filtroTexto) {
         var ehUsuarioLogado = admin.email.toLowerCase() === usuarioAtual;
         var badgeTexto = admin.sistema ? "Principal" : (ehUsuarioLogado ? "Admin Atual" : "Administrador");
 
-        // O admin principal pode ser editado, mas não excluído
         var botaoRemoverHTML = admin.sistema
             ? ""
             : `<button type="button" class="btnAdminRemover" onclick="excluirAdminCrud('${admin.email}')">Remover</button>`;

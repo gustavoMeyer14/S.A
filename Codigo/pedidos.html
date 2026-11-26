@@ -1,134 +1,144 @@
-
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="Loja geek, figures, Shadow Realm Store">
+    <meta name="Keywords" content="Loja geek, figures, Shadow Realm Store, pedidos">
     <meta name="author" content="Shadow Realm">
     <title>Shadow Realm Store - Meus Pedidos</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js" defer></script>
+    <script src="admin.js" defer></script>
+    <script src="conta.js" defer></script>
     <script src="shopee.js" defer></script>
+    <script src="vitrini.js" defer></script>
     <script src="estoque.js" defer></script>
     <link rel="stylesheet" href="melhorias.css">
     <script src="modais-globais.js"></script>
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
+
     <style>
-        .container-pedidos {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 25px;
+        .pedidos-container {
+            max-width: 1100px;
+            width: 92%;
+            margin: 40px auto;
+            padding: 30px;
             background-color: #0d0d0d;
-            border: 2px solid #b82929;
-            border-radius: 15px;
-            color: #ffffff;
+            border: 2px solid #C62828;
+            border-radius: 20px;
+            min-height: 55vh;
         }
 
-        .container-pedidos h2 {
+        .pedidos-titulo {
             text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .pedido-card {
+            background-color: #1b1b1b;
+            border: 1px solid #C62828;
+            border-radius: 15px;
+            padding: 22px;
             margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
         }
 
-        .card-pedido {
-            background-color: #1f1f1f;
-            border: 1px solid #b82929;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .cabecalho-pedido {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .cabecalho-pedido > div,
-        .cabecalho-pedido > span {
-            margin: 0;
-        }
-
-        .status-pedido {
-            background-color: #28a745;
-            color: #ffffff;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .status-cancelado {
-            background-color: #6c757d;
-        }
-
-        .lista-itens-pedido {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 16px;
-            justify-items: center;
-            max-width: 720px;
-            margin: 20px auto;
-        }
-
-        .item-pedido {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 15px;
-            width: 100%;
-            max-width: 340px;
-            background-color: #161616;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 12px 15px;
-            margin: 0;
-        }
-
-        .item-pedido img {
-            width: 65px;
-            height: 65px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #c62828;
-            margin: 0;
-            flex-shrink: 0;
-        }
-
-        .item-pedido div {
-            text-align: left;
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        .item-pedido p {
-            margin: 0;
-        }
-
-        .rodape-pedido {
+        .pedido-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-            border-top: 1px solid #333;
-            padding-top: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .pedido-numero {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff4d4d;
+        }
+
+        .pedido-status {
+            background-color: #2e7d32;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .pedido-status.cancelado {
+            background-color: #8e1616;
+            color: #ffd6d6;
+        }
+
+        .pedido-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+            font-size: 15px;
+            color: #e0e0e0;
+        }
+
+        .pedido-itens-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             margin-top: 10px;
         }
 
-        .rodape-pedido > div {
-            margin: 0;
+        .pedido-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #121212;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .acoes-pedido {
+        .pedido-item-esquerda {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pedido-item-esquerda img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #C62828;
+        }
+
+        .pedido-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #333;
+        }
+
+        .pedido-total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .pedido-acoes {
+            display: flex;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
@@ -173,6 +183,29 @@
             box-shadow: 0 10px 25px #c62828;
         }
 
+        .sem-pedidos {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #1b1b1b;
+            border-radius: 15px;
+            border: 1px dashed #C62828;
+        }
+
+        .sem-pedidos p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .sem-pedidos a {
+            display: inline-block;
+            background-color: #b82929;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
         .modalRastreio[open] {
             position: fixed !important;
             top: 50% !important;
@@ -193,18 +226,31 @@
             background-color: rgba(0, 0, 0, 0.75);
         }
 
-        .etapa-rastreio {
-            border-left: 3px solid #b82929;
-            padding-left: 15px;
-            margin: 15px 0;
-            text-align: left;
-        }
-
         .acoes-modal-cancelar {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 25px;
+        }
+
+        .btn-confirmar-cancelamento {
+            background-color: #b82929;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-manter-pedido {
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -218,8 +264,10 @@
                 <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
                 <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
-                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img src="imagens/Usuario.png" alt="Usuário"></button>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"
+                        alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
+                        src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
     </header>
@@ -237,30 +285,27 @@
         </div>
     </div>
 
-    <main class="container-pedidos">
-        <section id="aba-pedidos">
-            <h2>- Meus Pedidos -</h2>
-            <div id="lista-pedidos-exclusiva"></div>
-        </section>
+    <main class="pedidos-container">
+        <h2 class="pedidos-titulo">- Meus Pedidos -</h2>
+        <div id="listaPedidos"></div>
     </main>
 
-    <dialog id="modal-rastreio" class="modalRastreio">
-        <h2 id="titulo-rastreio" class="titulo-rastreio">- Rastreamento -</h2>
-        <p id="codigo-rastreio" style="color: #bbb; font-size: 14px; margin-bottom: 15px;"></p>
-        <div id="etapas-rastreio"></div>
-        <div style="text-align: right; margin-top: 20px;">
-            <button type="button" class="btn-rastrear" onclick="document.getElementById('modal-rastreio').close()">Fechar</button>
+    <dialog id="modalRastreio" class="modalRastreio">
+        <h2 style="text-align: center; margin-bottom: 15px;">- Rastreio do Pedido -</h2>
+        <p id="textoRastreio" style="color: #ddd; font-size: 15px; line-height: 1.5; text-align: center;"></p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="button" id="fecharRastreio" class="btn-manter-pedido">Fechar</button>
         </div>
     </dialog>
 
-    <dialog id="modal-cancelar" class="modalRastreio">
+    <dialog id="modalCancelarPedido" class="modalRastreio">
         <h2 style="text-align: center; margin-bottom: 15px;">- Cancelar Pedido -</h2>
-        <p id="texto-modal-cancelar" style="color: #ddd; font-size: 15px; line-height: 1.5; text-align: center;">
-            Tem certeza que deseja cancelar este pedido? Essa ação não poderá ser desfeita.
+        <p id="textoCancelarPedido" style="color: #ddd; font-size: 15px; line-height: 1.5; text-align: center;">
+            Tem certeza de que deseja cancelar este pedido?
         </p>
         <div class="acoes-modal-cancelar">
-            <button type="button" id="btn-fechar-modal-cancelar" class="btn-cancelar-pedido">Voltar</button>
-            <button type="button" id="btn-confirmar-cancelamento" class="btn-rastrear">Sim, Cancelar</button>
+            <button type="button" id="btnConfirmarCancelamento" class="btn-confirmar-cancelamento">Sim, cancelar</button>
+            <button type="button" id="btnManterPedido" class="btn-manter-pedido">Manter pedido</button>
         </div>
     </dialog>
 
@@ -270,202 +315,227 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const listaPedidosEl = document.getElementById('lista-pedidos-exclusiva') || document.getElementById('lista-pedidos');
-            const modalCancelar = document.getElementById('modal-cancelar');
-            const textoModalCancelar = document.getElementById('texto-modal-cancelar');
-            const btnFecharModalCancelar = document.getElementById('btn-fechar-modal-cancelar');
-            const btnConfirmarCancelamento = document.getElementById('btn-confirmar-cancelamento');
+        let pedidoAlvoCancelamento = null;
 
-            let pedidoParaCancelar = null;
-
-            function obterUsuarioAtivo() {
-                const logadoOficial = localStorage.getItem('usuarioLogado') === 'true';
-                const emailOficial = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
-                const clienteLocal = JSON.parse(localStorage.getItem('clienteLogado') || 'null');
-
-                if (logadoOficial && (emailOficial || (clienteLocal && clienteLocal.cpf))) {
-                    return {
-                        email: emailOficial || ((clienteLocal && clienteLocal.email) || '').toLowerCase(),
-                        cpf: (clienteLocal && clienteLocal.cpf) || ''
-                    };
-                }
-
-                return null;
-            }
-
-            function pertenceAoUsuario(pedido, usuarioAtivo) {
-                if (!usuarioAtivo) return false;
-                const emailPedido = (pedido.clienteEmail || '').trim().toLowerCase();
-                const cpfPedido = (pedido.clienteCpf || '').trim();
-
-                if (emailPedido && usuarioAtivo.email && emailPedido === usuarioAtivo.email) {
-                    return true;
-                }
-                if (cpfPedido && usuarioAtivo.cpf && cpfPedido === usuarioAtivo.cpf) {
-                    return true;
-                }
-                if (!emailPedido && !cpfPedido) {
-                    return true;
-                }
-                return false;
-            }
-
-            function lerPedidos() {
-                try {
-                    const dados = JSON.parse(localStorage.getItem('pedidosShadowRealm'));
-                    return Array.isArray(dados) ? dados : [];
-                } catch (e) {
-                    return [];
-                }
-            }
-
-            function carregarPedidos() {
-                if (!listaPedidosEl) return;
-                const usuarioAtivo = obterUsuarioAtivo();
-
-                if (!usuarioAtivo) {
-                    listaPedidosEl.innerHTML = `<p style="text-align: center;">Você precisa <a href="cliente.html" style="color: #ff4d4d;">fazer login</a> para visualizar seus pedidos.</p>`;
-                    return;
-                }
-
-                const todosPedidos = lerPedidos();
-                let precisaSalvar = false;
-                todosPedidos.forEach((p, idx) => {
-                    if (!p.numeroPedido) {
-                        p.numeroPedido = 1000 + idx;
-                        precisaSalvar = true;
+        function exibirAvisoPedidos(mensagem, titulo = '- Meus Pedidos -', aoFechar = null) {
+            if (window.srModal && typeof window.srModal.alerta === 'function') {
+                window.srModal.alerta(mensagem, titulo);
+                if (typeof aoFechar === 'function') {
+                    const btnOk = document.getElementById('sr-btn-ok');
+                    const dialog = document.getElementById('sr-modal-global');
+                    if (btnOk) {
+                        btnOk.addEventListener('click', aoFechar, { once: true });
+                    } else if (dialog) {
+                        dialog.addEventListener('close', aoFechar, { once: true });
                     }
-                });
-                if (precisaSalvar) {
-                    localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
                 }
+            } else if (typeof aoFechar === 'function') {
+                aoFechar();
+            }
+        }
 
-                const meusPedidos = todosPedidos.filter(p => pertenceAoUsuario(p, usuarioAtivo));
+        function confirmarAcaoPedidos(mensagem, aoConfirmar, titulo = '- Confirmação -') {
+            if (window.srModal && typeof window.srModal.confirmar === 'function') {
+                window.srModal.confirmar(mensagem, aoConfirmar, titulo);
+            } else if (typeof aoConfirmar === 'function') {
+                aoConfirmar();
+            }
+        }
 
-                if (meusPedidos.length === 0) {
-                    listaPedidosEl.innerHTML = `<p style="text-align: center;">Você ainda não realizou nenhum pedido.</p>`;
-                    return;
-                }
+        function renderizarPedidos() {
+            const container = document.getElementById('listaPedidos');
+            if (!container) return;
 
-                listaPedidosEl.innerHTML = '';
+            const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+            const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
 
-                meusPedidos.slice().reverse().forEach((pedido) => {
-                    const numPedido = pedido.numeroPedido;
-                    const statusAtual = pedido.status || 'Pedido Confirmado';
-                    const totalPedido = typeof pedido.total === 'number'
-                        ? pedido.total
-                        : (pedido.itens || []).reduce((s, i) => s + (i.preco * i.quantidade), 0);
+            if (!estaLogado || !usuarioAtual) {
+                container.innerHTML = `
+                    <div class="sem-pedidos">
+                        <p>Você precisa estar logado para visualizar seus pedidos.</p>
+                        <a href="cliente.html">Fazer Login</a>
+                    </div>
+                `;
+                return;
+            }
 
-                    const estaCancelado = statusAtual === 'Pedido Cancelado';
-                    const classeStatus = estaCancelado ? 'status-pedido status-cancelado' : 'status-pedido';
+            let todosPedidos = [];
+            try {
+                todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            } catch {
+                todosPedidos = [];
+            }
 
-                    const itensHTML = (pedido.itens || []).map(item => `
-                        <div class="item-pedido">
-                            <img src="${item.imagem || 'imagens/produto.png'}" alt="${item.nome}">
-                            <div>
-                                <p><strong>${item.nome}</strong></p>
-                                <p style="font-size: 14px; color: #ccc;">Qtd: ${item.quantidade} | R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</p>
-                            </div>
-                        </div>
-                    `).join('');
+            const pedidosUsuario = todosPedidos.filter(
+                p => (p.clienteEmail || '').trim().toLowerCase() === usuarioAtual
+            );
 
-                    const botoesHTML = estaCancelado
-                        ? '<span style="color: #999; font-size: 14px;">Este pedido foi cancelado.</span>'
-                        : `
-                            <button type="button" class="btn-rastrear" data-acao="rastrear" data-num="${numPedido}" data-data="${pedido.data}">Rastrear Entrega</button>
-                            <button type="button" class="btn-cancelar-pedido" data-acao="cancelar" data-num="${numPedido}">Cancelar Pedido</button>
-                          `;
+            if (pedidosUsuario.length === 0) {
+                container.innerHTML = `
+                    <div class="sem-pedidos">
+                        <p>Você ainda não realizou nenhum pedido na Shadow Realm Store.</p>
+                        <a href="produtos.html">Explorar Produtos</a>
+                    </div>
+                `;
+                return;
+            }
 
-                    listaPedidosEl.innerHTML += `
-                        <div class="card-pedido" id="card-pedido-${numPedido}">
-                            <div class="cabecalho-pedido">
+            container.innerHTML = '';
+
+            [...pedidosUsuario].reverse().forEach((pedido) => {
+                const itensHTML = (pedido.itens || []).map(item => {
+                    const subtotal = (Number(item.preco) || 0) * (Number(item.quantidade) || 1);
+                    return `
+                        <div class="pedido-item-row">
+                            <div class="pedido-item-esquerda">
+                                <img src="${item.imagem || 'imagens/logo.png'}" alt="${item.nome}">
                                 <div>
-                                    <strong>Pedido #${numPedido}</strong>
-                                    <p style="font-size: 13px; color: #bbb;">Data: ${pedido.data} | Pagamento: ${pedido.cartaoUsado || 'Pix / Cartão'}</p>
+                                    <strong>${item.nome}</strong><br>
+                                    <small>Quantidade: ${item.quantidade} × R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</small>
                                 </div>
-                                <span class="${classeStatus}">${statusAtual}</span>
                             </div>
-                            <div class="lista-itens-pedido">
-                                ${itensHTML}
-                            </div>
-                            <div class="rodape-pedido">
-                                <div class="acoes-pedido">
-                                    ${botoesHTML}
-                                </div>
-                                <div style="font-size: 18px;">
-                                    Total: <strong>R$ ${totalPedido.toFixed(2).replace('.', ',')}</strong>
-                                </div>
+                            <div>
+                                <strong>R$ ${subtotal.toFixed(2).replace('.', ',')}</strong>
                             </div>
                         </div>
                     `;
+                }).join('');
+
+                const estaCancelado = pedido.status === 'Cancelado';
+                const classeStatus = estaCancelado ? 'pedido-status cancelado' : 'pedido-status';
+
+                const card = document.createElement('article');
+                card.className = 'pedido-card';
+                card.innerHTML = `
+                    <div class="pedido-header">
+                        <span class="pedido-numero">Pedido #${pedido.numeroPedido}</span>
+                        <span class="${classeStatus}">${pedido.status || 'Pedido Confirmado'}</span>
+                    </div>
+
+                    <div class="pedido-info-grid">
+                        <div><strong>Data:</strong> ${pedido.data || '-'}</div>
+                        <div><strong>Pagamento:</strong> ${pedido.cartaoUsado || '-'}</div>
+                        <div><strong>Endereço:</strong> ${pedido.enderecoEntrega || '-'}</div>
+                    </div>
+
+                    <div class="pedido-itens-lista">
+                        ${itensHTML}
+                    </div>
+
+                    <div class="pedido-footer">
+                        <span class="pedido-total">Total: R$ ${Number(pedido.total || 0).toFixed(2).replace('.', ',')}</span>
+                        <div class="pedido-acoes">
+                            <button type="button" class="btn-rastrear" onclick="rastrearPedido(${pedido.numeroPedido})">Rastrear Pedido</button>
+                            ${!estaCancelado ? `<button type="button" class="btn-cancelar-pedido" onclick="abrirModalCancelarPedido(${pedido.numeroPedido})">Cancelar Pedido</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function rastrearPedido(numeroPedido) {
+            const modal = document.getElementById('modalRastreio');
+            const texto = document.getElementById('textoRastreio');
+            let todosPedidos = [];
+            try {
+                todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            } catch {}
+
+            const pedido = todosPedidos.find(p => Number(p.numeroPedido) === Number(numeroPedido));
+
+            if (!pedido) return;
+
+            if (pedido.status === 'Cancelado') {
+                texto.innerHTML = `O pedido <strong>#${pedido.numeroPedido}</strong> foi cancelado e o envio não será realizado.`;
+            } else {
+                texto.innerHTML = `
+                    Pedido <strong>#${pedido.numeroPedido}</strong><br>
+                    Status atual: <strong>${pedido.status || 'Pedido Confirmado'}</strong><br>
+                    Destino: <strong>${pedido.enderecoEntrega || 'Endereço cadastrado'}</strong><br>
+                    Previsão de entrega: <strong>5 a 8 dias úteis</strong>.
+                `;
+            }
+
+            if (modal && typeof modal.showModal === 'function') {
+                modal.showModal();
+            }
+        }
+
+        function abrirModalCancelarPedido(numeroPedido) {
+            pedidoAlvoCancelamento = numeroPedido;
+            const modal = document.getElementById('modalCancelarPedido');
+            const texto = document.getElementById('textoCancelarPedido');
+            if (texto) {
+                texto.innerHTML = `Tem certeza de que deseja cancelar o pedido <strong>#${numeroPedido}</strong>?`;
+            }
+            if (modal && typeof modal.showModal === 'function') {
+                modal.showModal();
+            }
+        }
+
+        function executarCancelamentoPedido() {
+            if (pedidoAlvoCancelamento === null) return;
+
+            let todosPedidos = [];
+            try {
+                todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            } catch {}
+
+            const indice = todosPedidos.findIndex(p => Number(p.numeroPedido) === Number(pedidoAlvoCancelamento));
+            if (indice !== -1 && todosPedidos[indice].status !== 'Cancelado') {
+                todosPedidos[indice].status = 'Cancelado';
+                localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
+
+                if (typeof obterEstoque === 'function' && typeof definirEstoque === 'function' && Array.isArray(todosPedidos[indice].itens)) {
+                    todosPedidos[indice].itens.forEach(item => {
+                        const atual = obterEstoque(item.nome);
+                        definirEstoque(item.nome, atual + (Number(item.quantidade) || 1));
+                    });
+                }
+            }
+
+            const modal = document.getElementById('modalCancelarPedido');
+            if (modal && modal.open) modal.close();
+            pedidoAlvoCancelamento = null;
+            renderizarPedidos();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarPedidos();
+
+            const btnFecharRastreio = document.getElementById('fecharRastreio');
+            const modalRastreio = document.getElementById('modalRastreio');
+            if (btnFecharRastreio && modalRastreio) {
+                btnFecharRastreio.addEventListener('click', () => modalRastreio.close());
+                modalRastreio.addEventListener('click', (e) => {
+                    const rect = modalRastreio.getBoundingClientRect();
+                    if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+                        modalRastreio.close();
+                    }
                 });
             }
 
-            document.addEventListener('click', (e) => {
-                const botao = e.target.closest('button[data-acao]');
-                if (!botao) return;
+            const btnConfirmarCancelamento = document.getElementById('btnConfirmarCancelamento');
+            const btnManterPedido = document.getElementById('btnManterPedido');
+            const modalCancelarPedido = document.getElementById('modalCancelarPedido');
 
-                e.preventDefault();
-                e.stopImmediatePropagation();
+            if (btnConfirmarCancelamento) {
+                btnConfirmarCancelamento.addEventListener('click', () => {
+                    confirmarAcaoPedidos(
+                        `Confirmar o cancelamento definitivo do pedido <strong>#${pedidoAlvoCancelamento}</strong>?`,
+                        executarCancelamentoPedido,
+                        '- Confirmar Cancelamento -'
+                    );
+                });
+            }
 
-                const acao = botao.getAttribute('data-acao');
-                const numPedido = botao.getAttribute('data-num');
-
-                if (acao === 'rastrear') {
-                    const dataPedido = botao.getAttribute('data-data');
-                    document.getElementById('titulo-rastreio').innerText = `- Pedido #${numPedido} -`;
-                    document.getElementById('codigo-rastreio').innerText = `Código de rastreio: SR${numPedido}BR`;
-
-                    document.getElementById('etapas-rastreio').innerHTML = `
-                        <div class="etapa-rastreio">
-                            <p><strong>Pedido Confirmado</strong></p>
-                            <p style="font-size: 13px; color: #bbb;">${dataPedido} - Pagamento aprovado.</p>
-                        </div>
-                        <div class="etapa-rastreio">
-                            <p><strong>Em Separação no Estoque</strong></p>
-                            <p style="font-size: 13px; color: #bbb;">${dataPedido} - Suas figures estão sendo embaladas com proteção.</p>
-                        </div>
-                        <div class="etapa-rastreio" style="border-left-color: #555;">
-                            <p style="color: #888;"><strong>Em Trânsito</strong></p>
-                            <p style="font-size: 13px; color: #888;">Aguardando coleta da transportadora.</p>
-                        </div>
-                    `;
-                    document.getElementById('modal-rastreio').showModal();
-                }
-
-                if (acao === 'cancelar') {
-                    pedidoParaCancelar = numPedido;
-                    textoModalCancelar.innerHTML = `Tem certeza que deseja cancelar o <strong>Pedido #${numPedido}</strong>?<br>Essa ação não poderá ser desfeita.`;
-                    modalCancelar.showModal();
-                }
-            }, true);
-
-            btnFecharModalCancelar.addEventListener('click', () => {
-                pedidoParaCancelar = null;
-                modalCancelar.close();
-            });
-
-            btnConfirmarCancelamento.addEventListener('click', () => {
-                if (!pedidoParaCancelar) return;
-
-                const todosPedidos = lerPedidos();
-                const alvo = todosPedidos.find(p => String(p.numeroPedido) === String(pedidoParaCancelar));
-
-                if (alvo) {
-                    alvo.status = 'Pedido Cancelado';
-                    if (typeof devolverAoEstoque === 'function' && alvo.itens) {
-                        devolverAoEstoque(alvo.itens);
-                    }
-                    localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
-                }
-
-                modalCancelar.close();
-                pedidoParaCancelar = null;
-                carregarPedidos();
-            });
-
-            carregarPedidos();
+            if (btnManterPedido && modalCancelarPedido) {
+                btnManterPedido.addEventListener('click', () => {
+                    pedidoAlvoCancelamento = null;
+                    modalCancelarPedido.close();
+                });
+            }
         });
     </script>
 </body>
