@@ -2,6 +2,16 @@
 // CARRINHO TURBO - SHADOW REALM STORE
 // =========================================================
 
+const CONFIG_CARRINHO_SR = {
+    chaveCarrinho: 'carrinhoShadowRealm',
+    chaveEstoque: 'estoqueShadowRealm',
+    limiteFreteGratis: 250,
+    valorFretePadrao: 25,
+    maxParcelas: 12,
+    maxSugestoes: 4,
+    codigoPix: '00020126580014BR.GOV.BCB.PIX0128shadowrealmstore@pix.com5204000053039865802BR5918SHADOW REALM STORE6009JOINVILLE62070503***6304SR26'
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const productsList = document.getElementById('products-list');
     if (!productsList) return;
@@ -25,9 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(priceBreakdown, { childList: true, subtree: true });
     }
 
-    atualizarBarraFrete();
-    atualizarParcelasCheckout();
+    reRenderizarCarrinhoSemReload();
 });
+
+function formatarMoedaSR(valor) {
+    return (Number(valor) || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
 
 function injetarEstilosCarrinhoTurbo() {
     if (document.getElementById('estilos-carrinho-turbo')) return;
@@ -191,7 +207,7 @@ function injetarEstilosCarrinhoTurbo() {
 
 function lerCarrinhoTurbo() {
     try {
-        const dados = JSON.parse(localStorage.getItem('carrinhoShadowRealm'));
+        const dados = JSON.parse(localStorage.getItem(CONFIG_CARRINHO_SR.chaveCarrinho));
         return Array.isArray(dados) ? dados : [];
     } catch {
         return [];
@@ -199,7 +215,7 @@ function lerCarrinhoTurbo() {
 }
 
 function salvarCarrinhoTurbo(carrinho) {
-    localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+    localStorage.setItem(CONFIG_CARRINHO_SR.chaveCarrinho, JSON.stringify(carrinho));
 }
 
 function obterEstoqueTurbo(nomeProduto) {
@@ -207,7 +223,7 @@ function obterEstoqueTurbo(nomeProduto) {
         return obterEstoque(nomeProduto);
     }
     try {
-        const est = JSON.parse(localStorage.getItem('estoqueShadowRealm'));
+        const est = JSON.parse(localStorage.getItem(CONFIG_CARRINHO_SR.chaveEstoque));
         if (est && est[nomeProduto] !== undefined) {
             return Number(est[nomeProduto]);
         }
@@ -240,16 +256,16 @@ function reRenderizarCarrinhoSemReload() {
                     </div>
                     <div style="flex:1; margin-left: 20px;">
                         <h3 class="product-name" style="margin-left:0;">${item.nome}</h3>
-                        <small style="color:#ffca28;">R$ ${subtotalItem.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
+                        <small style="color:#ffca28;">R$ ${formatarMoedaSR(subtotalItem)}</small>
                         ${temLimite ? `<small style="display:block; margin-top:4px; font-size:12px; color:${atingiuLimite ? '#ff4d4d' : '#aaa'};">Disponível em estoque: ${disponivel} un.</small>` : ''}
                     </div>
                     <div class="quantity-controls">
-                        <button type="button" class="btn-plus" onclick="alterarQuantidade(${index}, 1)"
+                        <button type="button" class="btn-plus" data-index="${index}" data-delta="1"
                             ${atingiuLimite ? 'disabled style="opacity:0.35; cursor:not-allowed;" title="Limite máximo de estoque atingido"' : ''}>+</button>
                         <span class="qty-value">${item.quantidade}</span>
-                        <button type="button" class="btn-minus" onclick="alterarQuantidade(${index}, -1)">-</button>
+                        <button type="button" class="btn-minus" data-index="${index}" data-delta="-1">-</button>
                     </div>
-                    <button type="button" class="btn-remove" onclick="removerProduto(${index})" title="Remover item" aria-label="Remover ${item.nome}">
+                    <button type="button" class="btn-remove" data-index="${index}" title="Remover item" aria-label="Remover ${item.nome}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -263,7 +279,7 @@ function reRenderizarCarrinhoSemReload() {
 
     if (priceBreakdown) {
         const subtotal = carrinho.reduce((acc, item) => acc + ((Number(item.preco) || 0) * (Number(item.quantidade) || 0)), 0);
-        const frete = subtotal === 0 ? 0 : (subtotal >= 250 ? 0 : 25);
+        const frete = subtotal === 0 ? 0 : (subtotal >= CONFIG_CARRINHO_SR.limiteFreteGratis ? 0 : CONFIG_CARRINHO_SR.valorFretePadrao);
         const totalFinal = subtotal + frete;
 
         let html = '';
@@ -273,19 +289,19 @@ function reRenderizarCarrinhoSemReload() {
             carrinho.forEach((item, idx) => {
                 const prefixo = idx === 0 ? '' : '+ ';
                 const sub = (Number(item.preco) || 0) * (Number(item.quantidade) || 0);
-                html += `<p class="price-item">${prefixo}R$ ${sub.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`;
+                html += `<p class="price-item">${prefixo}R$ ${formatarMoedaSR(sub)}</p>`;
             });
             html += frete === 0
                 ? '<p class="price-item" style="color: #00e676;">Frete: GRÁTIS (R$ 0,00)</p>'
-                : '<p class="price-item" style="color: #ffca28;">Frete: + R$ 25,00</p>';
+                : `<p class="price-item" style="color: #ffca28;">Frete: + R$ ${formatarMoedaSR(frete)}</p>`;
         }
 
         html += '<hr class="summary-divider">';
-        html += `<p class="total-final">Valor Total: <span>R$ ${totalFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>`;
+        html += `<p class="total-final">Valor Total: <span>R$ ${formatarMoedaSR(totalFinal)}</span></p>`;
         priceBreakdown.innerHTML = html;
 
         if (modalTotalValue) {
-            modalTotalValue.textContent = `Valor Total: R$ ${totalFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            modalTotalValue.textContent = `Valor Total: R$ ${formatarMoedaSR(totalFinal)}`;
         }
     }
 
@@ -337,14 +353,14 @@ function atualizarBarraFrete() {
     }
 
     box.style.display = 'block';
-    const perc = Math.min(100, (subtotal / 250) * 100);
+    const perc = Math.min(100, (subtotal / CONFIG_CARRINHO_SR.limiteFreteGratis) * 100);
     fill.style.width = `${perc}%`;
 
-    if (subtotal >= 250) {
+    if (subtotal >= CONFIG_CARRINHO_SR.limiteFreteGratis) {
         texto.style.color = '#00e676';
         texto.innerHTML = '🚚 <strong>Parabéns!</strong> Você desbloqueou <strong>Frete Grátis</strong>!';
     } else {
-        const falta = (250 - subtotal).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const falta = formatarMoedaSR(CONFIG_CARRINHO_SR.limiteFreteGratis - subtotal);
         texto.style.color = '#ffca28';
         texto.innerHTML = `🚚 Falta <strong>R$ ${falta}</strong> para ganhar <strong>Frete Grátis</strong>!`;
     }
@@ -360,7 +376,8 @@ function injetarBotaoLimparCarrinho() {
     btn.className = 'btn-limpar-carrinho-sr';
     btn.textContent = '🗑️ Esvaziar Carrinho';
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
         const carrinho = lerCarrinhoTurbo();
         if (carrinho.length === 0) {
             window.srModal?.alerta('Seu carrinho já está vazio!', '- Carrinho -');
@@ -368,8 +385,9 @@ function injetarBotaoLimparCarrinho() {
         }
 
         const executarLimpeza = () => {
-            localStorage.removeItem('carrinhoShadowRealm');
+            localStorage.removeItem(CONFIG_CARRINHO_SR.chaveCarrinho);
             reRenderizarCarrinhoSemReload();
+            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
         };
 
         if (window.srModal) {
@@ -396,7 +414,7 @@ function injetarExtrasPagamento() {
         const boxPix = document.createElement('div');
         boxPix.id = 'sr-box-pix';
         boxPix.className = 'sr-box-extra-pag';
-        const codigoPix = '00020126580014BR.GOV.BCB.PIX0128shadowrealmstore@pix.com5204000053039865802BR5918SHADOW REALM STORE6009JOINVILLE62070503***6304SR26';
+        const codigoPix = CONFIG_CARRINHO_SR.codigoPix;
         boxPix.innerHTML = `
             <strong style="color:#00e676;">⚡ Pagamento instantâneo via Pix</strong>
             <p style="font-size:12px; color:#bbb; margin-top:4px;">Aprovação imediata! Copie o código abaixo se quiser simular o pagamento:</p>
@@ -408,7 +426,7 @@ function injetarExtrasPagamento() {
         fieldset.appendChild(boxPix);
 
         document.getElementById('sr-btn-copiar-pix')?.addEventListener('click', (e) => {
-            navigator.clipboard?.writeText(codigoPix);
+            navigator.clipboard?.writeText(codigoPix).catch(() => {});
             e.target.textContent = 'Copiado ✔';
             e.target.style.backgroundColor = '#28a745';
             setTimeout(() => {
@@ -457,9 +475,8 @@ function atualizarParcelasCheckout() {
     }
 
     let opcoes = '';
-    for (let i = 1; i <= 12; i++) {
-        const valorParcela = (total / i).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        opcoes += `<option value="${i}x">${i}x de R$ ${valorParcela} sem juros</option>`;
+    for (let i = 1; i <= CONFIG_CARRINHO_SR.maxParcelas; i++) {
+        opcoes += `<option value="${i}x">${i}x de R$ ${formatarMoedaSR(total / i)} sem juros</option>`;
     }
     select.innerHTML = opcoes;
 }
@@ -469,12 +486,20 @@ async function injetarSugestoesProdutos() {
     if (!mainCart || document.getElementById('sr-sugestoes-carrinho')) return;
 
     try {
-        const produtos = typeof carregarProdutosSR === 'function' ? await carregarProdutosSR() : [];
+        let produtos = [];
+        if (typeof carregarProdutosSR === 'function') {
+            produtos = await carregarProdutosSR();
+        } else {
+            const resp = await fetch('produtos.json');
+            if (resp.ok) produtos = await resp.json();
+        }
         if (!Array.isArray(produtos)) return;
 
         const carrinho = lerCarrinhoTurbo();
         const nomesNoCarrinho = carrinho.map((i) => String(i.nome || '').toLowerCase());
-        const sugeridos = produtos.filter((p) => !nomesNoCarrinho.includes(String(p.nome || '').toLowerCase())).slice(0, 4);
+        const sugeridos = produtos
+            .filter((p) => !nomesNoCarrinho.includes(String(p.nome || '').toLowerCase()))
+            .slice(0, CONFIG_CARRINHO_SR.maxSugestoes);
 
         if (sugeridos.length === 0) return;
 
@@ -488,7 +513,7 @@ async function injetarSugestoesProdutos() {
                     <div class="sr-sugestao-card">
                         <img src="${p.imagem}" alt="${p.nome}">
                         <strong>${p.nome}</strong>
-                        <span>R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</span>
+                        <span>R$ ${formatarMoedaSR(p.preco)}</span>
                         <button type="button" class="btn-add-sugestao" data-nome="${p.nome}" data-preco="${p.preco}" data-imagem="${p.imagem}">
                             + Adicionar
                         </button>
@@ -500,7 +525,8 @@ async function injetarSugestoesProdutos() {
         mainCart.insertAdjacentElement('afterend', secao);
 
         secao.querySelectorAll('.btn-add-sugestao').forEach((btn) => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 const nome = btn.getAttribute('data-nome');
                 const preco = parseFloat(btn.getAttribute('data-preco')) || 0;
                 const imagem = btn.getAttribute('data-imagem') || 'imagens/logo.png';
@@ -532,6 +558,8 @@ async function injetarSugestoesProdutos() {
 }
 
 function configurarAcoesCarrinhoSemReload() {
+    const productsList = document.getElementById('products-list');
+
     window.alterarQuantidade = function (index, delta) {
         const carrinho = lerCarrinhoTurbo();
         if (!carrinho[index]) return;
@@ -566,4 +594,31 @@ function configurarAcoesCarrinhoSemReload() {
         reRenderizarCarrinhoSemReload();
         if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
     };
+
+    if (productsList && productsList.dataset.turboDelegacaoAtiva !== 'true') {
+        productsList.dataset.turboDelegacaoAtiva = 'true';
+        productsList.addEventListener('click', (e) => {
+            const btnQtd = e.target.closest('.btn-plus, .btn-minus');
+            if (btnQtd) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const idx = parseInt(btnQtd.getAttribute('data-index'), 10);
+                const delta = parseInt(btnQtd.getAttribute('data-delta'), 10);
+                if (!Number.isNaN(idx) && !Number.isNaN(delta)) {
+                    window.alterarQuantidade(idx, delta);
+                }
+                return;
+            }
+
+            const btnRem = e.target.closest('.btn-remove');
+            if (btnRem) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                const idx = parseInt(btnRem.getAttribute('data-index'), 10);
+                if (!Number.isNaN(idx)) {
+                    window.removerProduto(idx);
+                }
+            }
+        }, true);
+    }
 }

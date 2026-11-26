@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shadow Realm Store - Gerenciar Estoque</title>
+    <title>Shadow Realm Store - Gerenciar Produtos e Estoque</title>
     <link rel="stylesheet" href="site.css">
     <script src="site.js" defer></script>
     <script src="admin.js" defer></script>
@@ -16,13 +16,20 @@
     <script src="extras-loja.js" defer></script>
     <style>
         .painel-estoque {
-            max-width: 1000px;
-            width: 92%;
+            width: 94%;
+            max-width: 1280px;
             margin: 40px auto;
-            padding: 30px;
-            background-color: #0d0d0d;
+            padding: 32px;
+            background-color: #000000;
             border: 2px solid #C62828;
-            border-radius: 20px;
+            border-radius: 25px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
+            text-align: left;
+        }
+
+        .painel-estoque * {
+            margin: 0;
+            box-sizing: border-box;
         }
 
         .topo-estoque {
@@ -30,51 +37,287 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 16px;
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #C62828;
+        }
+
+        .topo-estoque h2 {
+            font-size: 30px;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .topo-acoes {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-produto-box {
+            background-color: #1b1b1b;
+            border: 1px solid #C62828;
+            border-radius: 20px;
+            padding: 26px;
+            margin-bottom: 34px;
+        }
+
+        .form-produto-box h3 {
+            color: #ffca28;
+            margin-bottom: 20px;
+            font-size: 22px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(198, 40, 40, 0.45);
+        }
+
+        .grid-form-produto {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px 22px;
+        }
+
+        .campo-prod {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .campo-prod.full {
+            grid-column: 1 / -1;
+        }
+
+        .campo-prod label {
+            font-weight: bold;
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+
+        .campo-prod input[type="text"],
+        .campo-prod input[type="number"],
+        .campo-prod textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            background-color: #121212;
+            border: 1px solid #C62828;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .campo-prod input[type="text"]:focus,
+        .campo-prod input[type="number"]:focus,
+        .campo-prod textarea:focus {
+            border-color: #ffca28;
+            box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.25);
+        }
+
+        .campo-prod textarea {
+            min-height: 95px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.45;
+        }
+
+        .upload-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background-color: #121212;
+            border: 1px dashed #C62828;
+            border-radius: 14px;
+            padding: 10px 14px;
+        }
+
+        .upload-wrapper input[type="file"] {
+            flex: 1;
+            color: #cccccc;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .upload-wrapper input[type="file"]::file-selector-button {
+            background-color: #C62828;
+            color: #ffffff;
+            border: 1px solid #C62828;
+            border-radius: 10px;
+            padding: 7px 14px;
+            margin-right: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .upload-wrapper input[type="file"]::file-selector-button:hover {
+            background-color: #151515;
+            box-shadow: 0 4px 12px rgba(198, 40, 40, 0.5);
+        }
+
+        .preview-img-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .preview-img-box img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #C62828;
+            background: #000;
+        }
+
+        .checkbox-destaque-linha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background-color: #121212;
+            border: 1px solid #333;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .checkbox-destaque-linha input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #C62828;
+            cursor: pointer;
+        }
+
+        .checkbox-destaque-linha label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        .acoes-form-prod {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .btn-sr-vermelho,
+        .btn-reset {
+            background-color: #C62828;
+            color: #ffffff;
+            border: 1px solid #C62828;
+            border-radius: 20px;
+            padding: 11px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn-sr-vermelho:hover,
+        .btn-reset:hover {
+            background-color: #151515;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(198, 40, 40, 0.55);
+        }
+
+        .btn-sr-escuro {
+            background-color: #151515;
+            color: #ffffff;
+            border: 1px solid #C62828;
+            border-radius: 20px;
+            padding: 11px 22px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn-sr-escuro:hover {
+            background-color: #C62828;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(198, 40, 40, 0.55);
+        }
+
+        .secao-tabela-titulo {
+            font-size: 22px;
+            color: #ffffff;
+            margin-bottom: 16px;
         }
 
         .tabela-estoque-wrapper {
             width: 100%;
             overflow-x: auto;
-            border-radius: 12px;
+            border-radius: 16px;
+            border: 1px solid #C62828;
         }
 
         .tabela-estoque {
             width: 100%;
-            min-width: 620px;
+            min-width: 820px;
             border-collapse: collapse;
             background-color: #1b1b1b;
-            border-radius: 12px;
-            overflow: hidden;
         }
 
         .tabela-estoque th,
         .tabela-estoque td {
             padding: 14px 16px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #2e2e2e;
             text-align: left;
+            vertical-align: middle;
+        }
+
+        .tabela-estoque tbody tr:hover {
+            background-color: #242424;
+        }
+
+        .tabela-estoque tbody tr:last-child td {
+            border-bottom: none;
         }
 
         .tabela-estoque th {
             background-color: #C62828;
-            color: #fff;
+            color: #ffffff;
+            font-size: 15px;
+            white-space: nowrap;
         }
 
         .tabela-estoque img {
-            width: 55px;
-            height: 55px;
+            width: 60px;
+            height: 60px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #C62828;
+            display: block;
+        }
+
+        .preco-destaque-tabela {
+            color: #ffca28;
+            font-weight: bold;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        .desc-curta {
+            max-width: 260px;
+            font-size: 13px;
+            color: #cccccc;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .status-tag {
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
             display: inline-block;
+            padding: 5px 11px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 12px;
+            white-space: nowrap;
         }
 
         .status-ok {
@@ -98,7 +341,7 @@
         .controles-qtd {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-est {
@@ -106,32 +349,76 @@
             height: 34px;
             border-radius: 50%;
             border: 1px solid #C62828;
-            background: #262626;
-            color: #fff;
+            background: #151515;
+            color: #ffffff;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: 0.2s;
         }
 
         .btn-est:hover {
             background: #C62828;
+            transform: scale(1.1);
         }
 
-        .btn-reset {
-            background: #C62828;
-            color: #fff;
+        .acoes-linha-prod {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-editar-prod {
+            background-color: #ffca28;
+            color: #111111;
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            border-radius: 10px;
+            padding: 7px 12px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
         }
 
-        .btn-reset:hover {
-            background: #151515;
-            outline: 1px solid #C62828;
+        .btn-editar-prod:hover {
+            background-color: #ffe082;
+            transform: scale(1.08);
+        }
+
+        .btn-excluir-prod {
+            background-color: #151515;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+            border-radius: 10px;
+            padding: 7px 11px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-excluir-prod:hover {
+            background-color: #ff4d4d;
+            color: #ffffff;
+            transform: scale(1.08);
+        }
+
+        @media (max-width: 768px) {
+            .painel-estoque {
+                padding: 20px 16px;
+            }
+
+            .grid-form-produto {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
     <script>
@@ -206,10 +493,83 @@
 
     <main class="painel-estoque">
         <div class="topo-estoque">
-            <h2>📦 Controle de Estoque</h2>
-            <button type="button" class="btn-reset" id="btnResetarEstoque">Restaurar Estoque Padrão</button>
+            <h2>📦 Controle de Produtos e Estoque</h2>
+            <div class="topo-acoes">
+                <button type="button" class="btn-sr-escuro" onclick="window.location.href='admin.html'">← Painel Admin</button>
+                <button type="button" class="btn-reset" id="btnResetarEstoque">Restaurar Estoque Padrão</button>
+            </div>
         </div>
 
+        <section class="form-produto-box" id="boxFormProduto">
+            <h3 id="tituloFormProduto">➕ Adicionar Novo Produto</h3>
+
+            <form id="formGerenciarProduto">
+                <input type="hidden" id="prod-id">
+
+                <div class="grid-form-produto">
+                    <div class="campo-prod">
+                        <label for="prod-nome">Nome do Produto *</label>
+                        <input type="text" id="prod-nome" placeholder="Ex: Tanjiro Kamado" required>
+                    </div>
+
+                    <div class="campo-prod">
+                        <label for="prod-preco">Preço (R$) *</label>
+                        <input type="number" id="prod-preco" step="0.01" min="0.01" placeholder="Ex: 320.00" required>
+                    </div>
+
+                    <div class="campo-prod">
+                        <label for="prod-categoria">Anime / Categoria</label>
+                        <input type="text" id="prod-categoria" list="listaCategoriasSR" placeholder="Ex: Bleach" value="Bleach">
+                        <datalist id="listaCategoriasSR">
+                            <option value="Bleach">
+                            <option value="Attack on Titan">
+                            <option value="Jujutsu Kaisen">
+                            <option value="Pokémon">
+                            <option value="Diário de uma Apotecária">
+                        </datalist>
+                    </div>
+
+                    <div class="campo-prod" id="grupo-estoque-inicial">
+                        <label for="prod-estoque">Estoque Inicial</label>
+                        <input type="number" id="prod-estoque" min="0" value="5">
+                    </div>
+
+                    <div class="campo-prod">
+                        <label for="prod-imagem-url">Caminho ou URL da Imagem *</label>
+                        <input type="text" id="prod-imagem-url" placeholder="Ex: imagens/bleach.png ou https://..." required>
+                    </div>
+
+                    <div class="campo-prod">
+                        <label for="prod-imagem-arquivo">Ou envie uma imagem do computador</label>
+                        <div class="upload-wrapper">
+                            <input type="file" id="prod-imagem-arquivo" accept="image/*">
+                            <div class="preview-img-box">
+                                <img id="preview-img-produto" src="imagens/produto.png" alt="Pré-visualização">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="campo-prod full">
+                        <label for="prod-descricao">Descrição do Produto *</label>
+                        <textarea id="prod-descricao" placeholder="Escala, material, detalhes da pose, acessórios e base..." required></textarea>
+                    </div>
+
+                    <div class="campo-prod full">
+                        <div class="checkbox-destaque-linha">
+                            <input type="checkbox" id="prod-destaque">
+                            <label for="prod-destaque">Exibir também nos Destaques da Página Inicial (Home)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="acoes-form-prod">
+                    <button type="submit" class="btn-sr-vermelho" id="btnSalvarProduto">Adicionar Produto</button>
+                    <button type="button" class="btn-sr-escuro" id="btnCancelarEdicao" style="display: none;">Cancelar Edição</button>
+                </div>
+            </form>
+        </section>
+
+        <h3 class="secao-tabela-titulo">📋 Produtos Cadastrados</h3>
         <div class="tabela-estoque-wrapper">
             <table class="tabela-estoque">
                 <thead>
@@ -217,8 +577,10 @@
                         <th>Imagem</th>
                         <th>Produto</th>
                         <th>Preço</th>
+                        <th>Descrição</th>
                         <th>Status</th>
                         <th>Em Estoque</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabelaEstoque"></tbody>
@@ -232,6 +594,51 @@
     </footer>
 
     <script>
+        const formProd = document.getElementById('formGerenciarProduto');
+        const inputId = document.getElementById('prod-id');
+        const inputNome = document.getElementById('prod-nome');
+        const inputPreco = document.getElementById('prod-preco');
+        const inputCategoria = document.getElementById('prod-categoria');
+        const inputEstoque = document.getElementById('prod-estoque');
+        const grupoEstoque = document.getElementById('grupo-estoque-inicial');
+        const inputImagemUrl = document.getElementById('prod-imagem-url');
+        const inputImagemArquivo = document.getElementById('prod-imagem-arquivo');
+        const previewImg = document.getElementById('preview-img-produto');
+        const inputDescricao = document.getElementById('prod-descricao');
+        const inputDestaque = document.getElementById('prod-destaque');
+        const tituloForm = document.getElementById('tituloFormProduto');
+        const btnSalvar = document.getElementById('btnSalvarProduto');
+        const btnCancelarEdicao = document.getElementById('btnCancelarEdicao');
+
+        inputImagemUrl.addEventListener('input', () => {
+            previewImg.src = inputImagemUrl.value.trim() || 'imagens/produto.png';
+        });
+
+        inputImagemArquivo.addEventListener('change', (e) => {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+            const leitor = new FileReader();
+            leitor.onload = function (ev) {
+                inputImagemUrl.value = ev.target.result;
+                previewImg.src = ev.target.result;
+            };
+            leitor.readAsDataURL(arquivo);
+        });
+
+        function resetarFormularioProduto() {
+            formProd.reset();
+            inputId.value = '';
+            inputCategoria.value = 'Bleach';
+            inputEstoque.value = 5;
+            grupoEstoque.style.display = 'flex';
+            previewImg.src = 'imagens/produto.png';
+            tituloForm.textContent = '➕ Adicionar Novo Produto';
+            btnSalvar.textContent = 'Adicionar Produto';
+            btnCancelarEdicao.style.display = 'none';
+        }
+
+        btnCancelarEdicao.addEventListener('click', resetarFormularioProduto);
+
         async function renderizarTabelaEstoque() {
             await window.promessaEstoqueSR;
             const produtos = await carregarProdutosSR();
@@ -248,14 +655,25 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><img src="${prod.imagem}" alt="${prod.nome}"></td>
-                    <td><strong>${prod.nome}</strong><br><small style="color:#aaa;">${prod.categoria || ''}</small></td>
-                    <td>R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}</td>
+                    <td>
+                        <strong>${prod.nome}</strong><br>
+                        <small style="color:#aaa;">${prod.categoria || ''}</small>
+                        ${prod.destaque ? '<br><small style="color:#00e676;">★ Home</small>' : ''}
+                    </td>
+                    <td><span class="preco-destaque-tabela">R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}</span></td>
+                    <td><div class="desc-curta" title="${prod.descricao}">${prod.descricao}</div></td>
                     <td>${statusHTML}</td>
                     <td>
                         <div class="controles-qtd">
                             <button type="button" class="btn-est" onclick="ajustar('${prod.nome.replace(/'/g, "\\'")}', -1)">-</button>
                             <strong style="min-width: 28px; text-align: center; font-size: 18px;">${qtd}</strong>
                             <button type="button" class="btn-est" onclick="ajustar('${prod.nome.replace(/'/g, "\\'")}', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="acoes-linha-prod">
+                            <button type="button" class="btn-editar-prod" onclick="prepararEdicaoProduto('${prod.id}')" title="Editar produto">✏️</button>
+                            <button type="button" class="btn-excluir-prod" onclick="excluirProdutoAdmin('${prod.id}', '${prod.nome.replace(/'/g, "\\'")}')" title="Excluir produto">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -268,15 +686,90 @@
             renderizarTabelaEstoque();
         }
 
+        window.prepararEdicaoProduto = async function (id) {
+            const produtos = await carregarProdutosSR();
+            const prod = produtos.find(p => String(p.id) === String(id));
+            if (!prod) return;
+
+            inputId.value = prod.id;
+            inputNome.value = prod.nome;
+            inputPreco.value = Number(prod.preco).toFixed(2);
+            inputCategoria.value = prod.categoria || '';
+            inputImagemUrl.value = prod.imagem;
+            previewImg.src = prod.imagem || 'imagens/produto.png';
+            inputDescricao.value = prod.descricao;
+            inputDestaque.checked = Boolean(prod.destaque);
+
+            grupoEstoque.style.display = 'none';
+            tituloForm.textContent = `✏️ Editando Produto: ${prod.nome}`;
+            btnSalvar.textContent = 'Salvar Alterações';
+            btnCancelarEdicao.style.display = 'inline-block';
+
+            document.getElementById('boxFormProduto').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.excluirProdutoAdmin = function (id, nome) {
+            const executar = async () => {
+                await removerProdutoSR(id);
+                if (inputId.value === String(id)) resetarFormularioProduto();
+                renderizarTabelaEstoque();
+            };
+
+            if (window.srModal && typeof window.srModal.confirmar === 'function') {
+                window.srModal.confirmar(
+                    `Tem certeza que deseja excluir o produto <strong>${nome}</strong>?`,
+                    executar,
+                    '- Excluir Produto -',
+                    true
+                );
+            } else if (confirm(`Excluir ${nome}?`)) {
+                executar();
+            }
+        };
+
+        formProd.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const dados = {
+                nome: inputNome.value,
+                preco: inputPreco.value,
+                categoria: inputCategoria.value,
+                estoque: inputEstoque.value,
+                imagem: inputImagemUrl.value,
+                descricao: inputDescricao.value,
+                destaque: inputDestaque.checked
+            };
+
+            if (inputId.value) {
+                await atualizarProdutoSR(inputId.value, dados);
+                if (window.srModal && typeof window.srModal.alerta === 'function') {
+                    window.srModal.alerta('Produto atualizado com sucesso!', '- Produto Atualizado -');
+                } else {
+                    alert('Produto atualizado com sucesso!');
+                }
+            } else {
+                await adicionarProdutoSR(dados);
+                if (window.srModal && typeof window.srModal.alerta === 'function') {
+                    window.srModal.alerta('Novo produto adicionado com sucesso!', '- Produto Cadastrado -');
+                } else {
+                    alert('Novo produto adicionado com sucesso!');
+                }
+            }
+
+            resetarFormularioProduto();
+            renderizarTabelaEstoque();
+        });
+
         document.getElementById('btnResetarEstoque').addEventListener('click', () => {
             const executarReset = () => {
                 localStorage.removeItem(CHAVE_ESTOQUE_SR);
+                localStorage.removeItem(CHAVE_CATALOGO_SR);
                 window.location.reload();
             };
 
             if (window.srModal && typeof window.srModal.confirmar === 'function') {
                 window.srModal.confirmar(
-                    'Deseja realmente restaurar todas as quantidades iniciais do estoque?',
+                    'Deseja realmente restaurar todas as quantidades iniciais e produtos padrão?',
                     executarReset,
                     '- Restaurar Estoque -'
                 );
@@ -290,3 +783,4 @@
 </body>
 
 </html>
+```[cite: 29]

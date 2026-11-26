@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,6 +7,18 @@
     <link rel="stylesheet" href="melhorias.css">
     <script src="modais-globais.js"></script>
     <style>
+        :root {
+            --sr-admin-bg: #151515;
+            --sr-admin-card: #0d0d0d;
+            --sr-admin-input-bg: #151515;
+            --sr-admin-border: #333333;
+            --sr-admin-accent: #C62828;
+            --sr-admin-accent-hover: #ff4d4d;
+            --sr-admin-text: #ffffff;
+            --sr-admin-muted: #aaaaaa;
+            --sr-admin-label: #cccccc;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,8 +27,8 @@
         }
 
         body {
-            background-color: #151515;
-            color: #ffffff;
+            background-color: var(--sr-admin-bg);
+            color: var(--sr-admin-text);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -29,8 +40,8 @@
         .admin-login-card {
             width: 100%;
             max-width: 420px;
-            background-color: #0d0d0d;
-            border: 1px solid #C62828;
+            background-color: var(--sr-admin-card);
+            border: 1px solid var(--sr-admin-accent);
             border-radius: 20px;
             padding: 36px 30px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85);
@@ -40,8 +51,8 @@
         .admin-badge {
             display: inline-block;
             background-color: rgba(198, 40, 40, 0.18);
-            color: #ff4d4d;
-            border: 1px solid #C62828;
+            color: var(--sr-admin-accent-hover);
+            border: 1px solid var(--sr-admin-accent);
             padding: 5px 14px;
             border-radius: 20px;
             font-size: 12px;
@@ -54,12 +65,12 @@
         .admin-login-card h1 {
             font-size: 26px;
             margin-bottom: 6px;
-            color: #ffffff;
+            color: var(--sr-admin-text);
         }
 
         .admin-login-card p {
             font-size: 14px;
-            color: #aaaaaa;
+            color: var(--sr-admin-muted);
             margin-bottom: 26px;
         }
 
@@ -71,7 +82,7 @@
         .campo-admin label {
             display: block;
             font-size: 13px;
-            color: #cccccc;
+            color: var(--sr-admin-label);
             margin-bottom: 6px;
             font-weight: bold;
         }
@@ -84,17 +95,17 @@
             width: 100%;
             height: 46px;
             padding: 0 44px 0 14px;
-            background-color: #151515;
-            border: 1px solid #333;
+            background-color: var(--sr-admin-input-bg);
+            border: 1px solid var(--sr-admin-border);
             border-radius: 12px;
-            color: #ffffff;
+            color: var(--sr-admin-text);
             font-size: 15px;
-            transition: 0.25s;
+            transition: border-color 0.25s, box-shadow 0.25s;
             outline: none;
         }
 
         .campo-admin input:focus {
-            border-color: #C62828;
+            border-color: var(--sr-admin-accent);
             box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.25);
         }
 
@@ -105,31 +116,33 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #aaaaaa;
+            color: var(--sr-admin-muted);
             font-size: 18px;
             cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
         }
 
         .btn-olho:hover {
-            color: #ffffff;
+            color: var(--sr-admin-text);
         }
 
         .btn-entrar-admin {
             width: 100%;
             height: 48px;
             margin-top: 8px;
-            background-color: #C62828;
-            color: #ffffff;
-            border: 1px solid #C62828;
+            background-color: var(--sr-admin-accent);
+            color: var(--sr-admin-text);
+            border: 1px solid var(--sr-admin-accent);
             border-radius: 25px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.25s;
+            transition: background-color 0.25s, box-shadow 0.25s, transform 0.25s;
         }
 
         .btn-entrar-admin:hover {
-            background-color: #151515;
+            background-color: var(--sr-admin-bg);
             box-shadow: 0 6px 20px rgba(198, 40, 40, 0.5);
             transform: translateY(-2px);
         }
@@ -137,14 +150,14 @@
         .link-voltar-loja {
             display: inline-block;
             margin-top: 22px;
-            color: #aaaaaa;
+            color: var(--sr-admin-muted);
             text-decoration: none;
             font-size: 14px;
-            transition: 0.2s;
+            transition: color 0.2s;
         }
 
         .link-voltar-loja:hover {
-            color: #ff4d4d;
+            color: var(--sr-admin-accent-hover);
         }
     </style>
 </head>
@@ -154,9 +167,7 @@
         <h1>Shadow Realm Admin</h1>
         <p>Faça login para gerenciar estoque, pedidos e produtos.</p>
 
-        <form id="form-login-admin" name="frmLoginAdmin"
-            onsubmit="event.preventDefault(); validaLoginAdmin();">
-
+        <form id="form-login-admin" name="frmLoginAdmin">
             <div class="campo-admin">
                 <label for="admin-user">E-mail</label>
                 <input type="email" id="admin-user" name="txtemail"
@@ -169,11 +180,11 @@
                     <input type="password" id="admin-pass" name="txtsenha"
                         placeholder="Digite sua senha" required autocomplete="current-password">
                     <button type="button" class="btn-olho" id="toggle-senha"
-                        title="Mostrar/Ocultar senha">👁️</button>
+                        aria-label="Mostrar ou ocultar senha" title="Mostrar/Ocultar senha">👁️</button>
                 </div>
             </div>
 
-            <button type="submit" class="btn-entrar-admin">Entrar no Painel</button>
+            <button type="submit" class="btn-entrar-admin" id="btn-entrar-admin">Entrar no Painel</button>
         </form>
 
         <a href="index.html" class="link-voltar-loja">← Voltar para a Shadow Realm Store</a>
@@ -181,13 +192,43 @@
 
     <script src="admin.js"></script>
     <script>
+        const formAdmin = document.getElementById('form-login-admin');
         const btnOlho = document.getElementById('toggle-senha');
         const inputSenha = document.getElementById('admin-pass');
+        const btnEntrar = document.getElementById('btn-entrar-admin');
+        let enviandoLoginAdmin = false;
 
-        btnOlho.addEventListener('click', () => {
+        btnOlho?.addEventListener('click', () => {
+            if (!inputSenha) return;
             const mostrando = inputSenha.type === 'text';
             inputSenha.type = mostrando ? 'password' : 'text';
             btnOlho.textContent = mostrando ? '👁️' : '🙈';
+        });
+
+        formAdmin?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (enviandoLoginAdmin || typeof validaLoginAdmin !== 'function') return;
+
+            enviandoLoginAdmin = true;
+            if (btnEntrar) btnEntrar.disabled = true;
+
+            try {
+                validaLoginAdmin();
+            } finally {
+                setTimeout(() => {
+                    enviandoLoginAdmin = false;
+                    if (btnEntrar) btnEntrar.disabled = false;
+                }, 400);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modalGlobal = document.getElementById('sr-modal-global');
+                if (modalGlobal && typeof modalGlobal.close === 'function' && modalGlobal.open) {
+                    modalGlobal.close();
+                }
+            }
         });
     </script>
 </body>
