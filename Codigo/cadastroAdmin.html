@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -19,16 +18,16 @@
 
 <body>
     <header id="topo">
-        <a href="index.html"><img src="imagens/logo.png" class="logo"></a>
+        <a href="index.html"><img src="imagens/logo.png" class="logo" alt="Logo Shadow Realm Store"></a>
         <h1>- Shadow Realm Store -</h1>
         <div class="nav">
             <nav>
-                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png"></a>
-                <a href="produtos.html" class="link"><img src="imagens/produto.png"></a>
-                <a href="contato.html" class="link"><img src="imagens/contato.png"></a>
-                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()"><img
-                        src="imagens/Usuario.png"></button>
+                <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
+                <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
+                <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
+                        src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
     </header>
@@ -57,11 +56,11 @@
 
                 <label for="nomeAdmin">Nome Completo:</label>
                 <input type="text" name="txtnome" id="nomeAdmin"
-                    placeholder="Digite seu Nome Completo:">
+                    placeholder="Digite seu Nome Completo:" autocomplete="name" required>
 
                 <label for="emailAdmin">Email:</label>
                 <input type="email" name="txtemail" id="emailAdmin"
-                    placeholder="Digite seu email:">
+                    placeholder="Digite seu email:" autocomplete="email" required>
 
             </div>
 
@@ -71,10 +70,11 @@
 
                 <div style="position: relative; display: inline-block; width: 100%;">
                     <input type="password" name="txtsenha" id="senhaAdmin"
-                        placeholder="Digite sua Senha:">
+                        placeholder="Digite sua Senha:" autocomplete="new-password" required>
 
-                    <button type="button"
+                    <button type="button" id="btnToggleSenhaAdmin"
                         onclick="toggleSenha('senhaAdmin', this)"
+                        aria-label="Mostrar ou ocultar senha"
                         style="position: absolute; right: 55px; top: 50%; transform: translateY(-50%); background: none; border: none; width: auto; height: auto; margin: 0; padding: 0; font-size: 20px; cursor: pointer;">
                         👁️
                     </button>
@@ -83,12 +83,12 @@
                 <label for="cpfAdmin">CPF:</label>
                 <input type="text" name="txtcpf" id="cpfAdmin"
                     maxlength="14" placeholder="000.000.000-00"
-                    autocomplete="off">
+                    autocomplete="off" required>
 
             </div>
 
             <div class="colunasBotao">
-                <button type="reset">Limpar</button>
+                <button type="reset" onclick="resetarFormularioAdmin()">Limpar</button>
                 <button type="submit">Enviar</button>
             </div>
 
@@ -129,6 +129,32 @@
 
         </div>
     </div>
+
+    <script>
+        function resetarFormularioAdmin() {
+            const inputSenha = document.getElementById("senhaAdmin");
+            const btnOlho = document.getElementById("btnToggleSenhaAdmin");
+            if (inputSenha) inputSenha.type = "password";
+            if (btnOlho) btnOlho.textContent = "👁️";
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const modalAdmin = document.getElementById("modalCadastroAdmin");
+            if (modalAdmin) {
+                modalAdmin.addEventListener("click", (e) => {
+                    if (e.target === modalAdmin && typeof fechaModalAdmin === "function") {
+                        fechaModalAdmin();
+                    }
+                });
+            }
+
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && modalAdmin && modalAdmin.classList.contains("aberto")) {
+                    if (typeof fechaModalAdmin === "function") fechaModalAdmin();
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
