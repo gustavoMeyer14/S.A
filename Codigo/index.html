@@ -18,6 +18,7 @@
     <script src="modais-globais.js"></script>
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
+    <script src="loja-turbo.js" defer></script>
 
     <style>
         .modalRastreio[open] {
@@ -131,7 +132,7 @@
         <div>
             <img src="imagens/Levi.png" alt="Levi Ackerman">
             <p>Levi Ackerman</p>
-            <h3><strong>R$ 250,00</strong></h3>
+            <h3><strong>R\$ 250,00</strong></h3>
             <button type="button" id="card1">Ver mais</button>
         </div>
         <dialog id="modal-card1" class="modalProduto">
@@ -142,9 +143,7 @@
                     <p>Escala 1/6 em resina de alto padrão da Tropa de Exploração.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
@@ -157,7 +156,7 @@
         <div>
             <img src="imagens/Maomao.png" alt="Maomao">
             <p>Maomao</p>
-            <h3><strong>R$ 300,00</strong></h3>
+            <h3><strong>R\$ 300,00</strong></h3>
             <button type="button" id="card2">Ver mais</button>
         </div>
         <dialog id="modal-card2" class="modalProduto">
@@ -168,9 +167,7 @@
                     <p>Escala 1/6 em resina de alto padrão com acessórios de boticária.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
@@ -183,7 +180,7 @@
         <div>
             <img src="imagens/Canva - download.png" alt="Satoru Gojo">
             <p>Satoru Gojo</p>
-            <h3><strong>R$ 350,00</strong></h3>
+            <h3><strong>R\$ 350,00</strong></h3>
             <button type="button" id="card3">Ver mais</button>
         </div>
         <dialog id="modal-card3" class="modalProduto">
@@ -194,9 +191,7 @@
                     <p>Escala 1/6 em resina de alto padrão com efeito de Energia Amaldiçoada.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="350.00"
@@ -209,7 +204,7 @@
         <div>
             <img src="imagens/Canva - download (1).png" alt="Greninja">
             <p>Greninja</p>
-            <h3><strong>R$ 400,00</strong></h3>
+            <h3><strong>R\$ 400,00</strong></h3>
             <button type="button" id="card4">Ver mais</button>
         </div>
         <dialog id="modal-card4" class="modalProduto">
@@ -220,9 +215,7 @@
                     <p>Escala 1/6 em resina de alto padrão com Water Shurikens em destaque.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
@@ -235,7 +228,7 @@
         <div>
             <img src="imagens/Snorlax.png" alt="Snorlax">
             <p>Snorlax</p>
-            <h3><strong>R$ 450,00</strong></h3>
+            <h3><strong>R\$ 450,00</strong></h3>
             <button type="button" id="card5">Ver mais</button>
         </div>
         <dialog id="modal-card5" class="modalProduto">
@@ -246,9 +239,7 @@
                     <p>Escala 1/6 em resina maciça de alto padrão com Poké Flauta e Berries.</p>
                 </div>
             </div>
-
             <div class="modalProduto-comentarios"></div>
-
             <footer class="modal-footer">
                 <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
                 <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
@@ -431,81 +422,28 @@
             });
         });
 
-        async function conectarMeuJSON() {
-            try {
-                const produtos = await carregarProdutosSR();
-                const destaques = produtos.filter(p => p.destaque);
-                const secao = document.querySelector('.destaques');
-                if (!secao || destaques.length === 0) return;
+        // Pesquisa na Home redireciona para o catálogo filtrado
+        const btnPesquisaHome = document.getElementById('enviarPesquisa');
+        const inputPesquisaHome = document.getElementById('barraPesquisa');
 
-                secao.innerHTML = '<h2> - Destaques - </h2>';
+        function irParaCatalogoPesquisa() {
+            const termo = inputPesquisaHome ? inputPesquisaHome.value.trim() : '';
+            window.location.href = termo
+                ? `produtos.html?busca=${encodeURIComponent(termo)}`
+                : 'produtos.html';
+        }
 
-                destaques.forEach((prod, idx) => {
-                    const num = idx + 1;
-                    const precoFormatado = Number(prod.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (btnPesquisaHome) {
+            btnPesquisaHome.addEventListener('click', irParaCatalogoPesquisa);
+        }
 
-                    const card = document.createElement('div');
-                    card.innerHTML = `
-                        <img src="${prod.imagem}" alt="${prod.nome}">
-                        <p>${prod.nome}</p>
-                        <h3><strong>R$ ${precoFormatado}</strong></h3>
-                        <button type="button" id="card${num}">Ver mais</button>
-                    `;
-
-                    const modal = document.createElement('dialog');
-                    modal.id = `modal-card${num}`;
-                    modal.className = 'modalProduto';
-                    modal.innerHTML = `
-                        <div class="modalProduto-conteudo">
-                            <img src="${prod.imagem}" alt="${prod.nome}">
-                            <div class="modalProduto-texto">
-                                <h2>- ${prod.nome}</h2>
-                                <p>${prod.descricao}</p>
-                            </div>
-                        </div>
-                        <div class="modalProduto-comentarios"></div>
-                        <footer class="modal-footer">
-                            <button type="button" id="fechar-card${num}" class="btn-fechar">Fechar</button>
-                            <button type="button" class="btn-carrinho" data-nome="${prod.nome}" data-preco="${prod.preco}"
-                                data-imagem="${prod.imagem}">+ Carrinho</button>
-                            <button type="button" class="btn-comprar-agora" data-nome="${prod.nome}" data-preco="${prod.preco}"
-                                data-imagem="${prod.imagem}">Comprar Agora</button>
-                        </footer>
-                    `;
-
-                    secao.appendChild(card);
-                    secao.appendChild(modal);
-
-                    const btnVerMais = card.querySelector(`#card${num}`);
-                    const btnFechar = modal.querySelector(`#fechar-card${num}`);
-
-                    btnVerMais.addEventListener('click', () => modal.showModal());
-                    btnFechar.addEventListener('click', () => modal.close());
-                    modal.addEventListener('click', (e) => {
-                        const rect = modal.getBoundingClientRect();
-                        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-                            modal.close();
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.btn-carrinho').forEach(btn => {
-                    btn.addEventListener('click', function () { processarCompra(this, false); });
-                });
-                document.querySelectorAll('.btn-comprar-agora').forEach(btn => {
-                    btn.addEventListener('click', function () { processarCompra(this, true); });
-                });
-
-                if (typeof turbinarCardsProdutos === 'function') turbinarCardsProdutos();
-                if (typeof processarCardsVitrine === 'function') {
-                    processarCardsVitrine(['ichigo kurosaki', 'kisuke urahara', 'renji abarai', 'rukia kuchiki', 'toshiro hitsugaya']);
+        if (inputPesquisaHome) {
+            inputPesquisaHome.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    irParaCatalogoPesquisa();
                 }
-                if (typeof inicializarComentariosHTML === 'function') inicializarComentariosHTML();
-                if (typeof injetarCalculadoraFrete === 'function') injetarCalculadoraFrete();
-                if (typeof atualizarInterfaceEstoque === 'function') atualizarInterfaceEstoque();
-            } catch (erro) {
-                console.error('Erro ao carregar catálogo na Home:', erro);
-            }
+            });
         }
     </script>
 </body>

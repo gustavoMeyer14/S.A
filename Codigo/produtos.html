@@ -18,6 +18,7 @@
     <script src="modais-globais.js"></script>
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
+    <script src="loja-turbo.js" defer></script>
 
     <style>
         .modalRastreio[open] {
@@ -169,266 +170,6 @@
 
     <section class="destaques">
         <h2 style="order: -1;"> - Produtos - </h2>
-
-        <div>
-            <img src="imagens/bleach.png" alt="Ichigo Kurosaki">
-            <p>Ichigo Kurosaki</p>
-            <h3><strong>R$ 340,00</strong></h3>
-            <button type="button" id="card1">Ver mais</button>
-        </div>
-        <dialog id="modal-card1" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/bleach.png" alt="Ichigo Kurosaki">
-                <div class="modalProduto-texto">
-                    <h2>- Ichigo Kurosaki</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card1" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Ichigo Kurosaki" data-preco="340.00"
-                    data-imagem="imagens/bleach.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Ichigo Kurosaki" data-preco="340.00"
-                    data-imagem="imagens/bleach.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/kisuke.png" alt="Kisuke Urahara">
-            <p>Kisuke Urahara</p>
-            <h3><strong>R$ 460,00</strong></h3>
-            <button type="button" id="card2">Ver mais</button>
-        </div>
-        <dialog id="modal-card2" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/kisuke.png" alt="Kisuke Urahara">
-                <div class="modalProduto-texto">
-                    <h2>- Kisuke Urahara</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card2" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Kisuke Urahara" data-preco="460.00"
-                    data-imagem="imagens/kisuke.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Kisuke Urahara" data-preco="460.00"
-                    data-imagem="imagens/kisuke.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/renje.png" alt="Renji Abarai">
-            <p>Renji Abarai</p>
-            <h3><strong>R$ 400,00</strong></h3>
-            <button type="button" id="card3">Ver mais</button>
-        </div>
-        <dialog id="modal-card3" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/renje.png" alt="Renji Abarai">
-                <div class="modalProduto-texto">
-                    <h2>- Renji Abarai</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card3" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Renji Abarai" data-preco="400.00"
-                    data-imagem="imagens/renje.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Renji Abarai" data-preco="400.00"
-                    data-imagem="imagens/renje.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/rukia.png" alt="Rukia Kuchiki">
-            <p>Rukia Kuchiki</p>
-            <h3><strong>R$ 430,00</strong></h3>
-            <button type="button" id="card4">Ver mais</button>
-        </div>
-        <dialog id="modal-card4" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/rukia.png" alt="Rukia Kuchiki">
-                <div class="modalProduto-texto">
-                    <h2>- Rukia Kuchiki</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card4" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Rukia Kuchiki" data-preco="430.00"
-                    data-imagem="imagens/rukia.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Rukia Kuchiki" data-preco="430.00"
-                    data-imagem="imagens/rukia.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/toshiro.png" alt="Toshiro Hitsugaya">
-            <p>Toshiro Hitsugaya</p>
-            <h3><strong>R$ 200,00</strong></h3>
-            <button type="button" id="card5">Ver mais</button>
-        </div>
-        <dialog id="modal-card5" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/toshiro.png" alt="Toshiro Hitsugaya">
-                <div class="modalProduto-texto">
-                    <h2>- Toshiro Hitsugaya</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Bleach.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card5" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Toshiro Hitsugaya" data-preco="200.00"
-                    data-imagem="imagens/toshiro.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Toshiro Hitsugaya" data-preco="200.00"
-                    data-imagem="imagens/toshiro.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/Levi.png" alt="Levi Ackerman">
-            <p>Levi Ackerman</p>
-            <h3><strong>R$ 250,00</strong></h3>
-            <button type="button" id="card6">Ver mais</button>
-        </div>
-        <dialog id="modal-card6" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Levi.png" alt="Levi Ackerman">
-                <div class="modalProduto-texto">
-                    <h2>- Levi Ackerman</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Attack on Titan.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card6" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Levi Ackerman" data-preco="250.00"
-                    data-imagem="imagens/Levi.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Levi Ackerman" data-preco="250.00"
-                    data-imagem="imagens/Levi.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/Maomao.png" alt="Maomao">
-            <p>Maomao</p>
-            <h3><strong>R$ 300,00</strong></h3>
-            <button type="button" id="card7">Ver mais</button>
-        </div>
-        <dialog id="modal-card7" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Maomao.png" alt="Maomao">
-                <div class="modalProduto-texto">
-                    <h2>- Maomao</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Diário de uma Apotecária.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card7" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Maomao" data-preco="300.00"
-                    data-imagem="imagens/Maomao.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Maomao" data-preco="300.00"
-                    data-imagem="imagens/Maomao.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/Canva - download.png" alt="Satoru Gojo">
-            <p>Satoru Gojo</p>
-            <h3><strong>R$ 350,00</strong></h3>
-            <button type="button" id="card8">Ver mais</button>
-        </div>
-        <dialog id="modal-card8" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download.png" alt="Satoru Gojo">
-                <div class="modalProduto-texto">
-                    <h2>- Satoru Gojo</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Jujutsu Kaisen.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card8" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Satoru Gojo" data-preco="350.00"
-                    data-imagem="imagens/Canva - download.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Satoru Gojo" data-preco="350.00"
-                    data-imagem="imagens/Canva - download.png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/Canva - download (1).png" alt="Greninja">
-            <p>Greninja</p>
-            <h3><strong>R$ 400,00</strong></h3>
-            <button type="button" id="card9">Ver mais</button>
-        </div>
-        <dialog id="modal-card9" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Canva - download (1).png" alt="Greninja">
-                <div class="modalProduto-texto">
-                    <h2>- Greninja</h2>
-                    <p>Escala 1/6 em resina de alto padrão da linha Pokémon.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card9" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Greninja" data-preco="400.00"
-                    data-imagem="imagens/Canva - download (1).png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Greninja" data-preco="400.00"
-                    data-imagem="imagens/Canva - download (1).png">Comprar Agora</button>
-            </footer>
-        </dialog>
-
-        <div>
-            <img src="imagens/Snorlax.png" alt="Snorlax">
-            <p>Snorlax</p>
-            <h3><strong>R$ 450,00</strong></h3>
-            <button type="button" id="card10">Ver mais</button>
-        </div>
-        <dialog id="modal-card10" class="modalProduto">
-            <div class="modalProduto-conteudo">
-                <img src="imagens/Snorlax.png" alt="Snorlax">
-                <div class="modalProduto-texto">
-                    <h2>- Snorlax</h2>
-                    <p>Escala 1/6 em resina maciça de alto padrão da linha Pokémon.</p>
-                </div>
-            </div>
-
-            <div class="modalProduto-comentarios"></div>
-
-            <footer class="modal-footer">
-                <button type="button" id="fechar-card10" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="Snorlax" data-preco="450.00"
-                    data-imagem="imagens/Snorlax.png">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="Snorlax" data-preco="450.00"
-                    data-imagem="imagens/Snorlax.png">Comprar Agora</button>
-            </footer>
-        </dialog>
     </section>
 
     <footer>
@@ -465,7 +206,7 @@
             const secao = document.querySelector('.destaques');
             if (!secao || !Array.isArray(catalogoAtualProdutos) || catalogoAtualProdutos.length === 0) return;
 
-            secao.innerHTML = '<h2> - Produtos - </h2>';
+            secao.innerHTML = '<h2 style="order: -1;"> - Produtos - </h2>';
 
             const selectCategoria = document.getElementById('filtroCategoria');
             if (selectCategoria) {
@@ -480,7 +221,7 @@
 
                 const card = document.createElement('div');
                 card.innerHTML = `
-                    <img src="${prod.imagem}" alt="${prod.nome}">
+                    <img src="${prod.imagem || 'imagens/produto.png'}" alt="${prod.nome}">
                     <p>${prod.nome}</p>
                     <h3><strong>R$ ${precoFormatado}</strong></h3>
                     <button type="button" id="card${num}">Ver mais</button>
@@ -491,7 +232,7 @@
                 modal.className = 'modalProduto';
                 modal.innerHTML = `
                     <div class="modalProduto-conteudo">
-                        <img src="${prod.imagem}" alt="${prod.nome}">
+                        <img src="${prod.imagem || 'imagens/produto.png'}" alt="${prod.nome}">
                         <div class="modalProduto-texto">
                             <h2>- ${prod.nome}</h2>
                             <p>${prod.descricao}</p>
@@ -501,9 +242,9 @@
                     <footer class="modal-footer">
                         <button type="button" id="fechar-card${num}" class="btn-fechar">Fechar</button>
                         <button type="button" class="btn-carrinho" data-nome="${prod.nome}" data-preco="${prod.preco}"
-                            data-imagem="${prod.imagem}">+ Carrinho</button>
+                            data-imagem="${prod.imagem || 'imagens/produto.png'}">+ Carrinho</button>
                         <button type="button" class="btn-comprar-agora" data-nome="${prod.nome}" data-preco="${prod.preco}"
-                            data-imagem="${prod.imagem}">Comprar Agora</button>
+                            data-imagem="${prod.imagem || 'imagens/produto.png'}">Comprar Agora</button>
                     </footer>
                 `;
 
