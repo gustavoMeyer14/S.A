@@ -465,7 +465,7 @@ function atualizarParcelasCheckout() {
 }
 
 async function injetarSugestoesProdutos() {
-    const mainCart = document.querySelector('.cart-content');
+   const mainCart = document.querySelector('.cart-content');
     if (!mainCart || document.getElementById('sr-sugestoes-carrinho')) return;
 
     try {
