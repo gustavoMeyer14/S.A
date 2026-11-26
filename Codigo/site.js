@@ -202,6 +202,14 @@ document.addEventListener("DOMContentLoaded", function () {
             linkNovoAdmin.textContent = "🛡️ Cadastrar Novo Admin";
             navUsuario.prepend(linkNovoAdmin);
         }
+
+        // Link para Painel Administrativo
+        if (!navUsuario.querySelector('a[href="admin.html"]')) {
+            const linkPainelAdmin = document.createElement("a");
+            linkPainelAdmin.href = "admin.html";
+            linkPainelAdmin.textContent = "⚙️ Painel de Admin";
+            navUsuario.prepend(linkPainelAdmin);
+        }
     }
 });
 
