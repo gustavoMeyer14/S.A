@@ -1,9 +1,7 @@
 
 var administradorEncontrado = null;
 
-// ==========================================
-// Guarda de Rota e Menu Dinâmico de Admin
-// ==========================================
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const nomePagina = window.location.pathname.split("/").pop().toLowerCase();
