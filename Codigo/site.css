@@ -1977,7 +1977,6 @@ dialog .btn-comprar-agora:hover {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
-@charset "UTF-8";
 
 /* ==========================================================================
    PAINEL ADMINISTRATIVO EM DUAS COLUNAS (CLASSES EXCLUSIVAS)
