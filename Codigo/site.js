@@ -66,6 +66,31 @@ window.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // Tooltips nos ícones do cabeçalho
+    const tooltipsNav = {
+        "index.html": "Início",
+        "produtos.html": "Produtos",
+        "contato.html": "Contato",
+        "carrinho.html": "Carrinho"
+    };
+
+    document.querySelectorAll(".nav .link").forEach(function (link) {
+        const href = link.getAttribute("href");
+        const nomePagina = tooltipsNav[href] || link.querySelector("img")?.getAttribute("alt");
+        if (nomePagina) {
+            link.setAttribute("data-tooltip", nomePagina);
+            link.setAttribute("title", nomePagina);
+        }
+    });
+
+    const btnUsuarioNav = document.querySelector(".nav .botaoUsuario");
+    if (btnUsuarioNav) {
+        const estaLogadoNav = localStorage.getItem("usuarioLogado") === "true";
+        const textoUsuario = estaLogadoNav ? "Minha Conta" : "Usuário";
+        btnUsuarioNav.setAttribute("data-tooltip", textoUsuario);
+        btnUsuarioNav.setAttribute("title", textoUsuario);
+    }
+
     const modalConteudo = document.querySelector('.modalCliente-conteudo');
     const navUsuario = document.querySelector('.nav-usuario');
 
