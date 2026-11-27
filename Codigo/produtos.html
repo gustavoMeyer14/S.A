@@ -1,6 +1,6 @@
 <!-- produtos.html -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -99,6 +99,16 @@
             font-size: 12px;
             color: #ffca28;
             font-weight: 600;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .badge-parcela-card {
+            font-size: 12px;
+            color: #00e676;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -211,206 +221,392 @@
     </dialog>
 
     <script>
-        let catalogoAtualProdutos = [];
+        (function () {
+            'use strict';
 
-        function escProd(str) {
-            return String(str ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
+            let catalogoAtualProdutos = [];
+            let renderizacaoEmAndamento = false;
+            let vitrineMontadaComSucesso = false;
 
-        function lerCarrinhoProdutos() {
-            try {
-                const dados = JSON.parse(localStorage.getItem('carrinhoShadowRealm'));
-                return Array.isArray(dados) ? dados : [];
-            } catch {
+            function escProd(str) {
+                return String(str ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function normalizarChaveNome(nome) {
+                return String(nome || '')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[̀-ͯ]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }
+
+            function lerCarrinhoProdutos() {
+                try {
+                    const dados = JSON.parse(localStorage.getItem('carrinhoShadowRealm'));
+                    return Array.isArray(dados) ? dados : [];
+                } catch {
+                    return [];
+                }
+            }
+
+            function obterEstoqueSeguro(nomeProduto) {
+                if (typeof window.obterEstoque === 'function') {
+                    const qtd = Number(window.obterEstoque(nomeProduto));
+                    if (Number.isFinite(qtd)) return qtd;
+                }
+                const achado = catalogoAtualProdutos.find(
+                    p => normalizarChaveNome(p.nome) === normalizarChaveNome(nomeProduto)
+                );
+                const fallback = achado ? Number(achado.estoque) : 10;
+                return Number.isFinite(fallback) ? fallback : 10;
+            }
+
+            async function obterCatalogoVitrine() {
+                if (window.promessaEstoqueSR) {
+                    try {
+                        await window.promessaEstoqueSR;
+                    } catch {}
+                }
+                if (typeof window.carregarProdutosSR === 'function') {
+                    const lista = await window.carregarProdutosSR();
+                    if (Array.isArray(lista) && lista.length > 0) return lista;
+                }
+                if (Array.isArray(window.produtosShadowRealm) && window.produtosShadowRealm.length > 0) {
+                    return window.produtosShadowRealm;
+                }
                 return [];
             }
-        }
 
-        async function renderizarVitrineProdutos() {
-            if (window.promessaEstoqueSR) await window.promessaEstoqueSR;
-            catalogoAtualProdutos = typeof carregarProdutosSR === 'function' ? await carregarProdutosSR() : [];
+            function aplicarFiltrosEOrdenacao(salvarHistorico = false) {
+                const selectCategoria = document.getElementById('filtroCategoria');
+                const selectPreco = document.getElementById('filtroPreco');
+                const selectOrdem = document.getElementById('ordenarPreco');
+                const inputPesquisa = document.getElementById('barraPesquisa');
 
-            const secao = document.querySelector('.destaques');
-            if (!secao || !Array.isArray(catalogoAtualProdutos) || catalogoAtualProdutos.length === 0) return;
+                const catEscolhida = selectCategoria ? selectCategoria.value : 'Todos';
+                const precoEscolhido = selectPreco ? selectPreco.value : 'todos';
+                const ordemEscolhida = selectOrdem ? selectOrdem.value : 'padrao';
+                const termoBruto = inputPesquisa ? inputPesquisa.value.trim() : '';
+                const termoBusca = normalizarChaveNome(termoBruto);
 
-            secao.innerHTML = '<h2 style="order: -1;"> - Produtos - </h2>';
+                if (salvarHistorico && typeof window.srRegistrarPesquisa === 'function') {
+                    window.srRegistrarPesquisa(termoBruto, {
+                        categoria: catEscolhida,
+                        preco: precoEscolhido
+                    });
+                }
 
-            const selectCategoria = document.getElementById('filtroCategoria');
-            if (selectCategoria) {
-                const categoriasUnicas = [...new Set(catalogoAtualProdutos.map(p => p.categoria).filter(Boolean))];
-                selectCategoria.innerHTML = '<option value="Todos">Todos os Animes</option>' +
-                    categoriasUnicas.map(cat => `<option value="${escProd(cat)}">${escProd(cat)}</option>`).join('');
+                const secao = document.querySelector('.destaques');
+                if (!secao) return;
+
+                const cards = Array.from(secao.querySelectorAll('.sr-card-vitrine'));
+                let visiveis = 0;
+
+                cards.forEach(card => {
+                    const nomeCard = card.getAttribute('data-nome') || '';
+                    const dados = catalogoAtualProdutos.find(
+                        p => normalizarChaveNome(p.nome) === normalizarChaveNome(nomeCard)
+                    );
+                    if (!dados) return;
+
+                    const precoVal = Number(dados.preco) || 0;
+                    const catVal = String(dados.categoria || '');
+                    const descVal = String(dados.descricao || '');
+
+                    const passaCategoria = (catEscolhida === 'Todos') || (catVal === catEscolhida);
+
+                    let passaPreco = true;
+                    if (precoEscolhido === 'ate300') passaPreco = precoVal <= 300;
+                    if (precoEscolhido === '300a400') passaPreco = precoVal > 300 && precoVal <= 400;
+                    if (precoEscolhido === 'acima400') passaPreco = precoVal > 400;
+
+                    const passaBusca = termoBusca === '' ||
+                        normalizarChaveNome(dados.nome).includes(termoBusca) ||
+                        normalizarChaveNome(catVal).includes(termoBusca) ||
+                        normalizarChaveNome(descVal).includes(termoBusca);
+
+                    if (passaCategoria && passaPreco && passaBusca) {
+                        card.style.display = '';
+                        visiveis++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                if (ordemEscolhida !== 'padrao') {
+                    const ordenados = [...cards].sort((a, b) => {
+                        const precoA = Number(a.getAttribute('data-preco')) || 0;
+                        const precoB = Number(b.getAttribute('data-preco')) || 0;
+                        return ordemEscolhida === 'menor' ? precoA - precoB : precoB - precoA;
+                    });
+                    ordenados.forEach((card, idx) => {
+                        card.style.order = String(idx + 1);
+                    });
+                } else {
+                    cards.forEach(card => {
+                        card.style.order = '';
+                    });
+                }
+
+                let aviso = document.getElementById('aviso-pesquisa');
+                if (!aviso) {
+                    aviso = document.createElement('p');
+                    aviso.id = 'aviso-pesquisa';
+                    aviso.style.cssText = 'color: white; width: 100%; text-align: center; order: 999;';
+                    secao.appendChild(aviso);
+                }
+                aviso.textContent = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
             }
 
-            catalogoAtualProdutos.forEach((prod, idx) => {
-                const num = idx + 1;
-                const precoNum = Number(prod.preco) || 0;
-                const estoqueNum = typeof window.obterEstoque === 'function'
-                    ? window.obterEstoque(prod.nome)
-                    : (Number(prod.estoque) || 0);
-                const precoFormatado = precoNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                const imgSegura = escProd(prod.imagem || 'imagens/produto.png');
-                const nomeSeguro = escProd(prod.nome);
+            function configurarFiltrosProdutos() {
+                const selectCategoria = document.getElementById('filtroCategoria');
+                const selectPreco = document.getElementById('filtroPreco');
+                const selectOrdem = document.getElementById('ordenarPreco');
+                const btnLimpar = document.getElementById('btnLimparFiltros');
+                const inputPesquisa = document.getElementById('barraPesquisa');
+                const btnPesquisa = document.getElementById('enviarPesquisa');
 
-                const card = document.createElement('div');
-                card.innerHTML = `
-                    <button type="button" class="btn-compra-rapida" title="Adicionar rapidamente ao carrinho"
-                        aria-label="Adicionar ${nomeSeguro} rapidamente ao carrinho"
-                        data-nome="${nomeSeguro}" data-preco="${precoNum}" data-imagem="${imgSegura}">🛒</button>
-                    <img src="${imgSegura}" alt="${nomeSeguro}">
-                    <p>${nomeSeguro}</p>
-                    <span class="badge-estoque-card" data-estoque-nome="${nomeSeguro}">${estoqueNum > 0 ? `Estoque: ${estoqueNum} un.` : 'Esgotado'}</span>
-                    <h3><strong>R$ ${precoFormatado}</strong></h3>
-                    <button type="button" id="card${num}">Ver mais</button>
-                `;
+                if (selectCategoria && !selectCategoria.dataset.srBind) {
+                    selectCategoria.dataset.srBind = '1';
+                    selectCategoria.addEventListener('change', () => aplicarFiltrosEOrdenacao(true));
+                }
+                if (selectPreco && !selectPreco.dataset.srBind) {
+                    selectPreco.dataset.srBind = '1';
+                    selectPreco.addEventListener('change', () => aplicarFiltrosEOrdenacao(true));
+                }
+                if (selectOrdem && !selectOrdem.dataset.srBind) {
+                    selectOrdem.dataset.srBind = '1';
+                    selectOrdem.addEventListener('change', () => aplicarFiltrosEOrdenacao(false));
+                }
+                if (inputPesquisa && !inputPesquisa.dataset.srBind) {
+                    inputPesquisa.dataset.srBind = '1';
+                    inputPesquisa.addEventListener('input', () => aplicarFiltrosEOrdenacao(false));
+                    inputPesquisa.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') aplicarFiltrosEOrdenacao(true);
+                    });
+                }
+                if (btnPesquisa && !btnPesquisa.dataset.srBind) {
+                    btnPesquisa.dataset.srBind = '1';
+                    btnPesquisa.addEventListener('click', () => aplicarFiltrosEOrdenacao(true));
+                }
+                if (btnLimpar && !btnLimpar.dataset.srBind) {
+                    btnLimpar.dataset.srBind = '1';
+                    btnLimpar.addEventListener('click', () => {
+                        if (selectCategoria) selectCategoria.value = 'Todos';
+                        if (selectPreco) selectPreco.value = 'todos';
+                        if (selectOrdem) selectOrdem.value = 'padrao';
+                        if (inputPesquisa) inputPesquisa.value = '';
+                        aplicarFiltrosEOrdenacao(false);
+                    });
+                }
 
-                const modal = document.createElement('dialog');
-                modal.id = `modal-card${num}`;
-                modal.className = 'modalProduto';
-                modal.innerHTML = `
-                    <div class="modalProduto-conteudo">
-                        <img src="${imgSegura}" alt="${nomeSeguro}">
-                        <div class="modalProduto-texto">
-                            <h2>- ${nomeSeguro}</h2>
-                            <p>${escProd(prod.descricao)}</p>
-                            <p style="color:#ffca28; font-size:17px;"><strong>Categoria:</strong> ${escProd(prod.categoria)} • <strong>Disponibilidade:</strong> ${estoqueNum > 0 ? `${estoqueNum} unidade(s)` : 'Esgotado'}</p>
-                        </div>
-                    </div>
-                    <div class="modalProduto-comentarios"></div>
-                    <footer class="modal-footer">
-                        <button type="button" id="fechar-card${num}" class="btn-fechar">Fechar</button>
-                        <button type="button" class="btn-carrinho" data-nome="${nomeSeguro}" data-preco="${precoNum}"
-                            data-imagem="${imgSegura}">+ Carrinho</button>
-                        <button type="button" class="btn-comprar-agora" data-nome="${nomeSeguro}" data-preco="${precoNum}"
-                            data-imagem="${imgSegura}">Comprar Agora</button>
-                    </footer>
-                `;
+                const buscaURL = new URLSearchParams(window.location.search).get('busca');
+                if (buscaURL && inputPesquisa && !inputPesquisa.value) {
+                    inputPesquisa.value = buscaURL;
+                    aplicarFiltrosEOrdenacao(true);
+                }
+            }
 
-                secao.appendChild(card);
-                secao.appendChild(modal);
+            async function renderizarVitrineProdutos() {
+                if (renderizacaoEmAndamento || vitrineMontadaComSucesso) return;
+                renderizacaoEmAndamento = true;
 
-                const btnVerMais = card.querySelector(`#card${num}`);
-                const btnFechar = modal.querySelector(`#fechar-card${num}`);
+                try {
+                    catalogoAtualProdutos = await obterCatalogoVitrine();
+                    const secao = document.querySelector('.destaques');
+                    if (!secao || !Array.isArray(catalogoAtualProdutos) || catalogoAtualProdutos.length === 0) {
+                        return;
+                    }
 
-                btnVerMais.addEventListener('click', () => {
-                    modal.showModal();
-                    if (typeof inicializarComentariosHTML === 'function') inicializarComentariosHTML();
-                });
-                btnFechar.addEventListener('click', () => modal.close());
+                    secao.innerHTML = '<h2 style="order: -1;"> - Produtos - </h2>';
 
-                modal.addEventListener('click', (e) => {
-                    const rect = modal.getBoundingClientRect();
+                    const selectCategoria = document.getElementById('filtroCategoria');
+                    if (selectCategoria) {
+                        const categoriasUnicas = [...new Set(catalogoAtualProdutos.map(p => p.categoria).filter(Boolean))];
+                        selectCategoria.innerHTML = '<option value="Todos">Todos os Animes</option>' +
+                            categoriasUnicas.map(cat => `<option value="${escProd(cat)}">${escProd(cat)}</option>`).join('');
+                    }
+
+                    catalogoAtualProdutos.forEach((prod, idx) => {
+                        const num = idx + 1;
+                        const precoNum = Number(prod.preco) || 0;
+                        const estoqueNum = obterEstoqueSeguro(prod.nome);
+                        const parcela12x = precoNum / 12;
+                        const precoFormatado = precoNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const parcelaFormatada = parcela12x.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const imgSegura = escProd(prod.imagem || 'imagens/produto.png');
+                        const nomeSeguro = escProd(prod.nome);
+
+                        const card = document.createElement('div');
+                        card.className = 'sr-card-vitrine';
+                        card.setAttribute('data-nome', prod.nome);
+                        card.setAttribute('data-preco', String(precoNum));
+                        card.innerHTML = `
+                            <button type="button" class="btn-compra-rapida" title="Adicionar rapidamente ao carrinho"
+                                aria-label="Adicionar ${nomeSeguro} rapidamente ao carrinho"
+                                data-nome="${nomeSeguro}" data-preco="${precoNum}" data-imagem="${imgSegura}">🛒</button>
+                            <img src="${imgSegura}" alt="${nomeSeguro}">
+                            <p>${nomeSeguro}</p>
+                            <span class="badge-estoque-card" data-estoque-nome="${nomeSeguro}">${estoqueNum > 0 ? `Estoque: ${estoqueNum} un.` : 'Esgotado'}</span>
+                            <h3><strong>R$ ${precoFormatado}</strong></h3>
+                            <span class="badge-parcela-card">12x de R$ ${parcelaFormatada} sem juros</span>
+                            <button type="button" id="card${num}">Ver mais</button>
+                        `;
+
+                        const modal = document.createElement('dialog');
+                        modal.id = `modal-card${num}`;
+                        modal.className = 'modalProduto';
+                        modal.innerHTML = `
+                            <div class="modalProduto-conteudo">
+                                <img src="${imgSegura}" alt="${nomeSeguro}">
+                                <div class="modalProduto-texto">
+                                    <h2>- ${nomeSeguro}</h2>
+                                    <p>${escProd(prod.descricao || 'Colecionável licenciado com embalagem reforçada pela Shadow Realm Store.')}</p>
+                                    <p style="color:#ffca28; font-size:17px;"><strong>Categoria:</strong> ${escProd(prod.categoria || 'Colecionáveis')} • <strong>Disponibilidade:</strong> ${estoqueNum > 0 ? `${estoqueNum} unidade(s)` : 'Esgotado'}</p>
+                                    <p style="color:#00e676; font-size:15px;"><strong>Parcelamento:</strong> até 12x de R$ ${parcelaFormatada} sem juros</p>
+                                </div>
+                            </div>
+                            <div class="modalProduto-comentarios"></div>
+                            <footer class="modal-footer">
+                                <button type="button" id="fechar-card${num}" class="btn-fechar">Fechar</button>
+                                <button type="button" class="btn-carrinho" data-nome="${nomeSeguro}" data-preco="${precoNum}"
+                                    data-imagem="${imgSegura}">+ Carrinho</button>
+                                <button type="button" class="btn-comprar-agora" data-nome="${nomeSeguro}" data-preco="${precoNum}"
+                                    data-imagem="${imgSegura}">Comprar Agora</button>
+                            </footer>
+                        `;
+
+                        secao.appendChild(card);
+                        secao.appendChild(modal);
+
+                        const btnVerMais = card.querySelector(`#card${num}`);
+                        const btnFechar = modal.querySelector(`#fechar-card${num}`);
+
+                        btnVerMais.addEventListener('click', () => {
+                            modal.showModal();
+                            if (typeof window.inicializarComentariosHTML === 'function') {
+                                window.inicializarComentariosHTML();
+                            }
+                        });
+
+                        btnFechar.addEventListener('click', () => modal.close());
+
+                        modal.addEventListener('click', (e) => {
+                            const rect = modal.getBoundingClientRect();
+                            const clicouFora =
+                                e.clientX < rect.left ||
+                                e.clientX > rect.right ||
+                                e.clientY < rect.top ||
+                                e.clientY > rect.bottom;
+                            if (clicouFora) modal.close();
+                        });
+                    });
+
+                    secao.querySelectorAll('.btn-carrinho').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            processarCompra(this, false);
+                        });
+                    });
+
+                    secao.querySelectorAll('.btn-compra-rapida').forEach(btn => {
+                        btn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            processarCompra(this, false);
+                        });
+                    });
+
+                    secao.querySelectorAll('.btn-comprar-agora').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            processarCompra(this, true);
+                        });
+                    });
+
+                    if (typeof window.turbinarCardsProdutos === 'function') window.turbinarCardsProdutos();
+                    if (typeof window.processarCardsVitrine === 'function') {
+                        window.processarCardsVitrine(['ichigo kurosaki', 'kisuke urahara', 'renji abarai', 'rukia kuchiki', 'toshiro hitsugaya']);
+                    }
+                    if (typeof window.inicializarComentariosHTML === 'function') window.inicializarComentariosHTML();
+                    if (typeof window.injetarCalculadoraFrete === 'function') window.injetarCalculadoraFrete();
+                    if (typeof window.atualizarInterfaceEstoque === 'function') window.atualizarInterfaceEstoque();
+                    if (typeof window.atualizarBadgeCarrinho === 'function') window.atualizarBadgeCarrinho();
+
+                    configurarFiltrosProdutos();
+                    vitrineMontadaComSucesso = true;
+                } finally {
+                    renderizacaoEmAndamento = false;
+                }
+            }
+
+            const modalAvisoLogin = document.getElementById('modalAvisoLogin');
+            const btnFecharAviso = document.getElementById('fecharAvisoLogin');
+
+            if (btnFecharAviso && modalAvisoLogin) {
+                btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
+                modalAvisoLogin.addEventListener('click', (e) => {
+                    const rect = modalAvisoLogin.getBoundingClientRect();
                     const clicouFora =
                         e.clientX < rect.left ||
                         e.clientX > rect.right ||
                         e.clientY < rect.top ||
                         e.clientY > rect.bottom;
-
-                    if (clicouFora) modal.close();
+                    if (clicouFora) modalAvisoLogin.close();
                 });
-            });
-
-            document.querySelectorAll('.btn-carrinho').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    processarCompra(this, false);
-                });
-            });
-
-            document.querySelectorAll('.btn-compra-rapida').forEach(btn => {
-                btn.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    processarCompra(this, false);
-                });
-            });
-
-            document.querySelectorAll('.btn-comprar-agora').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    processarCompra(this, true);
-                });
-            });
-
-            if (typeof turbinarCardsProdutos === 'function') turbinarCardsProdutos();
-            if (typeof processarCardsVitrine === 'function') {
-                processarCardsVitrine(['ichigo kurosaki', 'kisuke urahara', 'renji abarai', 'rukia kuchiki', 'toshiro hitsugaya']);
-            }
-            if (typeof inicializarComentariosHTML === 'function') inicializarComentariosHTML();
-            if (typeof injetarCalculadoraFrete === 'function') injetarCalculadoraFrete();
-            if (typeof atualizarInterfaceEstoque === 'function') atualizarInterfaceEstoque();
-            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
-
-            configurarFiltrosProdutos();
-        }
-
-        const modalAvisoLogin = document.getElementById('modalAvisoLogin');
-        const btnFecharAviso = document.getElementById('fecharAvisoLogin');
-
-        if (btnFecharAviso && modalAvisoLogin) {
-            btnFecharAviso.addEventListener('click', () => modalAvisoLogin.close());
-            modalAvisoLogin.addEventListener('click', (e) => {
-                const rect = modalAvisoLogin.getBoundingClientRect();
-                const clicouFora =
-                    e.clientX < rect.left ||
-                    e.clientX > rect.right ||
-                    e.clientY < rect.top ||
-                    e.clientY > rect.bottom;
-                if (clicouFora) modalAvisoLogin.close();
-            });
-        }
-
-        const modalAvisoCarrinho = document.getElementById('modalAvisoCarrinho');
-        const tituloAvisoCarrinho = document.getElementById('tituloAvisoCarrinho');
-        const textoAvisoCarrinho = document.getElementById('textoAvisoCarrinho');
-        const btnFecharAvisoCarrinho = document.getElementById('fecharAvisoCarrinho');
-        const btnIrCarrinho = document.getElementById('btnIrCarrinho');
-
-        function abrirModalAviso(titulo, mensagemHTML, mostrarBotaoCarrinho = true) {
-            if (!modalAvisoCarrinho) return;
-            tituloAvisoCarrinho.textContent = titulo;
-            textoAvisoCarrinho.innerHTML = mensagemHTML;
-            btnFecharAvisoCarrinho.textContent = mostrarBotaoCarrinho ? 'Continuar' : 'Fechar';
-            btnIrCarrinho.style.display = mostrarBotaoCarrinho ? 'inline-block' : 'none';
-            modalAvisoCarrinho.showModal();
-        }
-
-        if (btnFecharAvisoCarrinho && modalAvisoCarrinho) {
-            btnFecharAvisoCarrinho.addEventListener('click', () => modalAvisoCarrinho.close());
-
-            modalAvisoCarrinho.addEventListener('click', (e) => {
-                const rect = modalAvisoCarrinho.getBoundingClientRect();
-                const clicouFora =
-                    e.clientX < rect.left ||
-                    e.clientX > rect.right ||
-                    e.clientY < rect.top ||
-                    e.clientY > rect.bottom;
-
-                if (clicouFora) modalAvisoCarrinho.close();
-            });
-        }
-
-        function processarCompra(botao, irParaPagamento = false) {
-            const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
-            const modalAtual = botao.closest('dialog');
-
-            if (!estaLogado) {
-                if (modalAtual) modalAtual.close();
-                if (modalAvisoLogin) modalAvisoLogin.showModal();
-                return;
             }
 
-            const nome = botao.getAttribute('data-nome');
-            const preco = parseFloat(botao.getAttribute('data-preco')) || 0;
-            const imagem = botao.getAttribute('data-imagem');
+            const modalAvisoCarrinho = document.getElementById('modalAvisoCarrinho');
+            const tituloAvisoCarrinho = document.getElementById('tituloAvisoCarrinho');
+            const textoAvisoCarrinho = document.getElementById('textoAvisoCarrinho');
+            const btnFecharAvisoCarrinho = document.getElementById('fecharAvisoCarrinho');
+            const btnIrCarrinho = document.getElementById('btnIrCarrinho');
 
-            const carrinho = lerCarrinhoProdutos();
-            const produtoExistente = carrinho.find(item => item.nome === nome);
+            function abrirModalAviso(titulo, mensagemHTML, mostrarBotaoCarrinho = true) {
+                if (!modalAvisoCarrinho) return;
+                tituloAvisoCarrinho.textContent = titulo;
+                textoAvisoCarrinho.innerHTML = mensagemHTML;
+                btnFecharAvisoCarrinho.textContent = mostrarBotaoCarrinho ? 'Continuar' : 'Fechar';
+                btnIrCarrinho.style.display = mostrarBotaoCarrinho ? 'inline-block' : 'none';
+                modalAvisoCarrinho.showModal();
+            }
 
-            if (typeof obterEstoque === 'function') {
-                const disponivel = obterEstoque(nome);
+            if (btnFecharAvisoCarrinho && modalAvisoCarrinho) {
+                btnFecharAvisoCarrinho.addEventListener('click', () => modalAvisoCarrinho.close());
+                modalAvisoCarrinho.addEventListener('click', (e) => {
+                    const rect = modalAvisoCarrinho.getBoundingClientRect();
+                    const clicouFora =
+                        e.clientX < rect.left ||
+                        e.clientX > rect.right ||
+                        e.clientY < rect.top ||
+                        e.clientY > rect.bottom;
+                    if (clicouFora) modalAvisoCarrinho.close();
+                });
+            }
+
+            function processarCompra(botao, irParaPagamento = false) {
+                const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+                const modalAtual = botao.closest('dialog');
+
+                if (!estaLogado) {
+                    if (modalAtual) modalAtual.close();
+                    if (modalAvisoLogin) modalAvisoLogin.showModal();
+                    return;
+                }
+
+                const nome = botao.getAttribute('data-nome');
+                const preco = parseFloat(botao.getAttribute('data-preco')) || 0;
+                const imagem = botao.getAttribute('data-imagem');
+
+                const carrinho = lerCarrinhoProdutos();
+                const produtoExistente = carrinho.find(
+                    item => normalizarChaveNome(item.nome) === normalizarChaveNome(nome)
+                );
+
+                const disponivel = obterEstoqueSeguro(nome);
                 const qtdNoCarrinho = produtoExistente ? (Number(produtoExistente.quantidade) || 0) : 0;
 
                 if (disponivel <= 0) {
@@ -423,143 +619,44 @@
                     abrirModalAviso('- Estoque Insuficiente -', `Você já tem <strong>${qtdNoCarrinho}</strong> no carrinho e só restam <strong>${disponivel}</strong> unidade(s) disponíveis.`, true);
                     return;
                 }
-            }
 
-            if (produtoExistente) {
-                produtoExistente.quantidade = (Number(produtoExistente.quantidade) || 1) + 1;
-            } else {
-                carrinho.push({ nome, preco, imagem, quantidade: 1 });
-            }
-
-            localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
-            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
-
-            if (irParaPagamento) {
-                window.location.href = 'carrinho.html#tela-pagamento';
-            } else if (modalAtual) {
-                modalAtual.close();
-                abrirModalAviso('- Produto Adicionado -', `O produto <strong>${escProd(nome)}</strong> foi adicionado ao seu carrinho!`, true);
-            } else {
-                const iconeAnterior = botao.innerHTML;
-                botao.innerHTML = '✔';
-                botao.style.backgroundColor = '#28a745';
-                botao.style.borderColor = '#28a745';
-
-                setTimeout(() => {
-                    botao.innerHTML = iconeAnterior;
-                    botao.style.backgroundColor = '';
-                    botao.style.borderColor = '';
-                }, 1500);
-            }
-        }
-
-        function configurarFiltrosProdutos() {
-            const selectCategoria = document.getElementById('filtroCategoria');
-            const selectPreco = document.getElementById('filtroPreco');
-            const selectOrdem = document.getElementById('ordenarPreco');
-            const btnLimpar = document.getElementById('btnLimparFiltros');
-            const inputPesquisa = document.getElementById('barraPesquisa');
-            const btnPesquisa = document.getElementById('enviarPesquisa');
-
-            function limparTexto(texto) {
-                return String(texto || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-            }
-
-            function aplicarTodosFiltros(salvarHistorico = false) {
-                const catEscolhida = selectCategoria ? selectCategoria.value : 'Todos';
-                const precoEscolhido = selectPreco ? selectPreco.value : 'todos';
-                const ordemEscolhida = selectOrdem ? selectOrdem.value : 'padrao';
-                const termoBruto = inputPesquisa ? inputPesquisa.value.trim() : '';
-                const termoBusca = limparTexto(termoBruto);
-
-                if (salvarHistorico && typeof window.registrarPesquisaSR === 'function') {
-                    window.registrarPesquisaSR(termoBruto, { categoria: catEscolhida, preco: precoEscolhido });
-                }
-
-                const secao = document.querySelector('.destaques');
-                const cards = Array.from(secao.querySelectorAll(':scope > div'));
-                let visiveis = 0;
-
-                cards.forEach(card => {
-                    const nomeEl = card.querySelector('p');
-                    if (!nomeEl) return;
-                    const nomeCard = nomeEl.innerText.trim();
-                    const dados = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeCard.toLowerCase());
-                    if (!dados) return;
-
-                    const passaCategoria = (catEscolhida === 'Todos') || (dados.categoria === catEscolhida);
-
-                    let passaPreco = true;
-                    if (precoEscolhido === 'ate300') passaPreco = dados.preco <= 300;
-                    if (precoEscolhido === '300a400') passaPreco = dados.preco > 300 && dados.preco <= 400;
-                    if (precoEscolhido === 'acima400') passaPreco = dados.preco > 400;
-
-                    const passaBusca = termoBusca === '' ||
-                        limparTexto(dados.nome).includes(termoBusca) ||
-                        limparTexto(dados.categoria || '').includes(termoBusca) ||
-                        limparTexto(dados.descricao || '').includes(termoBusca);
-
-                    if (passaCategoria && passaPreco && passaBusca) {
-                        card.style.display = '';
-                        visiveis++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                if (ordemEscolhida !== 'padrao') {
-                    const cardsOrdenados = [...cards].sort((a, b) => {
-                        const nomeA = a.querySelector('p')?.innerText.trim() || '';
-                        const nomeB = b.querySelector('p')?.innerText.trim() || '';
-                        const dadosA = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeA.toLowerCase());
-                        const dadosB = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeB.toLowerCase());
-                        if (!dadosA || !dadosB) return 0;
-                        return ordemEscolhida === 'menor' ? dadosA.preco - dadosB.preco : dadosB.preco - dadosA.preco;
-                    });
-                    cardsOrdenados.forEach((card, pos) => card.style.order = pos);
+                if (produtoExistente) {
+                    produtoExistente.quantidade = (Number(produtoExistente.quantidade) || 1) + 1;
                 } else {
-                    cards.forEach(card => card.style.order = '');
+                    carrinho.push({ nome, preco, imagem, quantidade: 1 });
                 }
 
-                let aviso = document.getElementById('aviso-pesquisa');
-                if (!aviso) {
-                    aviso = document.createElement('p');
-                    aviso.id = 'aviso-pesquisa';
-                    aviso.style.cssText = 'color: white; width: 100%; text-align: center; order: 999;';
-                    secao.appendChild(aviso);
+                localStorage.setItem('carrinhoShadowRealm', JSON.stringify(carrinho));
+                if (typeof window.atualizarBadgeCarrinho === 'function') window.atualizarBadgeCarrinho();
+                if (typeof window.srNotificar === 'function') {
+                    window.srNotificar('Produto adicionado', `${nome} foi adicionado ao seu carrinho.`, 'carrinho');
                 }
-                aviso.innerText = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
+
+                if (irParaPagamento) {
+                    window.location.href = 'carrinho.html#tela-pagamento';
+                } else if (modalAtual) {
+                    modalAtual.close();
+                    abrirModalAviso('- Produto Adicionado -', `O produto <strong>${escProd(nome)}</strong> foi adicionado ao seu carrinho!`, true);
+                } else {
+                    const iconeAnterior = botao.innerHTML;
+                    botao.innerHTML = '✔';
+                    botao.style.backgroundColor = '#28a745';
+                    botao.style.borderColor = '#28a745';
+
+                    setTimeout(() => {
+                        botao.innerHTML = iconeAnterior;
+                        botao.style.backgroundColor = '';
+                        botao.style.borderColor = '';
+                    }, 1500);
+                }
             }
 
-            if (selectCategoria) selectCategoria.addEventListener('change', () => aplicarTodosFiltros(true));
-            if (selectPreco) selectPreco.addEventListener('change', () => aplicarTodosFiltros(true));
-            if (selectOrdem) selectOrdem.addEventListener('change', () => aplicarTodosFiltros(false));
-            if (inputPesquisa) {
-                inputPesquisa.addEventListener('input', () => aplicarTodosFiltros(false));
-                inputPesquisa.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') aplicarTodosFiltros(true);
-                });
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', renderizarVitrineProdutos);
+            } else {
+                renderizarVitrineProdutos();
             }
-            if (btnPesquisa) btnPesquisa.addEventListener('click', () => aplicarTodosFiltros(true));
-
-            if (btnLimpar) {
-                btnLimpar.addEventListener('click', () => {
-                    if (selectCategoria) selectCategoria.value = 'Todos';
-                    if (selectPreco) selectPreco.value = 'todos';
-                    if (selectOrdem) selectOrdem.value = 'padrao';
-                    if (inputPesquisa) inputPesquisa.value = '';
-                    aplicarTodosFiltros(false);
-                });
-            }
-
-            const buscaURL = new URLSearchParams(window.location.search).get('busca');
-            if (buscaURL && inputPesquisa) {
-                inputPesquisa.value = buscaURL;
-                aplicarTodosFiltros(true);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', renderizarVitrineProdutos);
+        })();
     </script>
 </body>
 

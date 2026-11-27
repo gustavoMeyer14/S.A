@@ -12,6 +12,20 @@ const CONFIG_CARRINHO_SR = {
     codigoPix: '00020126580014BR.GOV.BCB.PIX0128shadowrealmstore@pix.com5204000053039865802BR5918SHADOW REALM STORE6009JOINVILLE62070503***6304SR26'
 };
 
+function escaparHtmlCarrinhoSR(valor) {
+    return String(valor ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function sincronizarBadgesCarrinhoSR() {
+    if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+    if (typeof atualizarContadorCarrinho === 'function') atualizarContadorCarrinho();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const productsList = document.getElementById('products-list');
     if (!productsList) return;
@@ -32,9 +46,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch {}
     }
 
+    let atualizandoObserver = false;
     const observer = new MutationObserver(() => {
-        atualizarBarraFrete();
-        atualizarParcelasCheckout();
+        if (atualizandoObserver) return;
+        atualizandoObserver = true;
+        try {
+            atualizarBarraFrete();
+            atualizarParcelasCheckout();
+        } finally {
+            atualizandoObserver = false;
+        }
     });
 
     observer.observe(productsList, { childList: true, subtree: true });
@@ -219,7 +240,7 @@ function lerCarrinhoTurbo() {
         return dados.map((item) => ({
             ...item,
             nome: String(item?.nome || 'Produto'),
-            preco: Number(item?.preco) || 0,
+            preco: Math.max(0, Number(item?.preco) || 0),
             quantidade: Math.max(1, parseInt(item?.quantidade, 10) || 1),
             imagem: item?.imagem || 'imagens/logo.png'
         }));
@@ -270,28 +291,30 @@ function reRenderizarCarrinhoSemReload() {
                 const temLimite = Number.isFinite(disponivel);
                 const atingiuLimite = temLimite && item.quantidade >= disponivel;
                 const subtotalItem = item.preco * item.quantidade;
+                const nomeSeguro = escaparHtmlCarrinhoSR(item.nome);
+                const imgSegura = escaparHtmlCarrinhoSR(item.imagem);
 
                 const card = document.createElement('article');
                 card.className = 'product-card';
                 card.dataset.index = String(index);
                 card.innerHTML = `
                     <div class="product-thumb">
-                        <img src="${item.imagem}" alt="${item.nome}">
+                        <img src="${imgSegura}" alt="${nomeSeguro}">
                     </div>
                     <div style="flex:1; margin-left: 20px;">
-                        <h3 class="product-name" style="margin-left:0;">${item.nome}</h3>
+                        <h3 class="product-name" style="margin-left:0;">${nomeSeguro}</h3>
                         <small style="color:#ffca28;">R$ ${formatarMoedaSR(subtotalItem)}</small>
                         ${temLimite ? `<small style="display:block; margin-top:4px; font-size:12px; color:${atingiuLimite ? '#ff4d4d' : '#aaa'};">Disponível em estoque: ${disponivel} un.</small>` : ''}
                     </div>
                     <div class="quantity-controls">
                         <button type="button" class="btn-plus" data-index="${index}" data-delta="1"
-                            aria-label="Aumentar quantidade de ${item.nome}"
+                            aria-label="Aumentar quantidade de ${nomeSeguro}"
                             ${atingiuLimite ? 'disabled style="opacity:0.35; cursor:not-allowed;" title="Limite máximo de estoque atingido"' : ''}>+</button>
                         <span class="qty-value">${item.quantidade}</span>
                         <button type="button" class="btn-minus" data-index="${index}" data-delta="-1"
-                            aria-label="Diminuir quantidade de ${item.nome}">-</button>
+                            aria-label="Diminuir quantidade de ${nomeSeguro}">-</button>
                     </div>
-                    <button type="button" class="btn-remove" data-index="${index}" title="Remover item" aria-label="Remover ${item.nome}">
+                    <button type="button" class="btn-remove" data-index="${index}" title="Remover item" aria-label="Remover ${nomeSeguro}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -413,7 +436,7 @@ function injetarBotaoLimparCarrinho() {
         const executarLimpeza = () => {
             localStorage.removeItem(CONFIG_CARRINHO_SR.chaveCarrinho);
             reRenderizarCarrinhoSemReload();
-            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+            sincronizarBadgesCarrinhoSR();
         };
 
         if (window.srModal) {
@@ -445,19 +468,38 @@ function injetarExtrasPagamento() {
             <strong style="color:#00e676;">⚡ Pagamento instantâneo via Pix</strong>
             <p style="font-size:12px; color:#bbb; margin-top:4px;">Aprovação imediata! Copie o código abaixo se quiser simular o pagamento:</p>
             <div class="sr-pix-codigo">
-                <input type="text" value="${codigoPix}" readonly id="sr-input-pix">
+                <input type="text" value="${escaparHtmlCarrinhoSR(codigoPix)}" readonly id="sr-input-pix">
                 <button type="button" class="sr-btn-copiar" id="sr-btn-copiar-pix">Copiar</button>
             </div>
         `;
         fieldset.appendChild(boxPix);
 
-        document.getElementById('sr-btn-copiar-pix')?.addEventListener('click', (e) => {
-            navigator.clipboard?.writeText(codigoPix).catch(() => {});
-            e.target.textContent = 'Copiado ✔';
-            e.target.style.backgroundColor = '#28a745';
+        document.getElementById('sr-btn-copiar-pix')?.addEventListener('click', async (e) => {
+            const btnCopiar = e.currentTarget;
+            let copiado = false;
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(codigoPix);
+                    copiado = true;
+                }
+            } catch {}
+
+            if (!copiado) {
+                const inputPix = document.getElementById('sr-input-pix');
+                if (inputPix) {
+                    inputPix.select();
+                    inputPix.setSelectionRange(0, 99999);
+                    try {
+                        copiado = document.execCommand('copy');
+                    } catch {}
+                }
+            }
+
+            btnCopiar.textContent = copiado ? 'Copiado ✔' : 'Selecionado';
+            btnCopiar.style.backgroundColor = '#28a745';
             setTimeout(() => {
-                e.target.textContent = 'Copiar';
-                e.target.style.backgroundColor = '';
+                btnCopiar.textContent = 'Copiar';
+                btnCopiar.style.backgroundColor = '';
             }, 2000);
         });
     }
@@ -535,16 +577,21 @@ async function injetarSugestoesProdutos() {
         secao.innerHTML = `
             <h3>✨ Aproveite e leve também</h3>
             <div class="sr-sugestoes-grid">
-                ${sugeridos.map((p) => `
-                    <div class="sr-sugestao-card">
-                        <img src="${p.imagem}" alt="${p.nome}">
-                        <strong>${p.nome}</strong>
-                        <span>R$ ${formatarMoedaSR(p.preco)}</span>
-                        <button type="button" class="btn-add-sugestao" data-nome="${p.nome}" data-preco="${p.preco}" data-imagem="${p.imagem}">
-                            + Adicionar
-                        </button>
-                    </div>
-                `).join('')}
+                ${sugeridos.map((p) => {
+                    const nomeSeg = escaparHtmlCarrinhoSR(p.nome);
+                    const imgSeg = escaparHtmlCarrinhoSR(p.imagem || 'imagens/logo.png');
+                    const precoSeg = Number(p.preco) || 0;
+                    return `
+                        <div class="sr-sugestao-card">
+                            <img src="${imgSeg}" alt="${nomeSeg}">
+                            <strong>${nomeSeg}</strong>
+                            <span>R$ ${formatarMoedaSR(precoSeg)}</span>
+                            <button type="button" class="btn-add-sugestao" data-nome="${nomeSeg}" data-preco="${precoSeg}" data-imagem="${imgSeg}">
+                                + Adicionar
+                            </button>
+                        </div>
+                    `;
+                }).join('')}
             </div>
         `;
 
@@ -563,7 +610,7 @@ async function injetarSugestoesProdutos() {
                 const qtdAtual = existente ? existente.quantidade : 0;
 
                 if (Number.isFinite(disp) && (disp <= 0 || qtdAtual + 1 > disp)) {
-                    window.srModal?.alerta(`Estoque insuficiente para <strong>${nome}</strong>.`, '- Estoque -', true);
+                    window.srModal?.alerta(`Estoque insuficiente para <strong>${escaparHtmlCarrinhoSR(nome)}</strong>.`, '- Estoque -', true);
                     return;
                 }
 
@@ -575,7 +622,7 @@ async function injetarSugestoesProdutos() {
 
                 salvarCarrinhoTurbo(atual);
                 reRenderizarCarrinhoSemReload();
-                if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+                sincronizarBadgesCarrinhoSR();
             });
         });
     } catch (err) {
@@ -609,7 +656,7 @@ function configurarAcoesCarrinhoSemReload() {
             const disponivel = obterEstoqueTurbo(carrinho[index].nome);
             if (Number.isFinite(disponivel) && carrinho[index].quantidade + passo > disponivel) {
                 window.srModal?.alerta(
-                    `Limite de estoque atingido! Temos apenas <strong>${disponivel}</strong> unidade(s) de <strong>${carrinho[index].nome}</strong>.`,
+                    `Limite de estoque atingido! Temos apenas <strong>${disponivel}</strong> unidade(s) de <strong>${escaparHtmlCarrinhoSR(carrinho[index].nome)}</strong>.`,
                     '- Estoque Máximo -',
                     true
                 );
@@ -624,7 +671,7 @@ function configurarAcoesCarrinhoSemReload() {
 
         salvarCarrinhoTurbo(carrinho);
         reRenderizarCarrinhoSemReload();
-        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+        sincronizarBadgesCarrinhoSR();
     };
 
     window.removerProduto = function (index) {
@@ -633,7 +680,7 @@ function configurarAcoesCarrinhoSemReload() {
         carrinho.splice(index, 1);
         salvarCarrinhoTurbo(carrinho);
         reRenderizarCarrinhoSemReload();
-        if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
+        sincronizarBadgesCarrinhoSR();
     };
 
     if (document.body.dataset.srCarrinhoCapturaAtiva !== 'true') {

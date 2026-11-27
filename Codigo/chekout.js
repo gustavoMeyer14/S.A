@@ -1,3 +1,12 @@
+function escaparHtmlCheckoutSR(valor) {
+    return String(valor ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const formEndereco = document.querySelector('.address-column');
     if (!formEndereco) return;
@@ -21,7 +30,9 @@ function lerCartoesCheckout() {
         if (Array.isArray(viaSite)) return viaSite;
     }
 
+    const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
     const chaveUsuario = obterChaveCartoesCheckout();
+
     try {
         const dadosUsuario = JSON.parse(localStorage.getItem(chaveUsuario));
         if (Array.isArray(dadosUsuario) && dadosUsuario.length > 0) return dadosUsuario;
@@ -29,7 +40,9 @@ function lerCartoesCheckout() {
 
     try {
         const legado = JSON.parse(localStorage.getItem('cartoesShadowRealm'));
-        return Array.isArray(legado) ? legado : [];
+        if (!Array.isArray(legado)) return [];
+        if (!usuarioAtual) return legado;
+        return legado.filter((c) => !c.usuarioEmail || String(c.usuarioEmail).trim().toLowerCase() === usuarioAtual);
     } catch {
         return [];
     }
@@ -38,8 +51,10 @@ function lerCartoesCheckout() {
 function montarHtmlOpcoesCartoes(cartoes) {
     return cartoes.map((c, idx) => {
         const rotulo = idx === 0 ? 'Principal' : 'Secundário';
-        const numero = c.numeroMascarado || (c.final ? `**** **** **** ${c.final}` : 'Cartão');
-        const titular = c.titular ? ` (${c.titular})` : '';
+        const numero = escaparHtmlCheckoutSR(
+            c.numeroMascarado || (c.final ? `**** **** **** ${c.final}` : 'Cartão')
+        );
+        const titular = c.titular ? ` (${escaparHtmlCheckoutSR(c.titular)})` : '';
         return `<option value="${idx}">${rotulo} - ${numero}${titular}</option>`;
     }).join('');
 }
@@ -85,6 +100,8 @@ function injetarSelecaoCartoes(cartoesSalvos) {
 function configurarSincronizacaoMetodosPagamento() {
     const radiosPagamento = document.querySelectorAll('input[name="payment-group"]');
     radiosPagamento.forEach((radio) => {
+        if (radio.dataset.srCheckoutSync === 'true') return;
+        radio.dataset.srCheckoutSync = 'true';
         radio.addEventListener('change', atualizarVisibilidadeCartaoCheckout);
     });
 }
@@ -95,6 +112,13 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
     const inputCidade = document.getElementById('input-cidade');
     const primeiroGrupo = formEndereco.querySelector('.form-group');
     if (!inputRua || !primeiroGrupo) return;
+
+    if (inputEstado && inputEstado.dataset.srUfBound !== 'true') {
+        inputEstado.dataset.srUfBound = 'true';
+        inputEstado.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 2);
+        });
+    }
 
     const cartaoComEndereco = cartoesSalvos.find((c) => c.endereco && c.endereco.trim() !== '');
     if (cartaoComEndereco && !document.getElementById('btn-usar-endereco-cartao')) {
@@ -121,7 +145,7 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
                 const partes = cartaoAlvo.endereco.split(',').map((p) => p.trim()).filter(Boolean);
                 inputRua.value = partes[0] || cartaoAlvo.endereco;
                 if (partes[1] && inputCidade) inputCidade.value = partes[1];
-                if (partes[2] && inputEstado) inputEstado.value = partes[2];
+                if (partes[2] && inputEstado) inputEstado.value = partes[2].toUpperCase().slice(0, 2);
 
                 const statusEl = document.getElementById('status-cep');
                 if (statusEl) {
@@ -179,7 +203,7 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
                 } else {
                     inputRua.value = dados.logradouro ? `${dados.logradouro}, ` : '';
                     if (inputCidade) inputCidade.value = dados.localidade || '';
-                    if (inputEstado) inputEstado.value = dados.uf || '';
+                    if (inputEstado) inputEstado.value = (dados.uf || '').toUpperCase();
                     statusCep.style.color = '#00e676';
                     statusCep.textContent = '✔ Endereço encontrado! Informe o número.';
                     inputRua.focus();
@@ -194,7 +218,8 @@ function injetarEnderecoAutomatico(formEndereco, cartoesSalvos) {
 
 function configurarFechamentoModalPagamento() {
     const telaPagamento = document.getElementById('tela-pagamento');
-    if (!telaPagamento) return;
+    if (!telaPagamento || telaPagamento.dataset.srModalBound === 'true') return;
+    telaPagamento.dataset.srModalBound = 'true';
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && window.location.hash === '#tela-pagamento') {
@@ -214,4 +239,5 @@ window.atualizarCartoesCheckoutSR = function () {
     if (!formEndereco) return;
     const cartoes = lerCartoesCheckout();
     injetarSelecaoCartoes(cartoes);
+    injetarEnderecoAutomatico(formEndereco, cartoes);
 };
