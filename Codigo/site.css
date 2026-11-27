@@ -2437,10 +2437,21 @@ header {
 header h1 {
   float: none !important;
   width: auto !important;
-  flex: 1 1 240px;
+  flex: 1 1 auto;
   margin: 0 !important;
   font-size: clamp(1.4rem, 2.8vw, 2.5rem) !important;
-  text-align: center;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  header {
+    justify-content: center;
+  }
+
+  header h1 {
+    flex-basis: 100%;
+    text-align: center;
+  }
 }
 
 .nav {
