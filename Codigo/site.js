@@ -1,3 +1,4 @@
+/* site.js */
 // =========================================================
 // BASE GLOBAL - SHADOW REALM STORE (site.js)
 // =========================================================
@@ -14,7 +15,8 @@ const CONFIG_SITE_SR = {
         carrinho: 'carrinhoShadowRealm',
         estoque: 'estoqueShadowRealm',
         pedidos: 'pedidosShadowRealm',
-        cartoesBase: 'cartoesShadowRealm'
+        cartoesBase: 'cartoesShadowRealm',
+        produtosCustom: 'produtosCustomShadowRealm'
     },
     cupons: {
         'SHADOW26': 0.10,
@@ -32,6 +34,118 @@ const CONFIG_SITE_SR = {
             senha: 'Pedro@1983',
             admin: true,
             tipo: 'admin'
+        }
+    ],
+    catalogoFallback: [
+        {
+            id: '1',
+            nome: 'Ichigo Kurosaki',
+            preco: 340.00,
+            estoque: 5,
+            categoria: 'Bleach',
+            pagina: 'produtos.html',
+            descricao: 'Escala: 1/6 (~32 cm), em resina de alto padrão. Pose e Expressão: Avançando em meio a ondas de energia espiritual com olhar determinado e máscara Hollow parcial opcional. Vestes e Armas: Shihakusho preto rasgado em movimento dinâmico, empunhando a Tensa Zangetsu com efeito translúcido de Getsuga Tensho negro e vermelho. Base Diorama: Solo rachado da Soul Society com destroços flutuantes.',
+            destaque: true,
+            imagem: 'imagens/bleach.png'
+        },
+        {
+            id: '2',
+            nome: 'Kisuke Urahara',
+            preco: 460.00,
+            estoque: 3,
+            categoria: 'Bleach',
+            pagina: 'produtos.html',
+            descricao: 'Escala: 1/6 (~30 cm), em resina de alto padrão. Pose e Expressão: Pousando em um pé só sobre um telhado japonês, com sorriso enigmático sob a sombra do chapéu listrado (inclui cabeça extra com expressão séria). Vestes e Armas: Haori verde esvoaçante com texturas desgastadas e sandálias geta, acompanhado da bengala no ombro ou braço extra empunhando a Benihime com efeito translúcido de Reiatsu vermelha. Base Diorama: Telhas de Karakura com lanterna apagada, Yoruichi em forma de gato preto na ponta e um frasco de Mod-Soul escondido.',
+            destaque: true,
+            imagem: 'imagens/kisuke.png'
+        },
+        {
+            id: '3',
+            nome: 'Renji Abarai',
+            preco: 400.00,
+            estoque: 4,
+            categoria: 'Bleach',
+            pagina: 'produtos.html',
+            descricao: 'Escala: 1/6 (~31 cm), em resina de alto padrão. Pose e Expressão: Em postura de ataque intenso com expressão feroz e sobrancelhas tatuadas em destaque. Vestes e Armas: Uniforme de Tenente da 6ª Divisão com faixa branca na testa e a Zabimaru em sua forma Shikai segmentada estendendo-se ao redor da figure. Base Diorama: Rocha esculpida com marcas de impacto e poeira levantada.',
+            destaque: true,
+            imagem: 'imagens/renje.png'
+        },
+        {
+            id: '4',
+            nome: 'Rukia Kuchiki',
+            preco: 430.00,
+            estoque: 6,
+            categoria: 'Bleach',
+            pagina: 'produtos.html',
+            descricao: 'Escala: 1/6 (~28 cm), em resina de alto padrão. Pose e Expressão: Postura elegante e serena executando uma dança de gelo. Vestes e Armas: Shihakusho tradicional e a Sode no Shirayuki totalmente branca com fita esvoaçante e cristais de gelo translúcidos em espiral. Base Diorama: Lago congelado com flores de gelo esculpidas e névoa fria ao redor.',
+            destaque: true,
+            imagem: 'imagens/rukia.png'
+        },
+        {
+            id: '5',
+            nome: 'Toshiro Hitsugaya',
+            preco: 200.00,
+            estoque: 2,
+            categoria: 'Bleach',
+            pagina: 'produtos.html',
+            descricao: 'Escala: 1/6 (~26 cm), em resina de alto padrão. Pose e Expressão: Flutuando em combate com olhar frio e focado de Capitão da 10ª Divisão. Vestes e Armas: Haori branco de Capitão esvoaçante, empunhando a Hyorinmaru envolta por um dragão de gelo translúcido com detalhes em azul cristalino. Base Diorama: Pilar de gelo pontiagudo emergindo do chão.',
+            destaque: true,
+            imagem: 'imagens/toshiro.png'
+        },
+        {
+            id: '6',
+            nome: 'Levi Ackerman',
+            preco: 250.00,
+            estoque: 5,
+            categoria: 'Attack on Titan',
+            pagina: 'index.html',
+            descricao: 'Escala: 1/6 (~29 cm), em resina de alto padrão. Pose e Expressão: No ar em pleno giro de ataque com expressão fria e olhar cortante de Capitão da Tropa de Exploração. Vestes e Armas: Capa verde com o brasão das Asas da Liberdade em movimento, equipamento DMT detalhado com cabos metálicos e lâminas duplas empunhadas em pegada invertida. Base Diorama: Telhado europeu quebrado com fumaça de propulsão translúcida.',
+            destaque: false,
+            imagem: 'imagens/Levi.png'
+        },
+        {
+            id: '7',
+            nome: 'Maomao',
+            preco: 300.00,
+            estoque: 4,
+            categoria: 'Diário de uma Apotecária',
+            pagina: 'index.html',
+            descricao: 'Escala: 1/6 (~25 cm), em resina de alto padrão. Pose e Expressão: Examinando atentamente um frasco de ervas com sorriso curioso e sardas delicadas (inclui rosto extra empolgado ao encontrar veneno). Vestes e Acessórios: Traje tradicional do Palácio Interno em tons de verde e rosa com acabamento texturizado, acompanhada de pilão, almofariz e caderno de anotações. Base Diorama: Mesa de boticário em madeira esculpida com potes de ervas e flores medicinais.',
+            destaque: false,
+            imagem: 'imagens/Maomao.png'
+        },
+        {
+            id: '8',
+            nome: 'Satoru Gojo',
+            preco: 350.00,
+            estoque: 3,
+            categoria: 'Jujutsu Kaisen',
+            pagina: 'index.html',
+            descricao: 'Escala: 1/6 (~33 cm), em resina de alto padrão. Pose e Expressão: Flutuando de forma relaxada e confiante, puxando a venda preta para revelar o brilho intenso dos Seis Olhos azuis. Vestes e Poderes: Uniforme escuro da Escola Jujutsu com textura fosca e esfera translúcida de Energia Amaldiçoada Vazio Roxo flutuando na ponta dos dedos. Base Diorama: Escombros urbanos suspensos no ar por distorção espacial.',
+            destaque: false,
+            imagem: 'imagens/Canva - download.png'
+        },
+        {
+            id: '9',
+            nome: 'Greninja',
+            preco: 400.00,
+            estoque: 2,
+            categoria: 'Pokémon',
+            pagina: 'index.html',
+            descricao: 'Escala: 1/6 (~27 cm), em resina de alto padrão. Pose e Expressão: Agachado sobre a superfície da água em postura ágil de ninja, pronto para o bote com olhar focado. Vestes e Poderes: Cachecol longo e fluido esculpido com movimento dinâmico e duas Water Shurikens gigantes em resina azul translúcida com efeito de respingos. Base Diorama: Onda cristalina quebrando sobre rochas submersas.',
+            destaque: false,
+            imagem: 'imagens/Canva - download (1).png'
+        },
+        {
+            id: '10',
+            nome: 'Snorlax',
+            preco: 450.00,
+            estoque: 1,
+            categoria: 'Pokémon',
+            pagina: 'index.html',
+            descricao: 'Escala: 1/6 (~28 cm de altura e largura), em resina maciça de alto padrão. Pose e Expressão: Tirando um cochilo profundo de barriga para cima após um banquete, com expressão tranquila e feliz. Detalhes e Acessórios: Pintura fosca com sombreamento suave na pelagem azul-petróleo e creme, acompanhado de uma Poké Flauta dourada e várias Berries espalhadas ao redor. Base Diorama: Gramado florido da Rota 12 com placa de madeira.',
+            destaque: false,
+            imagem: 'imagens/Snorlax.png'
         }
     ]
 };
@@ -62,6 +176,61 @@ function escaparTextoSiteSR(texto) {
         .replace(/'/g, '&#39;');
 }
 
+async function carregarProdutosSR() {
+    let baseProdutos = CONFIG_SITE_SR.catalogoFallback.slice();
+
+    try {
+        const resp = await fetch('produtos.json');
+        if (resp.ok) {
+            const listaJson = await resp.json();
+            if (Array.isArray(listaJson) && listaJson.length > 0) {
+                baseProdutos = listaJson;
+            }
+        }
+    } catch {}
+
+    const customSalvos = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.produtosCustom, []);
+    const custom = Array.isArray(customSalvos) ? customSalvos : [];
+
+    const mapa = new Map();
+    baseProdutos.forEach((item, idx) => {
+        if (!item || !item.nome) return;
+        const chave = String(item.nome).trim().toLowerCase();
+        mapa.set(chave, {
+            id: item.id || String(idx + 1),
+            nome: String(item.nome).trim(),
+            preco: Number(item.preco) || 0,
+            estoque: Number(item.estoque) >= 0 ? Number(item.estoque) : 5,
+            categoria: String(item.categoria || 'Colecionável').trim(),
+            pagina: item.pagina || 'produtos.html',
+            descricao: String(item.descricao || '').trim(),
+            destaque: Boolean(item.destaque),
+            imagem: String(item.imagem || 'imagens/produto.png').trim()
+        });
+    });
+
+    custom.forEach((item, idx) => {
+        if (!item || !item.nome) return;
+        const chave = String(item.nome).trim().toLowerCase();
+        const anterior = mapa.get(chave) || {};
+        mapa.set(chave, {
+            id: item.id || anterior.id || `custom_${idx + 1}`,
+            nome: String(item.nome).trim(),
+            preco: Number(item.preco) || Number(anterior.preco) || 0,
+            estoque: Number(item.estoque) >= 0 ? Number(item.estoque) : (Number(anterior.estoque) || 5),
+            categoria: String(item.categoria || anterior.categoria || 'Colecionável').trim(),
+            pagina: item.pagina || anterior.pagina || 'produtos.html',
+            descricao: String(item.descricao || anterior.descricao || '').trim(),
+            destaque: Boolean(item.destaque ?? anterior.destaque),
+            imagem: String(item.imagem || anterior.imagem || 'imagens/produto.png').trim()
+        });
+    });
+
+    return Array.from(mapa.values());
+}
+
+window.carregarProdutosSR = carregarProdutosSR;
+
 function abreModalCliente() {
     const modal = document.getElementById('modalCliente');
     if (modal) modal.classList.add('aberto');
@@ -86,31 +255,14 @@ function toggleSenha(inputId, btnElement) {
 }
 
 function exibirAvisoSite(mensagem, titulo = '- Shadow Realm Store -', aoFechar = null, isHTML = false) {
-    const ligarFechamento = () => {
-        if (typeof aoFechar !== 'function') return;
-        const btnOk = document.getElementById('sr-btn-ok');
-        const dialog = document.getElementById('sr-modal-global');
-        if (btnOk) {
-            const handler = () => {
-                btnOk.removeEventListener('click', handler);
-                aoFechar();
-            };
-            btnOk.addEventListener('click', handler);
-        } else if (dialog) {
-            dialog.addEventListener('close', aoFechar, { once: true });
-        }
-    };
-
     if (window.srModal && typeof window.srModal.alerta === 'function') {
-        window.srModal.alerta(mensagem, titulo, isHTML);
-        ligarFechamento();
+        window.srModal.alerta(mensagem, titulo, isHTML, aoFechar);
         return;
     }
 
     const tentar = () => {
         if (window.srModal && typeof window.srModal.alerta === 'function') {
-            window.srModal.alerta(mensagem, titulo, isHTML);
-            ligarFechamento();
+            window.srModal.alerta(mensagem, titulo, isHTML, aoFechar);
         } else if (typeof aoFechar === 'function') {
             aoFechar();
         }
@@ -637,8 +789,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function obterEstoqueCarrinho(nomeProduto) {
-        if (typeof obterEstoque === 'function') {
-            return obterEstoque(nomeProduto);
+        if (typeof window.obterEstoque === 'function') {
+            return window.obterEstoque(nomeProduto);
         }
         const est = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.estoque, null);
         if (est && est[nomeProduto] !== undefined) {
@@ -829,8 +981,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const { totalFinal } = calcularTotaisCarrinho(carrinho);
 
-            if (typeof darBaixaNoEstoque === 'function') {
-                const resultadoEstoque = darBaixaNoEstoque(carrinho);
+            if (typeof window.darBaixaNoEstoque === 'function') {
+                const resultadoEstoque = window.darBaixaNoEstoque(carrinho);
                 if (!resultadoEstoque.sucesso) {
                     exibirAvisoSite(resultadoEstoque.mensagem, '- Estoque Insuficiente -');
                     return;

@@ -1,6 +1,16 @@
+/* extras-loja.js */
 // =========================================================
 // EXTRAS DA LOJA: FRETE, FAQ, NEWSLETTER INTELIGENTE E TOPO
 // =========================================================
+
+function escaparTextoExtraSR(texto) {
+    return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const pagina = window.location.pathname.toLowerCase();
@@ -71,11 +81,12 @@ function injetarCalculadoraFrete() {
                 res.textContent = 'Digite um CEP válido com 8 números.';
                 return;
             }
+            const cepSeguro = escaparTextoExtraSR(input.value);
             res.style.color = '#00e676';
             if (precoProduto >= 250) {
-                res.textContent = `✔ Frete GRÁTIS para o CEP ${input.value} • Entrega estimada em 3 a 5 dias úteis.`;
+                res.textContent = `✔ Frete GRÁTIS para o CEP ${cepSeguro} • Entrega estimada em 3 a 5 dias úteis.`;
             } else {
-                res.textContent = `📦 Frete Expresso: R$ 19,90 para ${input.value} • Entrega em 3 a 5 dias úteis.`;
+                res.textContent = `📦 Frete Expresso: R$ 19,90 para ${cepSeguro} • Entrega em 3 a 5 dias úteis.`;
             }
         });
 
@@ -125,8 +136,9 @@ function injetarNewsletter() {
         }
 
         if (window.srModal) {
+            const emailSeguro = escaparTextoExtraSR(email);
             const htmlVip = `
-                <p>Bem-vindo ao Clube VIP, <strong>${email}</strong>! 🎉</p>
+                <p>Bem-vindo ao Clube VIP, <strong>${emailSeguro}</strong>! 🎉</p>
                 <p>Seu cupom exclusivo de <strong>50% OFF</strong> foi desbloqueado:</p>
                 <div style="margin:15px auto; padding:12px; background:#0d0d0d; border:1px dashed #ffca28; border-radius:12px; display:flex; justify-content:center; align-items:center; gap:12px;">
                     <strong style="font-size:22px; color:#ffca28; letter-spacing:2px;">SHADOW50</strong>

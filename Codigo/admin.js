@@ -1,4 +1,22 @@
+/* admin.js */
 var administradorEncontrado = null;
+
+function escAdminSR(texto) {
+    return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function avisoAdminSR(mensagem, titulo = '- Administração -') {
+    if (window.srModal && typeof window.srModal.alerta === 'function') {
+        window.srModal.alerta(mensagem, titulo);
+    } else {
+        alert(mensagem);
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     const nomePagina = window.location.pathname.split("/").pop().toLowerCase();
@@ -9,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Bloqueia o cadastro de administrador para quem não é administrador
     if (ehPaginaCadastroAdmin && (!usuarioLogado || tipoUsuario !== "admin")) {
-        alert("Acesso negado! Apenas administradores logados podem cadastrar novos administradores.");
+        avisoAdminSR("Acesso negado! Apenas administradores logados podem cadastrar novos administradores.");
         window.location.replace("loginAdmin.html");
         return;
     }
@@ -77,14 +95,14 @@ function lerAdministradores() {
 }
 
 async function validaCadastroAdmin() {
-
     var f = document.frmCadastroAdmin;
+    if (!f) return false;
 
     var nome = f.txtnome.value.trim();
     var expRegnome = /^[A-ZÀ-Ú][a-zà-ú]+(\s+[A-ZÀ-Ú][a-zà-ú]+)+$/i;
 
     if (!expRegnome.test(nome)) {
-        alert("Preencha o Campo Nome completo (nome e sobrenome)!!!");
+        avisoAdminSR("Preencha o Campo Nome completo (nome e sobrenome)!!!");
         f.txtnome.focus();
         return false;
     }
@@ -93,15 +111,15 @@ async function validaCadastroAdmin() {
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
     if (!expRegemail.test(email)) {
-        alert("Preencha o Campo Email ou formato inválido !!!");
+        avisoAdminSR("Preencha o Campo Email ou formato inválido !!!");
         f.txtemail.focus();
         return false;
     }
 
     var cpf = f.txtcpf.value;
 
-    if (cpf.trim() === "" || cpfInvalido(cpf)) {
-        alert("CPF inválido! Verifique os números digitados.");
+    if (cpf.trim() === "" || (typeof cpfInvalido === "function" && cpfInvalido(cpf))) {
+        avisoAdminSR("CPF inválido! Verifique os números digitados.");
         f.txtcpf.focus();
         return false;
     }
@@ -110,7 +128,7 @@ async function validaCadastroAdmin() {
     var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
-        alert("A senha deve ter no mínimo 8 caracteres, contendo letras e números.");
+        avisoAdminSR("A senha deve ter no mínimo 8 caracteres, contendo letras e números.");
         f.txtsenha.focus();
         return false;
     }
@@ -124,7 +142,7 @@ async function validaCadastroAdmin() {
     });
 
     if (jaExiste) {
-        alert("Este e-mail ou CPF já está cadastrado como administrador!");
+        avisoAdminSR("Este e-mail ou CPF já está cadastrado como administrador!");
         return false;
     }
 
@@ -137,37 +155,37 @@ async function validaCadastroAdmin() {
 
     renderizarDadosAdmin(dados);
 
-    document.getElementById("modalCadastroAdmin").classList.add("aberto");
+    var modalCadastro = document.getElementById("modalCadastroAdmin");
+    if (modalCadastro) {
+        modalCadastro.classList.add("aberto");
+    }
 
     return false;
 }
 
 function renderizarDadosAdmin(dados) {
-
     var lista = document.getElementById("listaDadosAdmin");
+    if (!lista) return;
 
     lista.innerHTML = "";
 
     dados.forEach(function (item) {
-
         var li = document.createElement("li");
-
-        li.innerHTML = "<strong>" + item[0] + ":</strong> " + item[1];
-
+        li.innerHTML = "<strong>" + escAdminSR(item[0]) + ":</strong> " + escAdminSR(item[1]);
         lista.appendChild(li);
-
     });
 }
 
 function fechaModalAdmin() {
-
-    document.getElementById("modalCadastroAdmin").classList.remove("aberto");
-
+    var modalCadastro = document.getElementById("modalCadastroAdmin");
+    if (modalCadastro) {
+        modalCadastro.classList.remove("aberto");
+    }
 }
 
 function confirmaCadastroAdmin() {
-
     var f = document.frmCadastroAdmin;
+    if (!f) return;
 
     var novoAdmin = {
         nome: f.txtnome.value.trim(),
@@ -184,7 +202,7 @@ function confirmaCadastroAdmin() {
     });
 
     if (jaExiste) {
-        alert("Este e-mail ou CPF já está cadastrado!");
+        avisoAdminSR("Este e-mail ou CPF já está cadastrado!");
         fechaModalAdmin();
         return;
     }
@@ -196,13 +214,22 @@ function confirmaCadastroAdmin() {
         JSON.stringify(administradores)
     );
 
-    alert("Cadastro de administrador realizado com sucesso!");
-
     fechaModalAdmin();
-
     f.reset();
 
-    window.location.href = "admin.html";
+    if (window.srModal && typeof window.srModal.alerta === "function") {
+        window.srModal.alerta(
+            "Cadastro de administrador realizado com sucesso!",
+            "- Cadastro Concluído -",
+            false,
+            function () {
+                window.location.href = "admin.html";
+            }
+        );
+    } else {
+        alert("Cadastro de administrador realizado com sucesso!");
+        window.location.href = "admin.html";
+    }
 }
 
 // ==========================================
@@ -210,14 +237,14 @@ function confirmaCadastroAdmin() {
 // ==========================================
 
 async function validaLoginAdmin() {
-
     var f = document.frmLoginAdmin;
+    if (!f) return false;
 
     var email = f.txtemail.value.trim().toLowerCase();
     var expRegemail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
     if (!expRegemail.test(email)) {
-        alert("Preencha o Campo Email ou formato inválido !!!");
+        avisoAdminSR("Preencha o Campo Email ou formato inválido !!!");
         f.txtemail.focus();
         return false;
     }
@@ -226,7 +253,7 @@ async function validaLoginAdmin() {
     var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
     if (senha.trim() === "" || !expRegsenha.test(senha)) {
-        alert("Preencha o Campo Senha corretamente!");
+        avisoAdminSR("Preencha o Campo Senha corretamente!");
         f.txtsenha.focus();
         return false;
     }
@@ -241,7 +268,7 @@ async function validaLoginAdmin() {
     });
 
     if (!administradorEncontrado) {
-        alert("E-mail ou senha de administrador incorretos!");
+        avisoAdminSR("E-mail ou senha de administrador incorretos!");
         return false;
     }
 
@@ -258,10 +285,19 @@ async function validaLoginAdmin() {
         tipo: "admin"
     }));
 
-    alert("Login de administrador realizado com sucesso!");
-
-    // Redireciona para o painel administrativo
-    window.location.href = "admin.html";
+    if (window.srModal && typeof window.srModal.alerta === "function") {
+        window.srModal.alerta(
+            "Login de administrador realizado com sucesso!",
+            "- Acesso Permitido -",
+            false,
+            function () {
+                window.location.href = "admin.html";
+            }
+        );
+    } else {
+        alert("Login de administrador realizado com sucesso!");
+        window.location.href = "admin.html";
+    }
 
     return false;
 }
@@ -279,7 +315,7 @@ async function obterTodosAdministradores() {
         }
     } catch (e) {}
 
-    if (administradoresJSON.length === 0) {
+    if (!Array.isArray(administradoresJSON) || administradoresJSON.length === 0) {
         administradoresJSON = [
             {
                 id: "1",
@@ -297,7 +333,8 @@ async function obterTodosAdministradores() {
 
     administradoresJSON.forEach(function (jsonAdmin) {
         var versaoEditada = locais.find(function (l) {
-            return l.idOrigin === jsonAdmin.id || l.email.toLowerCase() === jsonAdmin.email.toLowerCase();
+            return (jsonAdmin.id && l.idOrigin === jsonAdmin.id) ||
+                (jsonAdmin.email && l.email && l.email.toLowerCase() === jsonAdmin.email.toLowerCase());
         });
 
         if (versaoEditada) {
@@ -309,7 +346,8 @@ async function obterTodosAdministradores() {
 
     locais.forEach(function (localAdmin) {
         var jaAdicionado = listaFinal.some(function (item) {
-            return item.email.toLowerCase() === localAdmin.email.toLowerCase();
+            return item.email && localAdmin.email &&
+                item.email.toLowerCase() === localAdmin.email.toLowerCase();
         });
         if (!jaAdicionado) {
             listaFinal.push(Object.assign({}, localAdmin, { sistema: false }));
@@ -337,12 +375,17 @@ async function renderizarPainelAdminsCadastrados(filtroTexto) {
             </div>
         `;
 
-        document.getElementById("buscaAdminCrud").addEventListener("input", function (e) {
-            renderizarPainelAdminsCadastrados(e.target.value);
-        });
+        var buscaInput = document.getElementById("buscaAdminCrud");
+        if (buscaInput) {
+            buscaInput.addEventListener("input", function (e) {
+                renderizarPainelAdminsCadastrados(e.target.value);
+            });
+        }
     }
 
     var listaEl = document.getElementById("listaAdminsCrud");
+    if (!listaEl) return;
+
     var termo = (filtroTexto || "").trim().toLowerCase();
     var usuarioAtual = (localStorage.getItem("usuarioAtual") || "").toLowerCase();
 
@@ -362,27 +405,43 @@ async function renderizarPainelAdminsCadastrados(filtroTexto) {
     listaEl.innerHTML = "";
 
     filtrados.forEach(function (admin) {
-        var ehUsuarioLogado = admin.email.toLowerCase() === usuarioAtual;
+        var emailAdmin = String(admin.email || "");
+        var ehUsuarioLogado = emailAdmin.toLowerCase() === usuarioAtual;
         var badgeTexto = admin.sistema ? "Principal" : (ehUsuarioLogado ? "Admin Atual" : "Administrador");
 
         var botaoRemoverHTML = admin.sistema
             ? ""
-            : `<button type="button" class="btnAdminRemover" onclick="excluirAdminCrud('${admin.email}')">Remover</button>`;
+            : '<button type="button" class="btnAdminRemover" data-email-remover="' + escAdminSR(emailAdmin) + '">Remover</button>';
 
         var card = document.createElement("div");
         card.className = "adminCrudCard";
         card.innerHTML = `
             <div class="adminCrudInfo">
-                <span class="adminCrudBadge">${badgeTexto}</span>
-                <h3>${admin.nome}</h3>
-                <p><strong>E-mail:</strong> ${admin.email}</p>
-                <p><strong>CPF:</strong> ${admin.cpf || "Não informado"}</p>
+                <span class="adminCrudBadge">${escAdminSR(badgeTexto)}</span>
+                <h3>${escAdminSR(admin.nome)}</h3>
+                <p><strong>E-mail:</strong> ${escAdminSR(emailAdmin)}</p>
+                <p><strong>CPF:</strong> ${escAdminSR(admin.cpf || "Não informado")}</p>
             </div>
             <div class="adminCrudAcoes">
-                <button type="button" class="btnAdminEditar" onclick="abrirModalEditarAdmin('${admin.email}')">Editar</button>
+                <button type="button" class="btnAdminEditar" data-email-editar="${escAdminSR(emailAdmin)}">Editar</button>
                 ${botaoRemoverHTML}
             </div>
         `;
+
+        var btnEditar = card.querySelector(".btnAdminEditar");
+        if (btnEditar) {
+            btnEditar.addEventListener("click", function () {
+                abrirModalEditarAdmin(emailAdmin);
+            });
+        }
+
+        var btnRemover = card.querySelector(".btnAdminRemover");
+        if (btnRemover) {
+            btnRemover.addEventListener("click", function () {
+                excluirAdminCrud(emailAdmin);
+            });
+        }
+
         listaEl.appendChild(card);
     });
 }
@@ -390,11 +449,11 @@ async function renderizarPainelAdminsCadastrados(filtroTexto) {
 async function abrirModalEditarAdmin(email) {
     var todos = await obterTodosAdministradores();
     var admin = todos.find(function (a) {
-        return a.email.toLowerCase() === email.toLowerCase();
+        return a.email && a.email.toLowerCase() === String(email || "").toLowerCase();
     });
 
     if (!admin) {
-        alert("Administrador não encontrado para edição.");
+        avisoAdminSR("Administrador não encontrado para edição.");
         return;
     }
 
@@ -405,19 +464,27 @@ async function abrirModalEditarAdmin(email) {
     document.getElementById("editAdminSenha").value = "";
 
     var inputCpfEdit = document.getElementById("editAdminCpf");
-    inputCpfEdit.oninput = function (e) {
-        var v = e.target.value.replace(/\D/g, "").slice(0, 11);
-        v = v.replace(/(\d{3})(\d)/, "$1.$2");
-        v = v.replace(/(\d{3})(\d)/, "$1.$2");
-        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-        e.target.value = v;
-    };
+    if (inputCpfEdit) {
+        inputCpfEdit.oninput = function (e) {
+            var v = e.target.value.replace(/\D/g, "").slice(0, 11);
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            e.target.value = v;
+        };
+    }
 
-    document.getElementById("modalEditarAdmin").classList.add("aberto");
+    var modalEditar = document.getElementById("modalEditarAdmin");
+    if (modalEditar) {
+        modalEditar.classList.add("aberto");
+    }
 }
 
 function fecharModalEditarAdmin() {
-    document.getElementById("modalEditarAdmin").classList.remove("aberto");
+    var modalEditar = document.getElementById("modalEditarAdmin");
+    if (modalEditar) {
+        modalEditar.classList.remove("aberto");
+    }
 }
 
 async function salvarEdicaoAdmin() {
@@ -429,43 +496,44 @@ async function salvarEdicaoAdmin() {
 
     var expRegnome = /^[A-ZÀ-Ú][a-zà-ú]+(\s+[A-ZÀ-Ú][a-zà-ú]+)+$/i;
     if (!expRegnome.test(novoNome)) {
-        alert("Informe o nome completo (nome e sobrenome).");
+        avisoAdminSR("Informe o nome completo (nome e sobrenome).");
         return;
     }
 
     if (novoCpf !== "" && typeof cpfInvalido === "function" && cpfInvalido(novoCpf)) {
-        alert("CPF inválido!");
+        avisoAdminSR("CPF inválido!");
         return;
     }
 
     if (novaSenha !== "") {
         var expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
         if (!expRegsenha.test(novaSenha)) {
-            alert("A nova senha deve ter no mínimo 8 caracteres, com letras e números.");
+            avisoAdminSR("A nova senha deve ter no mínimo 8 caracteres, com letras e números.");
             return;
         }
     }
 
     var todos = await obterTodosAdministradores();
     var adminAlvo = todos.find(function (a) {
-        return a.email.toLowerCase() === emailOriginal;
+        return a.email && a.email.toLowerCase() === emailOriginal;
     });
 
     if (!adminAlvo) return;
 
     var duplicado = todos.some(function (a) {
-        return a.email.toLowerCase() !== emailOriginal &&
+        return a.email && a.email.toLowerCase() !== emailOriginal &&
                (a.email.toLowerCase() === novoEmail || (novoCpf && a.cpf === novoCpf));
     });
 
     if (duplicado) {
-        alert("Já existe outro administrador com este e-mail ou CPF!");
+        avisoAdminSR("Já existe outro administrador com este e-mail ou CPF!");
         return;
     }
 
     var locais = lerAdministradores();
     var indiceLocal = locais.findIndex(function (a) {
-        return a.email.toLowerCase() === emailOriginal || (adminAlvo.id && a.idOrigin === adminAlvo.id);
+        return (a.email && a.email.toLowerCase() === emailOriginal) ||
+               (adminAlvo.id && a.idOrigin === adminAlvo.id);
     });
 
     var registroAtualizado = {
@@ -490,27 +558,38 @@ async function salvarEdicaoAdmin() {
         localStorage.setItem("usuarioNome", novoNome);
     }
 
-    alert("Dados do administrador atualizados com sucesso!");
     fecharModalEditarAdmin();
-    renderizarPainelAdminsCadastrados();
+    await renderizarPainelAdminsCadastrados();
+    avisoAdminSR("Dados do administrador atualizados com sucesso!");
 }
 
 function excluirAdminCrud(email) {
+    var emailAlvo = String(email || "").toLowerCase();
     var usuarioAtual = (localStorage.getItem("usuarioAtual") || "").toLowerCase();
 
-    if (email.toLowerCase() === usuarioAtual) {
-        alert("Você não pode remover a sua própria conta enquanto está logado nela!");
+    if (emailAlvo === usuarioAtual) {
+        avisoAdminSR("Você não pode remover a sua própria conta enquanto está logado nela!");
         return;
     }
 
-    if (!confirm("Tem certeza que deseja remover este administrador?")) return;
+    var executarRemocao = function () {
+        var locais = lerAdministradores();
+        var filtrados = locais.filter(function (a) {
+            return !a.email || a.email.toLowerCase() !== emailAlvo;
+        });
 
-    var locais = lerAdministradores();
-    var filtrados = locais.filter(function (a) {
-        return a.email.toLowerCase() !== email.toLowerCase();
-    });
+        localStorage.setItem("administradoresShadowRealm", JSON.stringify(filtrados));
+        renderizarPainelAdminsCadastrados();
+        avisoAdminSR("Administrador removido com sucesso!");
+    };
 
-    localStorage.setItem("administradoresShadowRealm", JSON.stringify(filtrados));
-    alert("Administrador removido com sucesso!");
-    renderizarPainelAdminsCadastrados();
+    if (window.srModal && typeof window.srModal.confirmar === "function") {
+        window.srModal.confirmar(
+            "Tem certeza que deseja remover este administrador?",
+            executarRemocao,
+            "- Remover Administrador -"
+        );
+    } else if (confirm("Tem certeza que deseja remover este administrador?")) {
+        executarRemocao();
+    }
 }

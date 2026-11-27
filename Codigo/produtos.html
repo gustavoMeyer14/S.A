@@ -1,3 +1,4 @@
+<!-- produtos.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -8,7 +9,7 @@
     <meta name="author" content="Shadow Realm">
     <title>Shadow Realm Store - Produtos</title>
     <link rel="stylesheet" href="site.css">
-    <script src="site.js"></script>
+    <script src="site.js" defer></script>
     <script src="admin.js" defer></script>
     <script src="conta.js" defer></script>
     <script src="shopee.js" defer></script>
@@ -19,9 +20,8 @@
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
     <link rel="stylesheet" href="ajustes-seguros.css">
-<script src="loja-turbo.js" defer></script>
-<script src="integracao-segura.js" defer></script>
-<script src="novas-funcoes-sr.js" defer></script>
+    <script src="loja-turbo.js" defer></script>
+    <script src="integracao-segura.js" defer></script>
     <style>
         .modalRastreio[open] {
             position: fixed !important;
@@ -103,8 +103,7 @@
                 <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
                 <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
-                        src="imagens/Usuario.png" alt="Usuário"></button>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
     </header>
@@ -201,9 +200,27 @@
     <script>
         let catalogoAtualProdutos = [];
 
+        function escProd(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function lerCarrinhoProdutos() {
+            try {
+                const dados = JSON.parse(localStorage.getItem('carrinhoShadowRealm'));
+                return Array.isArray(dados) ? dados : [];
+            } catch {
+                return [];
+            }
+        }
+
         async function renderizarVitrineProdutos() {
             if (window.promessaEstoqueSR) await window.promessaEstoqueSR;
-            catalogoAtualProdutos = await carregarProdutosSR();
+            catalogoAtualProdutos = typeof carregarProdutosSR === 'function' ? await carregarProdutosSR() : [];
 
             const secao = document.querySelector('.destaques');
             if (!secao || !Array.isArray(catalogoAtualProdutos) || catalogoAtualProdutos.length === 0) return;
@@ -214,17 +231,20 @@
             if (selectCategoria) {
                 const categoriasUnicas = [...new Set(catalogoAtualProdutos.map(p => p.categoria).filter(Boolean))];
                 selectCategoria.innerHTML = '<option value="Todos">Todos os Animes</option>' +
-                    categoriasUnicas.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+                    categoriasUnicas.map(cat => `<option value="${escProd(cat)}">${escProd(cat)}</option>`).join('');
             }
 
             catalogoAtualProdutos.forEach((prod, idx) => {
                 const num = idx + 1;
-                const precoFormatado = Number(prod.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const precoNum = Number(prod.preco) || 0;
+                const precoFormatado = precoNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const imgSegura = escProd(prod.imagem || 'imagens/produto.png');
+                const nomeSeguro = escProd(prod.nome);
 
                 const card = document.createElement('div');
                 card.innerHTML = `
-                    <img src="${prod.imagem || 'imagens/produto.png'}" alt="${prod.nome}">
-                    <p>${prod.nome}</p>
+                    <img src="${imgSegura}" alt="${nomeSeguro}">
+                    <p>${nomeSeguro}</p>
                     <h3><strong>R$ ${precoFormatado}</strong></h3>
                     <button type="button" id="card${num}">Ver mais</button>
                 `;
@@ -234,19 +254,19 @@
                 modal.className = 'modalProduto';
                 modal.innerHTML = `
                     <div class="modalProduto-conteudo">
-                        <img src="${prod.imagem || 'imagens/produto.png'}" alt="${prod.nome}">
+                        <img src="${imgSegura}" alt="${nomeSeguro}">
                         <div class="modalProduto-texto">
-                            <h2>- ${prod.nome}</h2>
-                            <p>${prod.descricao}</p>
+                            <h2>- ${nomeSeguro}</h2>
+                            <p>${escProd(prod.descricao)}</p>
                         </div>
                     </div>
                     <div class="modalProduto-comentarios"></div>
                     <footer class="modal-footer">
                         <button type="button" id="fechar-card${num}" class="btn-fechar">Fechar</button>
-                        <button type="button" class="btn-carrinho" data-nome="${prod.nome}" data-preco="${prod.preco}"
-                            data-imagem="${prod.imagem || 'imagens/produto.png'}">+ Carrinho</button>
-                        <button type="button" class="btn-comprar-agora" data-nome="${prod.nome}" data-preco="${prod.preco}"
-                            data-imagem="${prod.imagem || 'imagens/produto.png'}">Comprar Agora</button>
+                        <button type="button" class="btn-carrinho" data-nome="${nomeSeguro}" data-preco="${precoNum}"
+                            data-imagem="${imgSegura}">+ Carrinho</button>
+                        <button type="button" class="btn-comprar-agora" data-nome="${nomeSeguro}" data-preco="${precoNum}"
+                            data-imagem="${imgSegura}">Comprar Agora</button>
                     </footer>
                 `;
 
@@ -357,19 +377,19 @@
             }
 
             const nome = botao.getAttribute('data-nome');
-            const preco = parseFloat(botao.getAttribute('data-preco'));
+            const preco = parseFloat(botao.getAttribute('data-preco')) || 0;
             const imagem = botao.getAttribute('data-imagem');
 
-            let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+            const carrinho = lerCarrinhoProdutos();
             const produtoExistente = carrinho.find(item => item.nome === nome);
 
             if (typeof obterEstoque === 'function') {
                 const disponivel = obterEstoque(nome);
-                const qtdNoCarrinho = produtoExistente ? produtoExistente.quantidade : 0;
+                const qtdNoCarrinho = produtoExistente ? (Number(produtoExistente.quantidade) || 0) : 0;
 
                 if (disponivel <= 0) {
                     if (modalAtual) modalAtual.close();
-                    abrirModalAviso('- Produto Esgotado -', `Desculpe, <strong>${nome}</strong> está esgotado no momento!`, false);
+                    abrirModalAviso('- Produto Esgotado -', `Desculpe, <strong>${escProd(nome)}</strong> está esgotado no momento!`, false);
                     return;
                 }
                 if (qtdNoCarrinho + 1 > disponivel) {
@@ -380,7 +400,7 @@
             }
 
             if (produtoExistente) {
-                produtoExistente.quantidade += 1;
+                produtoExistente.quantidade = (Number(produtoExistente.quantidade) || 1) + 1;
             } else {
                 carrinho.push({ nome, preco, imagem, quantidade: 1 });
             }
@@ -392,7 +412,7 @@
                 window.location.href = 'carrinho.html#tela-pagamento';
             } else if (modalAtual) {
                 modalAtual.close();
-                abrirModalAviso('- Produto Adicionado -', `O produto <strong>${nome}</strong> foi adicionado ao seu carrinho!`, true);
+                abrirModalAviso('- Produto Adicionado -', `O produto <strong>${escProd(nome)}</strong> foi adicionado ao seu carrinho!`, true);
             } else {
                 const iconeAnterior = botao.innerHTML;
                 botao.innerHTML = '✔';
@@ -416,7 +436,7 @@
             const btnPesquisa = document.getElementById('enviarPesquisa');
 
             function limparTexto(texto) {
-                return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                return String(texto || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
             }
 
             function aplicarTodosFiltros() {
@@ -430,7 +450,9 @@
                 let visiveis = 0;
 
                 cards.forEach(card => {
-                    const nomeCard = card.querySelector('p').innerText;
+                    const nomeEl = card.querySelector('p');
+                    if (!nomeEl) return;
+                    const nomeCard = nomeEl.innerText;
                     const dados = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeCard.toLowerCase());
                     if (!dados) return;
 
@@ -455,8 +477,10 @@
 
                 if (ordemEscolhida !== 'padrao') {
                     const cardsOrdenados = [...cards].sort((a, b) => {
-                        const dadosA = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === a.querySelector('p').innerText.toLowerCase());
-                        const dadosB = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === b.querySelector('p').innerText.toLowerCase());
+                        const nomeA = a.querySelector('p')?.innerText || '';
+                        const nomeB = b.querySelector('p')?.innerText || '';
+                        const dadosA = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeA.toLowerCase());
+                        const dadosB = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeB.toLowerCase());
                         if (!dadosA || !dadosB) return 0;
                         return ordemEscolhida === 'menor' ? dadosA.preco - dadosB.preco : dadosB.preco - dadosA.preco;
                     });

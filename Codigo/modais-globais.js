@@ -1,3 +1,4 @@
+/* modais-globais.js */
 (function () {
     function garantirEstilosModalGlobal() {
         if (document.getElementById('estilos-sr-modal-global')) return;
@@ -66,6 +67,28 @@
             #sr-btn-cancelar:hover {
                 background: #333333;
             }
+            #sr-toast-global {
+                position: fixed;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%) translateY(16px);
+                background: #1a1a1a;
+                color: #ffffff;
+                border: 1px solid #C62828;
+                border-radius: 14px;
+                padding: 10px 20px;
+                font-size: 14px;
+                font-weight: bold;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease, transform 0.25s ease;
+                z-index: 1000000;
+            }
+            #sr-toast-global.visivel {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
         `;
         document.head.appendChild(style);
     }
@@ -103,7 +126,16 @@
         return dialog;
     }
 
-    function abrirAlerta(mensagem, titulo = '- Shadow Realm Store -', isHTML = false) {
+    function escapeHTMLModalGlobal(texto) {
+        return String(texto ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function abrirAlerta(mensagem, titulo = '- Shadow Realm Store -', isHTML = false, aoFechar = null) {
         const dialog = garantirModalGlobal();
         const tituloEl = document.getElementById('sr-modal-titulo');
         const msgEl = document.getElementById('sr-modal-mensagem');
@@ -124,9 +156,17 @@
             btnOk.type = 'button';
             btnOk.id = 'sr-btn-ok';
             btnOk.textContent = 'OK';
-            btnOk.addEventListener('click', () => {
-                dialog.close();
-            });
+
+            let disparado = false;
+            const finalizar = () => {
+                if (disparado) return;
+                disparado = true;
+                if (dialog.open) dialog.close();
+                if (typeof aoFechar === 'function') aoFechar();
+            };
+
+            btnOk.addEventListener('click', finalizar);
+            dialog.addEventListener('close', finalizar, { once: true });
             acoesEl.appendChild(btnOk);
         }
 
@@ -184,8 +224,23 @@
         dialog.showModal();
     }
 
+    function mostrarToast(mensagem) {
+        garantirEstilosModalGlobal();
+        let toast = document.getElementById('sr-toast-global');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'sr-toast-global';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = escapeHTMLModalGlobal(mensagem);
+        toast.classList.add('visivel');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('visivel'), 2800);
+    }
+
     window.srModal = {
         alerta: abrirAlerta,
-        confirmar: abrirConfirmacao
+        confirmar: abrirConfirmacao,
+        toast: mostrarToast
     };
 })();

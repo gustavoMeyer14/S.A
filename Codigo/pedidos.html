@@ -1,3 +1,4 @@
+<!-- pedidos.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -19,9 +20,8 @@
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
     <link rel="stylesheet" href="ajustes-seguros.css">
-<script src="loja-turbo.js" defer></script>
-<script src="integracao-segura.js" defer></script>
-<script src="novas-funcoes-sr.js" defer></script>
+    <script src="loja-turbo.js" defer></script>
+    <script src="integracao-segura.js" defer></script>
 
     <style>
         .pedidos-container {
@@ -268,10 +268,8 @@
                 <a href="index.html" class="link"><img src="imagens/Casinha-removebg-preview.png" alt="Início"></a>
                 <a href="produtos.html" class="link"><img src="imagens/produto.png" alt="Produtos"></a>
                 <a href="contato.html" class="link"><img src="imagens/contato.png" alt="Contato"></a>
-                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png"
-                        alt="Carrinho"></a>
-                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img
-                        src="imagens/Usuario.png" alt="Usuário"></button>
+                <a href="carrinho.html" class="link"><img src="imagens/carrinho-removebg-preview.png" alt="Carrinho"></a>
+                <button type="button" class="botaoUsuario" onclick="abreModalCliente()" aria-label="Menu do usuário"><img src="imagens/Usuario.png" alt="Usuário"></button>
             </nav>
         </div>
     </header>
@@ -321,26 +319,31 @@
     <script>
         let pedidoAlvoCancelamento = null;
 
-        function exibirAvisoPedidos(mensagem, titulo = '- Meus Pedidos -', aoFechar = null) {
-            if (window.srModal && typeof window.srModal.alerta === 'function') {
-                window.srModal.alerta(mensagem, titulo);
-                if (typeof aoFechar === 'function') {
-                    const btnOk = document.getElementById('sr-btn-ok');
-                    const dialog = document.getElementById('sr-modal-global');
-                    if (btnOk) {
-                        btnOk.addEventListener('click', aoFechar, { once: true });
-                    } else if (dialog) {
-                        dialog.addEventListener('close', aoFechar, { once: true });
-                    }
-                }
-            } else if (typeof aoFechar === 'function') {
-                aoFechar();
+        function escPed(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function lerPedidosStorage() {
+            try {
+                const dados = JSON.parse(localStorage.getItem('pedidosShadowRealm'));
+                return Array.isArray(dados) ? dados : [];
+            } catch {
+                return [];
             }
+        }
+
+        function pedidoEstaCancelado(status) {
+            return status === 'Cancelado' || status === 'Pedido Cancelado';
         }
 
         function confirmarAcaoPedidos(mensagem, aoConfirmar, titulo = '- Confirmação -') {
             if (window.srModal && typeof window.srModal.confirmar === 'function') {
-                window.srModal.confirmar(mensagem, aoConfirmar, titulo);
+                window.srModal.confirmar(mensagem, aoConfirmar, titulo, true);
             } else if (typeof aoConfirmar === 'function') {
                 aoConfirmar();
             }
@@ -363,13 +366,7 @@
                 return;
             }
 
-            let todosPedidos = [];
-            try {
-                todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
-            } catch {
-                todosPedidos = [];
-            }
-
+            const todosPedidos = lerPedidosStorage();
             const pedidosUsuario = todosPedidos.filter(
                 p => (p.clienteEmail || '').trim().toLowerCase() === usuarioAtual
             );
@@ -388,14 +385,16 @@
 
             [...pedidosUsuario].reverse().forEach((pedido) => {
                 const itensHTML = (pedido.itens || []).map(item => {
-                    const subtotal = (Number(item.preco) || 0) * (Number(item.quantidade) || 1);
+                    const qtd = Number(item.quantidade) || 1;
+                    const preco = Number(item.preco) || 0;
+                    const subtotal = preco * qtd;
                     return `
                         <div class="pedido-item-row">
                             <div class="pedido-item-esquerda">
-                                <img src="${item.imagem || 'imagens/logo.png'}" alt="${item.nome}">
+                                <img src="${escPed(item.imagem || 'imagens/logo.png')}" alt="${escPed(item.nome)}">
                                 <div>
-                                    <strong>${item.nome}</strong><br>
-                                    <small>Quantidade: ${item.quantidade} × R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</small>
+                                    <strong>${escPed(item.nome)}</strong><br>
+                                    <small>Quantidade: ${qtd} × R$ ${preco.toFixed(2).replace('.', ',')}</small>
                                 </div>
                             </div>
                             <div>
@@ -405,21 +404,21 @@
                     `;
                 }).join('');
 
-                const estaCancelado = pedido.status === 'Cancelado';
+                const estaCancelado = pedidoEstaCancelado(pedido.status);
                 const classeStatus = estaCancelado ? 'pedido-status cancelado' : 'pedido-status';
 
                 const card = document.createElement('article');
                 card.className = 'pedido-card';
                 card.innerHTML = `
                     <div class="pedido-header">
-                        <span class="pedido-numero">Pedido #${pedido.numeroPedido}</span>
-                        <span class="${classeStatus}">${pedido.status || 'Pedido Confirmado'}</span>
+                        <span class="pedido-numero">Pedido #${Number(pedido.numeroPedido)}</span>
+                        <span class="${classeStatus}">${escPed(pedido.status || 'Pedido Confirmado')}</span>
                     </div>
 
                     <div class="pedido-info-grid">
-                        <div><strong>Data:</strong> ${pedido.data || '-'}</div>
-                        <div><strong>Pagamento:</strong> ${pedido.cartaoUsado || '-'}</div>
-                        <div><strong>Endereço:</strong> ${pedido.enderecoEntrega || '-'}</div>
+                        <div><strong>Data:</strong> ${escPed(pedido.data || '-')}</div>
+                        <div><strong>Pagamento:</strong> ${escPed(pedido.cartaoUsado || '-')}</div>
+                        <div><strong>Endereço:</strong> ${escPed(pedido.enderecoEntrega || '-')}</div>
                     </div>
 
                     <div class="pedido-itens-lista">
@@ -429,8 +428,8 @@
                     <div class="pedido-footer">
                         <span class="pedido-total">Total: R$ ${Number(pedido.total || 0).toFixed(2).replace('.', ',')}</span>
                         <div class="pedido-acoes">
-                            <button type="button" class="btn-rastrear" onclick="rastrearPedido(${pedido.numeroPedido})">Rastrear Pedido</button>
-                            ${!estaCancelado ? `<button type="button" class="btn-cancelar-pedido" onclick="abrirModalCancelarPedido(${pedido.numeroPedido})">Cancelar Pedido</button>` : ''}
+                            <button type="button" class="btn-rastrear" onclick="rastrearPedido(${Number(pedido.numeroPedido)})">Rastrear Pedido</button>
+                            ${!estaCancelado ? `<button type="button" class="btn-cancelar-pedido" onclick="abrirModalCancelarPedido(${Number(pedido.numeroPedido)})">Cancelar Pedido</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -441,22 +440,18 @@
         function rastrearPedido(numeroPedido) {
             const modal = document.getElementById('modalRastreio');
             const texto = document.getElementById('textoRastreio');
-            let todosPedidos = [];
-            try {
-                todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
-            } catch {}
+            const todosPedidos = lerPedidosStorage();
 
             const pedido = todosPedidos.find(p => Number(p.numeroPedido) === Number(numeroPedido));
-
             if (!pedido) return;
 
-            if (pedido.status === 'Cancelado') {
-                texto.innerHTML = `O pedido <strong>#${pedido.numeroPedido}</strong> foi cancelado e o envio não será realizado.`;
+            if (pedidoEstaCancelado(pedido.status)) {
+                texto.innerHTML = `O pedido <strong>#${Number(pedido.numeroPedido)}</strong> foi cancelado e o envio não será realizado.`;
             } else {
                 texto.innerHTML = `
-                    Pedido <strong>#${pedido.numeroPedido}</strong><br>
-                    Status atual: <strong>${pedido.status || 'Pedido Confirmado'}</strong><br>
-                    Destino: <strong>${pedido.enderecoEntrega || 'Endereço cadastrado'}</strong><br>
+                    Pedido <strong>#${Number(pedido.numeroPedido)}</strong><br>
+                    Status atual: <strong>${escPed(pedido.status || 'Pedido Confirmado')}</strong><br>
+                    Destino: <strong>${escPed(pedido.enderecoEntrega || 'Endereço cadastrado')}</strong><br>
                     Previsão de entrega: <strong>5 a 8 dias úteis</strong>.
                 `;
             }
@@ -471,7 +466,7 @@
             const modal = document.getElementById('modalCancelarPedido');
             const texto = document.getElementById('textoCancelarPedido');
             if (texto) {
-                texto.innerHTML = `Tem certeza de que deseja cancelar o pedido <strong>#${numeroPedido}</strong>?`;
+                texto.innerHTML = `Tem certeza de que deseja cancelar o pedido <strong>#${Number(numeroPedido)}</strong>?`;
             }
             if (modal && typeof modal.showModal === 'function') {
                 modal.showModal();
@@ -481,17 +476,15 @@
         function executarCancelamentoPedido() {
             if (pedidoAlvoCancelamento === null) return;
 
-            let todosPedidos = [];
-            try {
-                todosPedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
-            } catch {}
-
+            const todosPedidos = lerPedidosStorage();
             const indice = todosPedidos.findIndex(p => Number(p.numeroPedido) === Number(pedidoAlvoCancelamento));
-            if (indice !== -1 && todosPedidos[indice].status !== 'Cancelado') {
-                todosPedidos[indice].status = 'Cancelado';
+            if (indice !== -1 && !pedidoEstaCancelado(todosPedidos[indice].status)) {
+                todosPedidos[indice].status = 'Pedido Cancelado';
                 localStorage.setItem('pedidosShadowRealm', JSON.stringify(todosPedidos));
 
-                if (typeof obterEstoque === 'function' && typeof definirEstoque === 'function' && Array.isArray(todosPedidos[indice].itens)) {
+                if (typeof devolverAoEstoque === 'function' && Array.isArray(todosPedidos[indice].itens)) {
+                    devolverAoEstoque(todosPedidos[indice].itens);
+                } else if (typeof obterEstoque === 'function' && typeof definirEstoque === 'function' && Array.isArray(todosPedidos[indice].itens)) {
                     todosPedidos[indice].itens.forEach(item => {
                         const atual = obterEstoque(item.nome);
                         definirEstoque(item.nome, atual + (Number(item.quantidade) || 1));
@@ -527,7 +520,7 @@
             if (btnConfirmarCancelamento) {
                 btnConfirmarCancelamento.addEventListener('click', () => {
                     confirmarAcaoPedidos(
-                        `Confirmar o cancelamento definitivo do pedido <strong>#${pedidoAlvoCancelamento}</strong>?`,
+                        `Confirmar o cancelamento definitivo do pedido <strong>#${Number(pedidoAlvoCancelamento)}</strong>?`,
                         executarCancelamentoPedido,
                         '- Confirmar Cancelamento -'
                     );

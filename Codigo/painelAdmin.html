@@ -316,6 +316,26 @@
     </footer>
 
     <script>
+        function escPainelSR(texto) {
+            return String(texto ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function lerJsonPainelSR(chave, fallback) {
+            try {
+                const bruto = localStorage.getItem(chave);
+                if (!bruto) return fallback;
+                const parsed = JSON.parse(bruto);
+                return parsed ?? fallback;
+            } catch {
+                return fallback;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const logado = localStorage.getItem('usuarioLogado') === 'true';
             const tipo = localStorage.getItem('tipoUsuario');
@@ -330,7 +350,9 @@
                 return;
             }
 
-            await window.promessaEstoqueSR;
+            if (window.promessaEstoqueSR) {
+                await window.promessaEstoqueSR;
+            }
             renderizarPainelAdmin();
 
             document.getElementById('formNovoProdutoAdmin').addEventListener('submit', (e) => {
@@ -342,8 +364,9 @@
                 const imagem = document.getElementById('npImagem').value;
                 const descricao = document.getElementById('npDescricao').value.trim();
 
-                const custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
-                if (custom.some(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+                const customSalvos = lerJsonPainelSR('produtosCustomShadowRealm', []);
+                const custom = Array.isArray(customSalvos) ? customSalvos : [];
+                if (custom.some(p => String(p.nome || '').toLowerCase() === nome.toLowerCase())) {
                     srModal.alerta('Já existe um produto customizado com este nome!', '- Aviso -');
                     return;
                 }
@@ -365,21 +388,25 @@
 
                 e.target.reset();
                 renderizarPainelAdmin();
-                srModal.alerta(`A figure <strong>${nome}</strong> foi adicionada ao catálogo da loja!`, '- Produto Cadastrado -', true);
+                srModal.alerta(`A figure <strong>${escPainelSR(nome)}</strong> foi adicionada ao catálogo da loja!`, '- Produto Cadastrado -', true);
             });
         });
 
         async function renderizarPainelAdmin() {
-            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
-            const produtos = await carregarProdutosSR();
-            const custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
-            const todosProdutos = [...produtos, ...custom];
+            const pedidosSalvos = lerJsonPainelSR('pedidosShadowRealm', []);
+            const pedidos = Array.isArray(pedidosSalvos) ? pedidosSalvos : [];
+            const produtos = typeof carregarProdutosSR === 'function' ? await carregarProdutosSR() : [];
+            const customSalvos = lerJsonPainelSR('produtosCustomShadowRealm', []);
+            const custom = Array.isArray(customSalvos) ? customSalvos : [];
+            const todosProdutos = [...(Array.isArray(produtos) ? produtos : []), ...custom];
 
             const faturamento = pedidos
                 .filter(p => p.status !== 'Pedido Cancelado')
                 .reduce((acc, p) => acc + (Number(p.total) || 0), 0);
 
-            const estoqueBaixo = todosProdutos.filter(p => obterEstoque(p.nome) <= 2).length;
+            const estoqueBaixo = todosProdutos.filter(p =>
+                (typeof obterEstoque === 'function' ? obterEstoque(p.nome) : (Number(p.estoque) || 0)) <= 2
+            ).length;
 
             document.getElementById('kpiGridAdmin').innerHTML = `
                 <div class="kpi-card">
@@ -413,20 +440,20 @@
                 ];
 
                 tbody.innerHTML = pedidos.slice().reverse().map(ped => {
-                    const qtdItens = (ped.itens || []).reduce((s, i) => s + (i.quantidade || 1), 0);
+                    const qtdItens = (ped.itens || []).reduce((s, i) => s + (Number(i.quantidade) || 1), 0);
                     const opcoesHTML = statusOpcoes.map(st =>
-                        `<option value="${st}" ${ped.status === st ? 'selected' : ''}>${st}</option>`
+                        `<option value="${escPainelSR(st)}" ${ped.status === st ? 'selected' : ''}>${escPainelSR(st)}</option>`
                     ).join('');
 
                     return `
                         <tr>
-                            <td><strong>#${ped.numeroPedido}</strong></td>
-                            <td>${ped.clienteEmail || 'Cliente'}</td>
-                            <td>${ped.data}</td>
+                            <td><strong>#${Number(ped.numeroPedido) || 0}</strong></td>
+                            <td>${escPainelSR(ped.clienteEmail || 'Cliente')}</td>
+                            <td>${escPainelSR(ped.data || '-')}</td>
                             <td>${qtdItens} un.</td>
-                            <td style="color:#ffca28; font-weight:bold;">R$ ${Number(ped.total || 0).toFixed(2).replace('.', ',')}</td>
+                            <td style="color:#ffca28; font-weight:bold;">R$ ${(Number(ped.total) || 0).toFixed(2).replace('.', ',')}</td>
                             <td>
-                                <select class="select-status-admin" onchange="alterarStatusPedidoAdmin(${ped.numeroPedido}, this.value)">
+                                <select class="select-status-admin" onchange="alterarStatusPedidoAdmin(${Number(ped.numeroPedido) || 0}, this.value)">
                                     ${opcoesHTML}
                                 </select>
                             </td>
@@ -441,7 +468,7 @@
             } else {
                 listaCustom.innerHTML = custom.map((p, idx) => `
                     <div class="chip-prod-custom">
-                        <span><strong>${p.nome}</strong> (${p.categoria}) - R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</span>
+                        <span><strong>${escPainelSR(p.nome)}</strong> (${escPainelSR(p.categoria)}) - R$ ${(Number(p.preco) || 0).toFixed(2).replace('.', ',')}</span>
                         <button type="button" class="sr-btn-secundario" style="padding:3px 10px; font-size:12px;" onclick="removerProdutoCustom(${idx})">Excluir</button>
                     </div>
                 `).join('');
@@ -449,7 +476,8 @@
         }
 
         window.alterarStatusPedidoAdmin = function (numeroPedido, novoStatus) {
-            const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+            const pedidosSalvos = lerJsonPainelSR('pedidosShadowRealm', []);
+            const pedidos = Array.isArray(pedidosSalvos) ? pedidosSalvos : [];
             const alvo = pedidos.find(p => Number(p.numeroPedido) === Number(numeroPedido));
             if (!alvo) return;
 
@@ -467,7 +495,8 @@
 
         window.removerProdutoCustom = function (idx) {
             srModal.confirmar('Remover esta figure customizada do catálogo?', () => {
-                const custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
+                const customSalvos = lerJsonPainelSR('produtosCustomShadowRealm', []);
+                const custom = Array.isArray(customSalvos) ? customSalvos : [];
                 custom.splice(idx, 1);
                 localStorage.setItem('produtosCustomShadowRealm', JSON.stringify(custom));
                 renderizarPainelAdmin();
