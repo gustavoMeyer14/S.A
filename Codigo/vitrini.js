@@ -1,3 +1,23 @@
+/* vitrini.js */
+function escVitriniSR(texto) {
+    return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function lerJsonVitriniSR(chave, fallback = null) {
+    try {
+        const bruto = localStorage.getItem(chave);
+        if (bruto === null || bruto === '') return fallback;
+        return JSON.parse(bruto);
+    } catch {
+        return fallback;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const produtosOriginais = [
         'ichigo kurosaki',
@@ -178,12 +198,12 @@ function injetarEstilosVitrine() {
 }
 
 function obterFavoritos() {
-    try { return JSON.parse(localStorage.getItem('favoritosShadowRealm')) || []; }
-    catch { return []; }
+    const dados = lerJsonVitriniSR('favoritosShadowRealm', []);
+    return Array.isArray(dados) ? dados : [];
 }
 
 function salvarFavoritos(lista) {
-    localStorage.setItem('favoritosShadowRealm', JSON.stringify(lista));
+    localStorage.setItem('favoritosShadowRealm', JSON.stringify(Array.isArray(lista) ? lista : []));
 }
 
 function configurarFavoritosGlobal() {
@@ -223,32 +243,46 @@ function configurarFavoritosGlobal() {
 window.abrirModalFavoritos = function () {
     const modal = document.getElementById('modalFavoritosSR');
     const container = document.getElementById('conteudoFavoritosSR');
+    if (!modal || !container) return;
+
     const favoritos = obterFavoritos();
 
     if (favoritos.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:#bbb;">Você ainda não favoritou nenhuma figure.</p>';
     } else {
-        container.innerHTML = favoritos.map(item => `
-            <div class="item-fav-modal">
-                <img src="${item.imagem}" alt="${item.nome}">
-                <div style="flex:1; text-align:left;">
-                    <strong>${item.nome}</strong>
-                    <p style="color:#ffca28; font-size:14px; margin:2px 0;">R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</p>
+        container.innerHTML = favoritos.map(item => {
+            const nomeSeguro = escVitriniSR(item.nome);
+            const imgSegura = escVitriniSR(item.imagem || 'imagens/produto.png');
+            const precoFormatado = (Number(item.preco) || 0).toFixed(2).replace('.', ',');
+            return `
+                <div class="item-fav-modal">
+                    <img src="${imgSegura}" alt="${nomeSeguro}">
+                    <div style="flex:1; text-align:left;">
+                        <strong>${nomeSeguro}</strong>
+                        <p style="color:#ffca28; font-size:14px; margin:2px 0;">R$ ${precoFormatado}</p>
+                    </div>
+                    <button type="button" class="btn-remover-fav-modal" data-nome-fav="${nomeSeguro}"
+                        style="background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; padding:5px 10px; border-radius:6px; cursor:pointer;">
+                        Remover
+                    </button>
                 </div>
-                <button type="button" onclick="removerFavoritoModal('${item.nome.replace(/'/g, "\\'")}')"
-                    style="background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; padding:5px 10px; border-radius:6px; cursor:pointer;">
-                    Remover
-                </button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+
+        container.querySelectorAll('.btn-remover-fav-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.removerFavoritoModal(btn.getAttribute('data-nome-fav') || '');
+            });
+        });
     }
-    modal.showModal();
+
+    if (!modal.open) modal.showModal();
 };
 
 window.removerFavoritoModal = function (nome) {
     const atualizados = obterFavoritos().filter(f => f.nome !== nome);
     salvarFavoritos(atualizados);
-    abrirModalFavoritos();
+    window.abrirModalFavoritos();
     document.querySelectorAll('.btn-favorito-card').forEach(btn => {
         if (btn.getAttribute('data-nome') === nome) btn.innerHTML = '🤍';
     });
@@ -267,7 +301,7 @@ function processarCardsVitrine(produtosOriginais) {
 
         const nomeProduto = nomeEl.innerText.trim();
         const chave = nomeProduto.toLowerCase();
-        const imagemProduto = imgEl ? imgEl.getAttribute('src') : 'imagens/produto.png';
+        const imagemProduto = imgEl ? (imgEl.getAttribute('src') || 'imagens/produto.png') : 'imagens/produto.png';
         const precoNum = parseFloat(precoEl.innerText.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
         const isOriginal = produtosOriginais.includes(chave);
 
@@ -282,7 +316,7 @@ function processarCardsVitrine(produtosOriginais) {
 
             btnFav.addEventListener('click', (e) => {
                 e.stopPropagation();
-                let lista = obterFavoritos();
+                const lista = obterFavoritos();
                 const idx = lista.findIndex(f => f.nome === nomeProduto);
                 if (idx >= 0) {
                     lista.splice(idx, 1);
@@ -327,6 +361,7 @@ function inicializarComentariosHTML() {
     const usuarioAtual = (localStorage.getItem('usuarioAtual') || '').trim();
     const nomeSalvo = (localStorage.getItem('usuarioNome') || '').trim();
     const nomeUsuario = nomeSalvo || (usuarioAtual.includes('@') ? usuarioAtual.split('@')[0] : usuarioAtual);
+    const rotuloAutorSeguro = escVitriniSR(nomeUsuario || 'Visitante');
 
     document.querySelectorAll('.modalProduto').forEach(modal => {
         const tituloEl = modal.querySelector('.modalProduto-conteudo h2');
@@ -334,13 +369,14 @@ function inicializarComentariosHTML() {
         if (!tituloEl || !container) return;
 
         const nomeProduto = tituloEl.innerText.replace(/^-\s*/, '').trim();
+        const nomeProdutoSeguro = escVitriniSR(nomeProduto);
         const produtoSlug = nomeProduto.toLowerCase();
         container.setAttribute('data-produto', produtoSlug);
 
         if (!container.querySelector('.lista-novos-comentarios')) {
             container.innerHTML = `
                 <h3 style="color:#ffffff; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:8px;">
-                    💬 Avaliações e Comentários (${nomeProduto})
+                    💬 Avaliações e Comentários (${nomeProdutoSeguro})
                 </h3>
                 <form class="form-comentario-html">
                     <div class="form-comentario-linha">
@@ -352,7 +388,7 @@ function inicializarComentariosHTML() {
                             <option value="2">★★☆☆☆ (2 - Regular)</option>
                             <option value="1">★☆☆☆☆ (1 - Ruim)</option>
                         </select>
-                        <span style="font-size:13px; color:#bbb;">Comentando como <strong style="color:#ffca28;">${nomeUsuario || 'Visitante'}</strong></span>
+                        <span style="font-size:13px; color:#bbb;">Comentando como <strong style="color:#ffca28;">${rotuloAutorSeguro}</strong></span>
                     </div>
                     <textarea placeholder="Conte o que achou dos detalhes, pintura e acabamento desta figure..." required></textarea>
                     <button type="submit" class="btn-enviar-comentario">Publicar Avaliação</button>
@@ -378,9 +414,7 @@ function inicializarComentariosHTML() {
         }
 
         function obterListaComentarios() {
-            let salvos = null;
-            try { salvos = JSON.parse(localStorage.getItem(chave)); }
-            catch { salvos = null; }
+            let salvos = lerJsonVitriniSR(chave, null);
 
             if (!Array.isArray(salvos)) {
                 salvos = [...comentariosIniciaisPadrao];
@@ -403,18 +437,21 @@ function inicializarComentariosHTML() {
                 const idxReal = salvos.length - 1 - idxRev;
                 const dono = estaLogado && item.autorId === usuarioAtual.toLowerCase();
                 const notaNum = Math.min(5, Math.max(1, Number(item.nota) || 5));
+                const autorSeguro = escVitriniSR(item.autor || 'Colecionador');
+                const textoSeguro = escVitriniSR(item.texto || '');
+                const dataSegura = escVitriniSR(item.data || '');
 
                 const div = document.createElement('div');
                 div.className = 'comentarios';
 
                 div.innerHTML = `
                     <h2>
-                        <span>${item.autor}</span>
+                        <span>${autorSeguro}</span>
                         <span style="color:#ffca28; font-size:15px;">${'★'.repeat(notaNum)}${'☆'.repeat(5 - notaNum)}</span>
                     </h2>
-                    <p>${item.texto}</p>
+                    <p>${textoSeguro}</p>
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
-                        <small style="font-size:12px; color:#888;">${item.data || ''}</small>
+                        <small style="font-size:12px; color:#888;">${dataSegura}</small>
                         ${dono ? `<button type="button" class="btn-del" style="width:auto; height:auto; padding:4px 10px; margin:0; font-size:12px; background:transparent; border:1px solid #C62828; color:#ff4d4d; border-radius:10px; cursor:pointer;">Excluir</button>` : ''}
                     </div>
                 `;
@@ -438,8 +475,8 @@ function inicializarComentariosHTML() {
                 e.preventDefault();
                 const textarea = form.querySelector('textarea');
                 const selectNota = form.querySelector('select');
-                const texto = textarea.value.trim();
-                const nota = parseInt(selectNota.value, 10) || 5;
+                const texto = textarea ? textarea.value.trim() : '';
+                const nota = parseInt(selectNota ? selectNota.value : '5', 10) || 5;
                 if (!texto) return;
 
                 const salvos = obterListaComentarios();

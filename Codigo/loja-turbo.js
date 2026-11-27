@@ -1,7 +1,27 @@
+/* loja-turbo.js */
 // =========================================================
 // LOJA TURBO: AUTOCOMPLETE, COMPARADOR, VISTOS RECENTEMENTE,
 // PRODUTOS CUSTOMIZADOS & COMPROVANTE DE PEDIDOS
 // =========================================================
+
+function escTurboSR(texto) {
+    return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function lerJsonTurboSR(chave, fallback = null) {
+    try {
+        const bruto = localStorage.getItem(chave);
+        if (bruto === null || bruto === '') return fallback;
+        return JSON.parse(bruto);
+    } catch {
+        return fallback;
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const catalogo = await carregarCatalogoUnificadoSR();
@@ -16,18 +36,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function carregarCatalogoUnificadoSR() {
     let base = [];
     if (typeof carregarProdutosSR === 'function') {
-        base = await carregarProdutosSR();
+        const carregados = await carregarProdutosSR();
+        if (Array.isArray(carregados)) base = carregados;
     } else {
         try {
             const resp = await fetch('produtos.json');
-            if (resp.ok) base = await resp.json();
+            if (resp.ok) {
+                const dados = await resp.json();
+                if (Array.isArray(dados)) base = dados;
+            }
         } catch {}
     }
 
-    let custom = [];
-    try {
-        custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
-    } catch {}
+    const customSalvos = lerJsonTurboSR('produtosCustomShadowRealm', []);
+    const custom = Array.isArray(customSalvos) ? customSalvos : [];
 
     return [...base, ...custom];
 }
@@ -40,21 +62,23 @@ function renderizarProdutosCustomizadosNaVitrine(catalogo) {
     const secao = document.querySelector('.destaques');
     if (!secao) return;
 
-    let custom = [];
-    try {
-        custom = JSON.parse(localStorage.getItem('produtosCustomShadowRealm')) || [];
-    } catch {}
+    const customSalvos = lerJsonTurboSR('produtosCustomShadowRealm', []);
+    const custom = Array.isArray(customSalvos) ? customSalvos : [];
 
     custom.forEach((prod, index) => {
         const cardId = `customCard${index + 1}`;
         if (document.getElementById(cardId)) return;
 
-        const precoFormatado = Number(prod.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const precoNum = Number(prod.preco) || 0;
+        const precoFormatado = precoNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const imgSegura = escTurboSR(prod.imagem || 'imagens/produto.png');
+        const nomeSeguro = escTurboSR(prod.nome);
+        const descSegura = escTurboSR(prod.descricao || '');
 
         const card = document.createElement('div');
         card.innerHTML = `
-            <img src="${prod.imagem || 'imagens/produto.png'}" alt="${prod.nome}">
-            <p>${prod.nome}</p>
+            <img src="${imgSegura}" alt="${nomeSeguro}">
+            <p>${nomeSeguro}</p>
             <h3><strong>R$ ${precoFormatado}</strong></h3>
             <button type="button" id="${cardId}">Ver mais</button>
         `;
@@ -64,25 +88,25 @@ function renderizarProdutosCustomizadosNaVitrine(catalogo) {
         dialog.className = 'modalProduto';
         dialog.innerHTML = `
             <div class="modalProduto-conteudo">
-                <img src="${prod.imagem || 'imagens/produto.png'}" alt="${prod.nome}">
+                <img src="${imgSegura}" alt="${nomeSeguro}">
                 <div class="modalProduto-texto">
-                    <h2>- ${prod.nome}</h2>
-                    <p>${prod.descricao}</p>
+                    <h2>- ${nomeSeguro}</h2>
+                    <p>${descSegura}</p>
                 </div>
             </div>
             <div class="modalProduto-comentarios"></div>
             <footer class="modal-footer">
                 <button type="button" id="fechar-${cardId}" class="btn-fechar">Fechar</button>
-                <button type="button" class="btn-carrinho" data-nome="${prod.nome}" data-preco="${prod.preco}" data-imagem="${prod.imagem || 'imagens/produto.png'}">+ Carrinho</button>
-                <button type="button" class="btn-comprar-agora" data-nome="${prod.nome}" data-preco="${prod.preco}" data-imagem="${prod.imagem || 'imagens/produto.png'}">Comprar Agora</button>
+                <button type="button" class="btn-carrinho" data-nome="${nomeSeguro}" data-preco="${precoNum}" data-imagem="${imgSegura}">+ Carrinho</button>
+                <button type="button" class="btn-comprar-agora" data-nome="${nomeSeguro}" data-preco="${precoNum}" data-imagem="${imgSegura}">Comprar Agora</button>
             </footer>
         `;
 
         secao.appendChild(card);
         secao.appendChild(dialog);
 
-        document.getElementById(cardId).addEventListener('click', () => dialog.showModal());
-        document.getElementById(`fechar-${cardId}`).addEventListener('click', () => dialog.close());
+        document.getElementById(cardId)?.addEventListener('click', () => dialog.showModal());
+        document.getElementById(`fechar-${cardId}`)?.addEventListener('click', () => dialog.close());
         dialog.addEventListener('click', (e) => {
             const rect = dialog.getBoundingClientRect();
             if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
@@ -134,19 +158,19 @@ function injetarAutocompleteBusca(catalogo) {
         ).slice(0, 5);
 
         if (resultados.length === 0) {
-            dropdown.innerHTML = `<div class="sr-auto-vazio">Nenhuma figure encontrada para "${input.value}"</div>`;
+            dropdown.innerHTML = `<div class="sr-auto-vazio">Nenhuma figure encontrada para "${escTurboSR(input.value)}"</div>`;
             dropdown.style.display = 'block';
             return;
         }
 
         dropdown.innerHTML = resultados.map(p => `
-            <a href="produtos.html?busca=${encodeURIComponent(p.nome)}" class="sr-auto-item">
-                <img src="${p.imagem || 'imagens/produto.png'}" alt="${p.nome}">
+            <a href="produtos.html?busca=${encodeURIComponent(p.nome || '')}" class="sr-auto-item">
+                <img src="${escTurboSR(p.imagem || 'imagens/produto.png')}" alt="${escTurboSR(p.nome)}">
                 <div class="sr-auto-info">
-                    <strong>${p.nome}</strong>
-                    <small>${p.categoria || 'Colecionável'}</small>
+                    <strong>${escTurboSR(p.nome)}</strong>
+                    <small>${escTurboSR(p.categoria || 'Colecionável')}</small>
                 </div>
-                <span class="sr-auto-preco">R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</span>
+                <span class="sr-auto-preco">R$ ${(Number(p.preco) || 0).toFixed(2).replace('.', ',')}</span>
             </a>
         `).join('');
         dropdown.style.display = 'block';
@@ -208,46 +232,54 @@ function injetarComparadorFigures(catalogo) {
             return;
         }
         barra.classList.add('visivel');
+        const nomesSeguros = selecionados.map(n => escTurboSR(n)).join(' • ');
         barra.innerHTML = `
-            <span>⚖️ Comparando <strong>${selecionados.length}/3</strong>: ${selecionados.join(' • ')}</span>
+            <span>⚖️ Comparando <strong>${selecionados.length}/3</strong>: ${nomesSeguros}</span>
             <div style="display:flex; gap:8px; margin:0;">
                 <button type="button" class="sr-btn-primario" id="btnAbrirComparadorSR" style="padding:7px 16px; font-size:13px;">Comparar Agora</button>
                 <button type="button" class="sr-btn-secundario" id="btnLimparComparadorSR" style="padding:7px 12px; font-size:13px;">Limpar</button>
             </div>
         `;
 
-        document.getElementById('btnLimparComparadorSR').onclick = () => {
-            selecionados = [];
-            document.querySelectorAll('.btn-comparar-card').forEach(b => b.classList.remove('ativo'));
-            atualizarBarraComparacao();
-        };
+        const btnLimpar = document.getElementById('btnLimparComparadorSR');
+        if (btnLimpar) {
+            btnLimpar.onclick = () => {
+                selecionados = [];
+                document.querySelectorAll('.btn-comparar-card').forEach(b => b.classList.remove('ativo'));
+                atualizarBarraComparacao();
+            };
+        }
 
-        document.getElementById('btnAbrirComparadorSR').onclick = () => {
-            const itens = selecionados
-                .map(n => catalogo.find(p => p.nome.toLowerCase() === n.toLowerCase()))
-                .filter(Boolean);
+        const btnAbrir = document.getElementById('btnAbrirComparadorSR');
+        if (btnAbrir) {
+            btnAbrir.onclick = () => {
+                const itens = selecionados
+                    .map(n => catalogo.find(p => String(p.nome || '').toLowerCase() === n.toLowerCase()))
+                    .filter(Boolean);
 
-            const html = `
-                <div class="sr-grid-comparacao">
-                    ${itens.map(item => {
-                        const est = typeof obterEstoque === 'function' ? obterEstoque(item.nome) : (item.estoque || 3);
-                        const parcela = (Number(item.preco) / 12).toFixed(2).replace('.', ',');
-                        return `
-                            <div class="sr-col-comparacao">
-                                <img src="${item.imagem || 'imagens/produto.png'}" alt="${item.nome}">
-                                <h4>${item.nome}</h4>
-                                <p><strong>Anime:</strong> ${item.categoria || 'Geek'}</p>
-                                <p><strong>Preço:</strong> <span style="color:#ffca28;">R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</span></p>
-                                <p><strong>Parcelas:</strong> 12x de R$ ${parcela}</p>
-                                <p><strong>Estoque:</strong> ${est > 0 ? est + ' un.' : 'Esgotado'}</p>
-                                <p style="font-size:12px; color:#bbb;">${(item.descricao || '').slice(0, 130)}...</p>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            window.srModal?.alerta(html, '- Comparação de Figures ⚖️ -', true);
-        };
+                const html = `
+                    <div class="sr-grid-comparacao">
+                        ${itens.map(item => {
+                            const precoNum = Number(item.preco) || 0;
+                            const est = typeof obterEstoque === 'function' ? obterEstoque(item.nome) : (Number(item.estoque) || 3);
+                            const parcela = (precoNum / 12).toFixed(2).replace('.', ',');
+                            return `
+                                <div class="sr-col-comparacao">
+                                    <img src="${escTurboSR(item.imagem || 'imagens/produto.png')}" alt="${escTurboSR(item.nome)}">
+                                    <h4>${escTurboSR(item.nome)}</h4>
+                                    <p><strong>Anime:</strong> ${escTurboSR(item.categoria || 'Geek')}</p>
+                                    <p><strong>Preço:</strong> <span style="color:#ffca28;">R$ ${precoNum.toFixed(2).replace('.', ',')}</span></p>
+                                    <p><strong>Parcelas:</strong> 12x de R$ ${parcela}</p>
+                                    <p><strong>Estoque:</strong> ${est > 0 ? est + ' un.' : 'Esgotado'}</p>
+                                    <p style="font-size:12px; color:#bbb;">${escTurboSR((item.descricao || '').slice(0, 130))}...</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                window.srModal?.alerta(html, '- Comparação de Figures ⚖️ -', true);
+            };
+        }
     }
 }
 
@@ -256,8 +288,8 @@ function registrarEMostrarVistosRecentemente(catalogo) {
     const CHAVE_VISTOS = 'vistosRecentementeSR';
 
     function lerVistos() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_VISTOS)) || []; }
-        catch { return []; }
+        const dados = lerJsonTurboSR(CHAVE_VISTOS, []);
+        return Array.isArray(dados) ? dados : [];
     }
 
     document.querySelectorAll('.destaques > div > button[id]').forEach(btn => {
@@ -266,7 +298,7 @@ function registrarEMostrarVistosRecentemente(catalogo) {
             const nome = card?.querySelector('p')?.innerText.trim();
             if (!nome) return;
 
-            let vistos = lerVistos().filter(n => n.toLowerCase() !== nome.toLowerCase());
+            const vistos = lerVistos().filter(n => String(n).toLowerCase() !== nome.toLowerCase());
             vistos.unshift(nome);
             localStorage.setItem(CHAVE_VISTOS, JSON.stringify(vistos.slice(0, 5)));
         });
@@ -279,7 +311,7 @@ function registrarEMostrarVistosRecentemente(catalogo) {
     if (vistos.length === 0) return;
 
     const itensVistos = vistos
-        .map(nome => catalogo.find(p => p.nome.toLowerCase() === nome.toLowerCase()))
+        .map(nome => catalogo.find(p => String(p.nome || '').toLowerCase() === String(nome).toLowerCase()))
         .filter(Boolean);
 
     if (itensVistos.length === 0) return;
@@ -294,11 +326,11 @@ function registrarEMostrarVistosRecentemente(catalogo) {
         <h3>👀 Vistos Recentemente por Você</h3>
         <div class="sr-vistos-grid">
             ${itensVistos.map(p => `
-                <a href="produtos.html?busca=${encodeURIComponent(p.nome)}" class="sr-visto-card">
-                    <img src="${p.imagem || 'imagens/produto.png'}" alt="${p.nome}">
+                <a href="produtos.html?busca=${encodeURIComponent(p.nome || '')}" class="sr-visto-card">
+                    <img src="${escTurboSR(p.imagem || 'imagens/produto.png')}" alt="${escTurboSR(p.nome)}">
                     <div>
-                        <strong>${p.nome}</strong>
-                        <span>R$ ${Number(p.preco).toFixed(2).replace('.', ',')}</span>
+                        <strong>${escTurboSR(p.nome)}</strong>
+                        <span>R$ ${(Number(p.preco) || 0).toFixed(2).replace('.', ',')}</span>
                     </div>
                 </a>
             `).join('')}
@@ -314,7 +346,8 @@ function turbinarPaginaPedidos() {
     if (!listaEl) return;
 
     function injetarBotoesExtrasPedidos() {
-        const pedidos = JSON.parse(localStorage.getItem('pedidosShadowRealm')) || [];
+        const pedidosSalvos = lerJsonTurboSR('pedidosShadowRealm', []);
+        const pedidos = Array.isArray(pedidosSalvos) ? pedidosSalvos : [];
 
         document.querySelectorAll('.card-pedido').forEach(card => {
             const acoes = card.querySelector('.acoes-pedido');
@@ -329,25 +362,27 @@ function turbinarPaginaPedidos() {
             btnComprovante.className = 'btn-comprovante-sr';
             btnComprovante.textContent = '📄 Comprovante';
             btnComprovante.onclick = () => {
-                const linhasItens = (pedido.itens || []).map(i =>
-                    `<li>${i.quantidade}x <strong>${i.nome}</strong> — R$ ${(i.preco * i.quantidade).toFixed(2).replace('.', ',')}</li>`
-                ).join('');
+                const linhasItens = (pedido.itens || []).map(i => {
+                    const qtd = Number(i.quantidade) || 1;
+                    const preco = Number(i.preco) || 0;
+                    return `<li>${qtd}x <strong>${escTurboSR(i.nome)}</strong> — R$ ${(preco * qtd).toFixed(2).replace('.', ',')}</li>`;
+                }).join('');
 
                 const html = `
                     <div style="text-align:left; background:#121212; border:1px dashed #ffca28; border-radius:12px; padding:16px; font-size:14px;">
-                        <p style="margin-bottom:6px;"><strong>Pedido:</strong> #${pedido.numeroPedido}</p>
-                        <p style="margin-bottom:6px;"><strong>Data:</strong> ${pedido.data}</p>
-                        <p style="margin-bottom:6px;"><strong>Status:</strong> ${pedido.status}</p>
-                        <p style="margin-bottom:6px;"><strong>Pagamento:</strong> ${pedido.cartaoUsado || 'Pix'}</p>
-                        <p style="margin-bottom:10px;"><strong>Entrega:</strong> ${pedido.enderecoEntrega || 'Endereço cadastrado'}</p>
+                        <p style="margin-bottom:6px;"><strong>Pedido:</strong> #${Number(pedido.numeroPedido)}</p>
+                        <p style="margin-bottom:6px;"><strong>Data:</strong> ${escTurboSR(pedido.data || '-')}</p>
+                        <p style="margin-bottom:6px;"><strong>Status:</strong> ${escTurboSR(pedido.status || '-')}</p>
+                        <p style="margin-bottom:6px;"><strong>Pagamento:</strong> ${escTurboSR(pedido.cartaoUsado || 'Pix')}</p>
+                        <p style="margin-bottom:10px;"><strong>Entrega:</strong> ${escTurboSR(pedido.enderecoEntrega || 'Endereço cadastrado')}</p>
                         <hr style="border-color:#333; margin:10px 0;">
                         <ul style="padding-left:18px; margin-bottom:10px;">${linhasItens}</ul>
                         <p style="font-size:17px; color:#ffca28; text-align:right; margin:0;">
-                            <strong>Total Pago: R$ ${Number(pedido.total || 0).toFixed(2).replace('.', ',')}</strong>
+                            <strong>Total Pago: R$ ${(Number(pedido.total) || 0).toFixed(2).replace('.', ',')}</strong>
                         </p>
                     </div>
                 `;
-                window.srModal?.alerta(html, `- Comprovante Pedido #${pedido.numeroPedido} -`, true);
+                window.srModal?.alerta(html, `- Comprovante Pedido #${Number(pedido.numeroPedido)} -`, true);
             };
 
             const btnRecomprar = document.createElement('button');
@@ -355,7 +390,8 @@ function turbinarPaginaPedidos() {
             btnRecomprar.className = 'btn-recomprar-sr';
             btnRecomprar.textContent = '🔄 Comprar Novamente';
             btnRecomprar.onclick = () => {
-                let carrinho = JSON.parse(localStorage.getItem('carrinhoShadowRealm')) || [];
+                const carrinhoSalvo = lerJsonTurboSR('carrinhoShadowRealm', []);
+                const carrinho = Array.isArray(carrinhoSalvo) ? carrinhoSalvo : [];
                 let adicionados = 0;
 
                 (pedido.itens || []).forEach(item => {
@@ -363,14 +399,14 @@ function turbinarPaginaPedidos() {
                     if (disp <= 0) return;
 
                     const existente = carrinho.find(c => c.nome === item.nome);
-                    const qtdDesejada = Math.min(disp, item.quantidade || 1);
+                    const qtdDesejada = Math.min(disp, Number(item.quantidade) || 1);
                     if (existente) {
-                        existente.quantidade = Math.min(disp, existente.quantidade + qtdDesejada);
+                        existente.quantidade = Math.min(disp, (Number(existente.quantidade) || 0) + qtdDesejada);
                     } else {
                         carrinho.push({
                             nome: item.nome,
-                            preco: item.preco,
-                            imagem: item.imagem,
+                            preco: Number(item.preco) || 0,
+                            imagem: item.imagem || 'imagens/produto.png',
                             quantidade: qtdDesejada
                         });
                     }

@@ -1,89 +1,175 @@
+/* favoritos.js */
 // =========================================================
-// SISTEMA DE FAVORITOS (INTEGRADO COM VITRINI.JS)
+// FAVORITOS UNIFICADOS - SHADOW REALM STORE (favoritos.js)
 // =========================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-    const CHAVE_FAV = 'favoritosShadowRealm';
+(function () {
+    'use strict';
+
+    const CHAVE_FAV_BASE = 'favoritosShadowRealm';
+
+    function obterChaveFavoritos() {
+        const logado = localStorage.getItem('usuarioLogado') === 'true';
+        const usuario = (localStorage.getItem('usuarioAtual') || '').trim().toLowerCase();
+        return logado && usuario ? `${CHAVE_FAV_BASE}_${usuario}` : `${CHAVE_FAV_BASE}_visitante`;
+    }
 
     function lerFavoritos() {
         try {
-            return JSON.parse(localStorage.getItem(CHAVE_FAV)) || [];
+            const bruto = localStorage.getItem(obterChaveFavoritos());
+            if (bruto) {
+                const parsed = JSON.parse(bruto);
+                if (Array.isArray(parsed)) return parsed;
+            }
+            const legado = JSON.parse(localStorage.getItem(CHAVE_FAV_BASE) || '[]');
+            return Array.isArray(legado) ? legado : [];
         } catch {
             return [];
         }
     }
 
     function salvarFavoritos(lista) {
-        localStorage.setItem(CHAVE_FAV, JSON.stringify(lista));
-        atualizarContadorFavoritos();
+        const limpos = Array.isArray(lista) ? lista : [];
+        try {
+            localStorage.setItem(obterChaveFavoritos(), JSON.stringify(limpos));
+            localStorage.setItem(CHAVE_FAV_BASE, JSON.stringify(limpos));
+        } catch {}
     }
 
-    function atualizarContadorFavoritos() {
-        const badge = document.getElementById('sr-badge-fav');
-        if (!badge) return;
+    function escaparTextoFav(texto) {
+        return String(texto ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function ehFavorito(nomeProduto) {
+        const alvo = String(nomeProduto ?? '').trim().toLowerCase();
+        if (!alvo) return false;
+        return lerFavoritos().some((item) => String(item.nome || '').trim().toLowerCase() === alvo);
+    }
+
+    function atualizarBadgeFavoritos() {
         const total = lerFavoritos().length;
-        badge.textContent = total;
-        badge.style.display = total > 0 ? 'flex' : 'none';
+        const badge = document.getElementById('sr-badge-fav');
+        if (badge) {
+            badge.textContent = String(total);
+            badge.style.display = total > 0 ? 'flex' : 'none';
+        }
     }
 
-    function montarConteudoFavoritosHTML() {
-        const lista = lerFavoritos();
-        if (lista.length === 0) {
-            return '<p id="sr-fav-vazio" style="color:#bbb; margin: 15px 0;">Você ainda não favoritou nenhuma figure. Clique no 🤍 nos cards para salvar!</p>';
+    function atualizarBotoesFavoritos() {
+        document.querySelectorAll('.btn-favorito-sr').forEach((extra) => extra.remove());
+
+        document.querySelectorAll('.destaques > div').forEach((card) => {
+            const botoes = Array.from(card.querySelectorAll('.btn-favorito-card'));
+            botoes.slice(1).forEach((dup) => dup.remove());
+        });
+
+        document.querySelectorAll('.btn-favorito-card').forEach((btn) => {
+            const nome = btn.getAttribute('data-nome') || '';
+            const ativo = ehFavorito(nome);
+            btn.classList.toggle('ativo', ativo);
+            btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+            btn.title = ativo ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos';
+            btn.innerHTML = ativo ? '❤️' : '🤍';
+        });
+
+        atualizarBadgeFavoritos();
+    }
+
+    function alternarFavorito(produto) {
+        if (!produto || !produto.nome) return false;
+
+        const estaLogado = localStorage.getItem('usuarioLogado') === 'true';
+        if (!estaLogado) {
+            if (window.srModal && typeof window.srModal.alerta === 'function') {
+                window.srModal.alerta(
+                    'Faça login na sua conta para salvar figures nos favoritos!',
+                    '- Favoritos -'
+                );
+            }
+            return false;
         }
 
-        return '<div class="sr-lista-fav" id="sr-lista-fav-itens">' + lista.map((item) => `
-            <div class="sr-item-fav" data-fav-nome="${item.nome}">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="${item.imagem}" alt="${item.nome}">
-                    <div>
-                        <strong>${item.nome}</strong><br>
-                        <small style="color:#ffca28;">R$ ${Number(item.preco).toFixed(2).replace('.', ',')}</small>
-                    </div>
-                </div>
-                <button type="button" class="sr-btn-secundario btn-rem-fav-sr" data-nome="${item.nome}" style="padding:6px 12px; font-size:12px;">Remover</button>
-            </div>
-        `).join('') + '</div>';
+        const nomeNorm = String(produto.nome).trim().toLowerCase();
+        const lista = lerFavoritos();
+        const idx = lista.findIndex((item) => String(item.nome || '').trim().toLowerCase() === nomeNorm);
+
+        let adicionado = false;
+        if (idx !== -1) {
+            lista.splice(idx, 1);
+            adicionado = false;
+        } else {
+            lista.push({
+                nome: String(produto.nome).trim(),
+                preco: Number(produto.preco) || 0,
+                imagem: String(produto.imagem || 'imagens/produto.png').trim()
+            });
+            adicionado = true;
+        }
+
+        salvarFavoritos(lista);
+        atualizarBotoesFavoritos();
+        renderizarSecaoFavoritos();
+
+        if (window.srModal && typeof window.srModal.toast === 'function') {
+            window.srModal.toast(
+                adicionado
+                    ? `"${produto.nome}" adicionado aos favoritos!`
+                    : `"${produto.nome}" removido dos favoritos.`
+            );
+        }
+
+        return adicionado;
     }
 
-    function ligarBotoesRemoverFavoritos() {
-        document.querySelectorAll('.btn-rem-fav-sr').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const nome = btn.getAttribute('data-nome');
-                const novaLista = lerFavoritos().filter((f) => f.nome !== nome);
-                salvarFavoritos(novaLista);
+    function renderizarSecaoFavoritos() {
+        const secao = document.getElementById('secao-favoritos-sr');
+        if (!secao) return;
 
-                document.querySelectorAll('.btn-favorito-card').forEach((cardBtn) => {
-                    if (cardBtn.getAttribute('data-nome') === nome) {
-                        cardBtn.textContent = '🤍';
-                        cardBtn.classList.remove('ativo');
-                    }
-                });
+        const lista = lerFavoritos();
+        if (lista.length === 0) {
+            secao.style.display = 'none';
+            secao.innerHTML = '';
+            return;
+        }
 
-                const msgEl = document.getElementById('sr-modal-mensagem');
-                if (msgEl) {
-                    msgEl.innerHTML = montarConteudoFavoritosHTML();
-                    ligarBotoesRemoverFavoritos();
-                }
+        secao.style.display = 'block';
+        secao.innerHTML = `
+            <h3 style="margin:0 0 14px 0; color:#ffca28;">❤️ Seus Favoritos (${lista.length})</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                ${lista.map((item) => `
+                    <div style="background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+                        <img src="${escaparTextoFav(item.imagem)}" alt="${escaparTextoFav(item.nome)}" style="width:42px; height:42px; object-fit:cover; border-radius:8px;">
+                        <div>
+                            <strong style="display:block; font-size:14px;">${escaparTextoFav(item.nome)}</strong>
+                            <small style="color:#ffca28;">R$ ${(Number(item.preco) || 0).toFixed(2).replace('.', ',')}</small>
+                        </div>
+                        <button type="button" data-nome-remover="${escaparTextoFav(item.nome)}" style="background:#8e1616; color:#fff; border:none; border-radius:8px; padding:5px 10px; cursor:pointer; font-size:12px; font-weight:bold;">Remover</button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        secao.querySelectorAll('button[data-nome-remover]').forEach((btnRem) => {
+            btnRem.addEventListener('click', () => {
+                const nomeRem = btnRem.getAttribute('data-nome-remover');
+                alternarFavorito({ nome: nomeRem });
             });
         });
     }
 
-    // Sincroniza o contador sempre que clicar em qualquer coração dos cards
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-favorito-card')) {
-            setTimeout(atualizarContadorFavoritos, 30);
-        }
+    window.lerFavoritosSR = lerFavoritos;
+    window.salvarFavoritosSR = salvarFavoritos;
+    window.alternarFavoritoSR = alternarFavorito;
+    window.ehFavoritoSR = ehFavorito;
+    window.atualizarBotoesFavoritosSR = atualizarBotoesFavoritos;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarBotoesFavoritos();
+        renderizarSecaoFavoritos();
     });
-
-    window.abrirModalFavoritos = function () {
-        const html = montarConteudoFavoritosHTML();
-
-        if (window.srModal) {
-            window.srModal.alerta(html, '- Meus Favoritos ❤️ -', true);
-            ligarBotoesRemoverFavoritos();
-        }
-    };
-
-    setTimeout(atualizarContadorFavoritos, 120);
-});
+})();

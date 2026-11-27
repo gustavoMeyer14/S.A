@@ -206,7 +206,7 @@
             btnOlho.textContent = mostrando ? '👁️' : '🙈';
         });
 
-        formAdmin?.addEventListener('submit', (e) => {
+        formAdmin?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (enviandoLoginAdmin || typeof validaLoginAdmin !== 'function') return;
 
@@ -214,7 +214,7 @@
             if (btnEntrar) btnEntrar.disabled = true;
 
             try {
-                validaLoginAdmin();
+                await validaLoginAdmin();
             } finally {
                 setTimeout(() => {
                     enviandoLoginAdmin = false;
