@@ -20,15 +20,10 @@
     <script src="favoritos.js" defer></script>
     <script src="extras-loja.js" defer></script>
     <link rel="stylesheet" href="ajustes-seguros.css">
-<<<<<<< HEAD
     <script src="loja-turbo.js" defer></script>
     <script src="integracao-segura.js" defer></script>
-=======
-<script src="loja-turbo.js" defer></script>
-<script src="integracao-segura.js" defer></script>
-<script src="novas-funcoes-sr.js" defer></script>
-<script src="extras-marketplace-sr.js" defer></script>
->>>>>>> d0d141db184a2b43bec943a5edfe80a4d122b6c4
+    <script src="novas-funcoes-sr.js" defer></script>
+    <script src="extras-marketplace-sr.js" defer></script>
     <style>
         .modalRastreio[open] {
             position: fixed !important;
@@ -97,6 +92,12 @@
             transition: 0.3s;
             box-shadow: 0 10px 25px #c62828;
         }
+
+        .badge-estoque-card {
+            font-size: 12px;
+            color: #ffca28;
+            font-weight: 600;
+        }
     </style>
 </head>
 
@@ -130,7 +131,7 @@
 
     <div class="pesquisa">
         <h2>Procure o que deseja.</h2>
-        <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Ex.: Bleach">
+        <input type="text" name="txtpesquisa" id="barraPesquisa" placeholder="Ex.: Bleach, Satoru Gojo, Snorlax...">
         <button type="button" id="enviarPesquisa">Pesquisar</button>
         <div class="painel-filtros"
             style="max-width: 900px; margin: 15px auto 30px auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px;">
@@ -244,14 +245,21 @@
             catalogoAtualProdutos.forEach((prod, idx) => {
                 const num = idx + 1;
                 const precoNum = Number(prod.preco) || 0;
+                const estoqueNum = typeof window.obterEstoque === 'function'
+                    ? window.obterEstoque(prod.nome)
+                    : (Number(prod.estoque) || 0);
                 const precoFormatado = precoNum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 const imgSegura = escProd(prod.imagem || 'imagens/produto.png');
                 const nomeSeguro = escProd(prod.nome);
 
                 const card = document.createElement('div');
                 card.innerHTML = `
+                    <button type="button" class="btn-compra-rapida" title="Adicionar rapidamente ao carrinho"
+                        aria-label="Adicionar ${nomeSeguro} rapidamente ao carrinho"
+                        data-nome="${nomeSeguro}" data-preco="${precoNum}" data-imagem="${imgSegura}">🛒</button>
                     <img src="${imgSegura}" alt="${nomeSeguro}">
                     <p>${nomeSeguro}</p>
+                    <span class="badge-estoque-card" data-estoque-nome="${nomeSeguro}">${estoqueNum > 0 ? `Estoque: ${estoqueNum} un.` : 'Esgotado'}</span>
                     <h3><strong>R$ ${precoFormatado}</strong></h3>
                     <button type="button" id="card${num}">Ver mais</button>
                 `;
@@ -265,6 +273,7 @@
                         <div class="modalProduto-texto">
                             <h2>- ${nomeSeguro}</h2>
                             <p>${escProd(prod.descricao)}</p>
+                            <p style="color:#ffca28; font-size:17px;"><strong>Categoria:</strong> ${escProd(prod.categoria)} • <strong>Disponibilidade:</strong> ${estoqueNum > 0 ? `${estoqueNum} unidade(s)` : 'Esgotado'}</p>
                         </div>
                     </div>
                     <div class="modalProduto-comentarios"></div>
@@ -283,7 +292,10 @@
                 const btnVerMais = card.querySelector(`#card${num}`);
                 const btnFechar = modal.querySelector(`#fechar-card${num}`);
 
-                btnVerMais.addEventListener('click', () => modal.showModal());
+                btnVerMais.addEventListener('click', () => {
+                    modal.showModal();
+                    if (typeof inicializarComentariosHTML === 'function') inicializarComentariosHTML();
+                });
                 btnFechar.addEventListener('click', () => modal.close());
 
                 modal.addEventListener('click', (e) => {
@@ -305,7 +317,8 @@
             });
 
             document.querySelectorAll('.btn-compra-rapida').forEach(btn => {
-                btn.addEventListener('click', function () {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
                     processarCompra(this, false);
                 });
             });
@@ -323,6 +336,7 @@
             if (typeof inicializarComentariosHTML === 'function') inicializarComentariosHTML();
             if (typeof injetarCalculadoraFrete === 'function') injetarCalculadoraFrete();
             if (typeof atualizarInterfaceEstoque === 'function') atualizarInterfaceEstoque();
+            if (typeof atualizarBadgeCarrinho === 'function') atualizarBadgeCarrinho();
 
             configurarFiltrosProdutos();
         }
@@ -446,11 +460,16 @@
                 return String(texto || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
             }
 
-            function aplicarTodosFiltros() {
+            function aplicarTodosFiltros(salvarHistorico = false) {
                 const catEscolhida = selectCategoria ? selectCategoria.value : 'Todos';
                 const precoEscolhido = selectPreco ? selectPreco.value : 'todos';
                 const ordemEscolhida = selectOrdem ? selectOrdem.value : 'padrao';
-                const termoBusca = inputPesquisa ? limparTexto(inputPesquisa.value) : '';
+                const termoBruto = inputPesquisa ? inputPesquisa.value.trim() : '';
+                const termoBusca = limparTexto(termoBruto);
+
+                if (salvarHistorico && typeof window.registrarPesquisaSR === 'function') {
+                    window.registrarPesquisaSR(termoBruto, { categoria: catEscolhida, preco: precoEscolhido });
+                }
 
                 const secao = document.querySelector('.destaques');
                 const cards = Array.from(secao.querySelectorAll(':scope > div'));
@@ -459,7 +478,7 @@
                 cards.forEach(card => {
                     const nomeEl = card.querySelector('p');
                     if (!nomeEl) return;
-                    const nomeCard = nomeEl.innerText;
+                    const nomeCard = nomeEl.innerText.trim();
                     const dados = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeCard.toLowerCase());
                     if (!dados) return;
 
@@ -472,7 +491,8 @@
 
                     const passaBusca = termoBusca === '' ||
                         limparTexto(dados.nome).includes(termoBusca) ||
-                        limparTexto(dados.categoria || '').includes(termoBusca);
+                        limparTexto(dados.categoria || '').includes(termoBusca) ||
+                        limparTexto(dados.descricao || '').includes(termoBusca);
 
                     if (passaCategoria && passaPreco && passaBusca) {
                         card.style.display = '';
@@ -484,8 +504,8 @@
 
                 if (ordemEscolhida !== 'padrao') {
                     const cardsOrdenados = [...cards].sort((a, b) => {
-                        const nomeA = a.querySelector('p')?.innerText || '';
-                        const nomeB = b.querySelector('p')?.innerText || '';
+                        const nomeA = a.querySelector('p')?.innerText.trim() || '';
+                        const nomeB = b.querySelector('p')?.innerText.trim() || '';
                         const dadosA = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeA.toLowerCase());
                         const dadosB = catalogoAtualProdutos.find(p => p.nome.toLowerCase() === nomeB.toLowerCase());
                         if (!dadosA || !dadosB) return 0;
@@ -506,11 +526,16 @@
                 aviso.innerText = visiveis === 0 ? 'Nenhuma figure encontrada com esses filtros.' : '';
             }
 
-            if (selectCategoria) selectCategoria.addEventListener('change', aplicarTodosFiltros);
-            if (selectPreco) selectPreco.addEventListener('change', aplicarTodosFiltros);
-            if (selectOrdem) selectOrdem.addEventListener('change', aplicarTodosFiltros);
-            if (inputPesquisa) inputPesquisa.addEventListener('input', aplicarTodosFiltros);
-            if (btnPesquisa) btnPesquisa.addEventListener('click', aplicarTodosFiltros);
+            if (selectCategoria) selectCategoria.addEventListener('change', () => aplicarTodosFiltros(true));
+            if (selectPreco) selectPreco.addEventListener('change', () => aplicarTodosFiltros(true));
+            if (selectOrdem) selectOrdem.addEventListener('change', () => aplicarTodosFiltros(false));
+            if (inputPesquisa) {
+                inputPesquisa.addEventListener('input', () => aplicarTodosFiltros(false));
+                inputPesquisa.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') aplicarTodosFiltros(true);
+                });
+            }
+            if (btnPesquisa) btnPesquisa.addEventListener('click', () => aplicarTodosFiltros(true));
 
             if (btnLimpar) {
                 btnLimpar.addEventListener('click', () => {
@@ -518,14 +543,14 @@
                     if (selectPreco) selectPreco.value = 'todos';
                     if (selectOrdem) selectOrdem.value = 'padrao';
                     if (inputPesquisa) inputPesquisa.value = '';
-                    aplicarTodosFiltros();
+                    aplicarTodosFiltros(false);
                 });
             }
 
             const buscaURL = new URLSearchParams(window.location.search).get('busca');
             if (buscaURL && inputPesquisa) {
                 inputPesquisa.value = buscaURL;
-                aplicarTodosFiltros();
+                aplicarTodosFiltros(true);
             }
         }
 

@@ -1,6 +1,6 @@
 /* site.js */
 // =========================================================
-// BASE GLOBAL - SHADOW REALM STORE (site.js)
+// BASE GLOBAL TURBINADA - SHADOW REALM STORE (site.js)
 // =========================================================
 
 const CONFIG_SITE_SR = {
@@ -16,15 +16,21 @@ const CONFIG_SITE_SR = {
         estoque: 'estoqueShadowRealm',
         pedidos: 'pedidosShadowRealm',
         cartoesBase: 'cartoesShadowRealm',
-        produtosCustom: 'produtosCustomShadowRealm'
+        produtosCustom: 'produtosCustomShadowRealm',
+        historicoPesquisas: 'historicoPesquisasShadowRealm',
+        notificacoes: 'notificacoesShadowRealm',
+        reclamacoes: 'reclamacoesShadowRealm',
+        cuponsUsados: 'cuponsUsadosShadowRealm'
     },
     cupons: {
-        'SHADOW26': 0.10,
-        'GEEK15': 0.15,
-        'SHADOW50': 0.50
+        'SHADOW26': { desconto: 0.15, apenasPrimeiraCompra: true },
+        'GEEK15': { desconto: 0.15, apenasPrimeiraCompra: false },
+        'SHADOW50': { desconto: 0.50, apenasPrimeiraCompra: false }
     },
-    limiteFreteGratis: 250,
+    limiteFreteGratis: 150,
     valorFretePadrao: 25,
+    minItensDescontoVolume: 15,
+    descontoVolumePercentual: 0.10,
     adminFallback: [
         {
             id: '1',
@@ -175,6 +181,107 @@ function escaparTextoSiteSR(texto) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+
+// =========================================================
+// HISTÓRICO DE PESQUISAS, NOTIFICAÇÕES E RECLAMAÇÕES
+// =========================================================
+
+window.registrarPesquisaSR = function (termo, filtros = {}) {
+    const limpo = String(termo || '').trim();
+    const usuarioEmail = (localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioAtual) || 'visitante').trim().toLowerCase();
+    if (!limpo && !filtros.categoria && !filtros.preco) return;
+
+    const lista = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.historicoPesquisas, []);
+    const arr = Array.isArray(lista) ? lista : [];
+    arr.push({
+        id: `pesq_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        usuarioEmail,
+        termo: limpo || '(Filtro aplicado)',
+        categoria: filtros.categoria || 'Todos',
+        preco: filtros.preco || 'todos',
+        timestamp: Date.now(),
+        dataHora: new Date().toLocaleString('pt-BR')
+    });
+    localStorage.setItem(CONFIG_SITE_SR.chaves.historicoPesquisas, JSON.stringify(arr.slice(-100)));
+};
+
+window.obterHistoricoPesquisasSR = function (ordem = 'recentes') {
+    const usuarioEmail = (localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioAtual) || '').trim().toLowerCase();
+    const lista = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.historicoPesquisas, []);
+    const filtrada = (Array.isArray(lista) ? lista : []).filter((item) => {
+        if (!usuarioEmail) return true;
+        return item.usuarioEmail === usuarioEmail || item.usuarioEmail === 'visitante';
+    });
+
+    return filtrada.sort((a, b) => ordem === 'antigas'
+        ? (Number(a.timestamp) || 0) - (Number(b.timestamp) || 0)
+        : (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+};
+
+window.obterHistoricoPedidosSR = function (ordem = 'recentes') {
+    const usuarioEmail = (localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioAtual) || '').trim().toLowerCase();
+    const pedidos = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.pedidos, []);
+    const lista = (Array.isArray(pedidos) ? pedidos : []).filter((p) => {
+        if (!usuarioEmail) return true;
+        return !p.clienteEmail || String(p.clienteEmail).toLowerCase() === usuarioEmail;
+    });
+
+    return lista.map((p, idx) => ({
+        ...p,
+        _ordemTs: Number(p.timestamp) || (Number(p.numeroPedido) || (idx + 1)) * 1000
+    })).sort((a, b) => ordem === 'antigas'
+        ? a._ordemTs - b._ordemTs
+        : b._ordemTs - a._ordemTs);
+};
+
+window.adicionarNotificacaoSR = function (titulo, mensagem, tipo = 'promo') {
+    const usuarioEmail = (localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioAtual) || 'geral').trim().toLowerCase();
+    const lista = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.notificacoes, []);
+    const arr = Array.isArray(lista) ? lista : [];
+    arr.unshift({
+        id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        usuarioEmail,
+        titulo,
+        mensagem,
+        tipo,
+        lida: false,
+        dataHora: new Date().toLocaleString('pt-BR')
+    });
+    localStorage.setItem(CONFIG_SITE_SR.chaves.notificacoes, JSON.stringify(arr.slice(0, 50)));
+};
+
+window.registrarReclamacaoSR = function ({ pedidoNumero = '', categoria = 'Pedido / Entrega', descricao = '' }) {
+    const usuarioEmail = (localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioAtual) || 'visitante').trim().toLowerCase();
+    const usuarioNome = localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioNome) || 'Cliente';
+    const protocolo = `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const lista = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.reclamacoes, []);
+    const arr = Array.isArray(lista) ? lista : [];
+    const registro = {
+        protocolo,
+        usuarioEmail,
+        usuarioNome,
+        pedidoNumero: String(pedidoNumero || '').trim(),
+        categoria,
+        descricao: String(descricao || '').trim(),
+        status: 'Aberto - Em análise',
+        dataHora: new Date().toLocaleString('pt-BR')
+    };
+    arr.unshift(registro);
+    localStorage.setItem(CONFIG_SITE_SR.chaves.reclamacoes, JSON.stringify(arr));
+
+    window.adicionarNotificacaoSR(
+        `Protocolo ${protocolo} aberto`,
+        `Sua reclamação sobre "${categoria}" foi registrada com sucesso.`,
+        'suporte'
+    );
+
+    return registro;
+};
+
+// =========================================================
+// CATÁLOGO DE PRODUTOS
+// =========================================================
 
 async function carregarProdutosSR() {
     let baseProdutos = CONFIG_SITE_SR.catalogoFallback.slice();
@@ -431,6 +538,33 @@ function cpfInvalido(rawCpf) {
     return false;
 }
 
+function verificarMaioridadeCadastro(f) {
+    if (!f) return { ok: true };
+
+    const campoNasc = f.querySelector('input[type="date"], input[name*="nasc"], input[id*="nasc"]');
+    if (campoNasc && campoNasc.value) {
+        const dataNasc = new Date(`${campoNasc.value}T00:00:00`);
+        if (!Number.isNaN(dataNasc.getTime())) {
+            const hoje = new Date();
+            let idade = hoje.getFullYear() - dataNasc.getFullYear();
+            const m = hoje.getMonth() - dataNasc.getMonth();
+            if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
+                idade--;
+            }
+            if (idade < 18) {
+                return { ok: false, motivo: 'Cadastro restrito a maiores de 18 anos (RN05).' };
+            }
+        }
+    }
+
+    const campoMenor = f.querySelector('input[name*="menor"], input[id*="menor"]');
+    if (campoMenor && campoMenor.checked) {
+        return { ok: false, motivo: 'Cadastro restrito a maiores de 18 anos (RN05).' };
+    }
+
+    return { ok: true };
+}
+
 var usuarioEncontradoLogin = null;
 
 async function validaLogin() {
@@ -592,6 +726,14 @@ function validaCadastro() {
         return false;
     }
 
+    const checagemIdade = verificarMaioridadeCadastro(f);
+    if (!checagemIdade.ok) {
+        exibirAvisoSite(checagemIdade.motivo, '- Restrição de Idade (18+) -', () => {
+            f.txtcpf.focus();
+        });
+        return false;
+    }
+
     const senha = f.txtsenha.value;
     const expRegsenha = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (senha.trim() === '' || !expRegsenha.test(senha)) {
@@ -669,6 +811,26 @@ function confirmaCadastro() {
     });
 }
 
+// =========================================================
+// CARRINHO, CUPONS, FRETE, RETIRADA NA LOJA E CHECKOUT
+// =========================================================
+
+function validarCepERaioLojaSR(cepBruto) {
+    const digitos = String(cepBruto || '').replace(/\D/g, '');
+    if (digitos.length !== 8) {
+        return { valido: false, mensagem: 'Informe um CEP válido com 8 dígitos.' };
+    }
+    const prefixo = parseInt(digitos.slice(0, 2), 10);
+    // Prefixos 01-19 (Grande SP / região sede de referência) ou 88-89 (Joinville/SC) simulam raio elegível de 15 km
+    const elegivelRetirada = (prefixo >= 1 && prefixo <= 19) || prefixo === 89;
+    return {
+        valido: true,
+        cepFormatado: `${digitos.slice(0, 5)}-${digitos.slice(5)}`,
+        elegivelRetirada,
+        prazoDias: elegivelRetirada ? '2 a 4 dias úteis' : '4 a 8 dias úteis'
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const productsList = document.getElementById('products-list');
     const priceBreakdown = document.querySelector('.price-breakdown');
@@ -681,14 +843,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const couponMessage = document.getElementById('coupon-message');
     const btncancelar = document.getElementById('btn-cancelar');
 
-    const cuponsValidos = CONFIG_SITE_SR.cupons;
-    let descontoAtual = 0;
+    let descontoCupomPerc = 0;
     let cupomAtivo = '';
+    let retiradaNaLojaAtiva = false;
 
     function obterCarrinho() {
         const dados = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.carrinho, []);
         return Array.isArray(dados) ? dados : [];
     }
+
+    function clienteJaFezCompra() {
+        const emailAtual = (localStorage.getItem(CONFIG_SITE_SR.chaves.usuarioAtual) || '').trim().toLowerCase();
+        const clienteObj = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.clienteLogado, {});
+        const cpfAtual = String(clienteObj?.cpf || '').replace(/\D/g, '');
+        const pedidos = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.pedidos, []);
+        const usados = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.cuponsUsados, []);
+
+        const temPedidoAnterior = Array.isArray(pedidos) && pedidos.some((p) => {
+            const mesmoEmail = emailAtual && String(p.clienteEmail || '').toLowerCase() === emailAtual;
+            const mesmoCpf = cpfAtual && String(p.clienteCpf || '').replace(/\D/g, '') === cpfAtual;
+            return mesmoEmail || mesmoCpf;
+        });
+
+        const usouShadow26 = Array.isArray(usados) && usados.some((u) => {
+            const mesmoEmail = emailAtual && String(u.email || '').toLowerCase() === emailAtual;
+            const mesmoCpf = cpfAtual && String(u.cpf || '').replace(/\D/g, '') === cpfAtual;
+            return u.cupom === 'SHADOW26' && (mesmoEmail || mesmoCpf);
+        });
+
+        return temPedidoAnterior || usouShadow26;
+    }
+
+    function injetarControlesEntregaNoCheckout() {
+        if (!addressForm || document.getElementById('grupo-cep-retirada-sr')) return;
+
+        const containerExtra = document.createElement('div');
+        containerExtra.id = 'grupo-cep-retirada-sr';
+        containerExtra.style.cssText = 'display:flex; flex-direction:column; gap:8px; margin-top:6px;';
+        containerExtra.innerHTML = `
+            <div class="form-group">
+                <label for="input-cep-sr">CEP</label>
+                <input type="text" id="input-cep-sr" maxlength="9" placeholder="00000-000">
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:14px; color:#ffca28; cursor:pointer;">
+                <input type="checkbox" id="check-retirada-loja-sr" disabled>
+                <span>Retirar na Loja Física (raio de 15 km)</span>
+            </label>
+            <small id="status-cep-sr" style="color:#cccccc; font-size:12px; text-align:left;"></small>
+        `;
+
+        const btnConfirmarPag = addressForm.querySelector('.btn-confirm-payment');
+        if (btnConfirmarPag) {
+            addressForm.insertBefore(containerExtra, btnConfirmarPag);
+        } else {
+            addressForm.appendChild(containerExtra);
+        }
+
+        const inputCep = document.getElementById('input-cep-sr');
+        const checkRetirada = document.getElementById('check-retirada-loja-sr');
+        const statusCep = document.getElementById('status-cep-sr');
+
+        if (inputCep) {
+            inputCep.addEventListener('input', (e) => {
+                let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                if (v.length > 5) v = `${v.slice(0, 5)}-${v.slice(5)}`;
+                e.target.value = v;
+
+                const info = validarCepERaioLojaSR(v);
+                if (!info.valido) {
+                    retiradaNaLojaAtiva = false;
+                    if (checkRetirada) {
+                        checkRetirada.checked = false;
+                        checkRetirada.disabled = true;
+                    }
+                    if (statusCep) statusCep.textContent = v.length > 0 ? 'Digite os 8 dígitos do CEP para calcular entrega e retirada.' : '';
+                    renderizarCarrinho();
+                    return;
+                }
+
+                if (checkRetirada) {
+                    checkRetirada.disabled = !info.elegivelRetirada;
+                    if (!info.elegivelRetirada) {
+                        checkRetirada.checked = false;
+                        retiradaNaLojaAtiva = false;
+                    }
+                }
+
+                if (statusCep) {
+                    statusCep.textContent = info.elegivelRetirada
+                        ? `CEP ${info.cepFormatado} elegível para Retirada na Loja (até 15 km) • Prazo: ${info.prazoDias}.`
+                        : `CEP ${info.cepFormatado} fora do raio de 15 km para retirada local • Prazo entrega: ${info.prazoDias}.`;
+                }
+                renderizarCarrinho();
+            });
+        }
+
+        if (checkRetirada) {
+            checkRetirada.addEventListener('change', () => {
+                retiradaNaLojaAtiva = Boolean(checkRetirada.checked);
+                renderizarCarrinho();
+            });
+        }
+    }
+
+    injetarControlesEntregaNoCheckout();
 
     if (btnBuy) {
         btnBuy.onclick = (e) => {
@@ -717,14 +975,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (Object.prototype.hasOwnProperty.call(cuponsValidos, codigoDigitado)) {
-                descontoAtual = cuponsValidos[codigoDigitado];
+            const regraCupom = CONFIG_SITE_SR.cupons[codigoDigitado];
+            if (regraCupom) {
+                if (regraCupom.apenasPrimeiraCompra && clienteJaFezCompra()) {
+                    descontoCupomPerc = 0;
+                    cupomAtivo = '';
+                    exibirMensagemCupom('Cupom SHADOW26 é exclusivo para a primeira compra!', '#ff4444');
+                    renderizarCarrinho();
+                    return;
+                }
+
+                descontoCupomPerc = regraCupom.desconto;
                 cupomAtivo = codigoDigitado;
-                const porcText = Math.round(descontoAtual * 100) + '%';
+                const porcText = Math.round(descontoCupomPerc * 100) + '%';
                 exibirMensagemCupom(`Cupom ${codigoDigitado} aplicado! (-${porcText})`, '#00ff88');
                 renderizarCarrinho();
             } else {
-                descontoAtual = 0;
+                descontoCupomPerc = 0;
                 cupomAtivo = '';
                 exibirMensagemCupom('Cupom inválido!', '#ff4444');
                 renderizarCarrinho();
@@ -734,11 +1001,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btncancelar) {
         btncancelar.onclick = () => {
-            if (descontoAtual === 0 && cupomAtivo === '') {
+            if (descontoCupomPerc === 0 && cupomAtivo === '') {
                 exibirMensagemCupom('Nenhum cupom aplicado no momento.', '#ffaa00');
                 return;
             }
-            descontoAtual = 0;
+            descontoCupomPerc = 0;
             cupomAtivo = '';
             if (couponInput) couponInput.value = '';
             exibirMensagemCupom('Cupom cancelado.', '#ffaa00');
@@ -754,14 +1021,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function calcularTotaisCarrinho(itens) {
-        const subtotal = itens.reduce((acc, item) => acc + ((Number(item.preco) || 0) * (Number(item.quantidade) || 0)), 0);
-        const valorDesconto = subtotal * descontoAtual;
-        const subtotalComDesconto = Math.max(0, subtotal - valorDesconto);
-        const frete = subtotal === 0
+        const totalUnidades = itens.reduce((acc, item) => acc + (Number(item.quantidade) || 0), 0);
+        const subtotalBruto = itens.reduce((acc, item) => acc + ((Number(item.preco) || 0) * (Number(item.quantidade) || 0)), 0);
+
+        const maiorItem = itens.reduce((max, item) => {
+            const p = Number(item.preco) || 0;
+            return p > max ? p : max;
+        }, 0);
+
+        const descontoVolume = totalUnidades >= CONFIG_SITE_SR.minItensDescontoVolume
+            ? maiorItem * CONFIG_SITE_SR.descontoVolumePercentual
+            : 0;
+
+        const subtotalAposVolume = Math.max(0, subtotalBruto - descontoVolume);
+        const valorDescontoCupom = subtotalAposVolume * descontoCupomPerc;
+        const subtotalLiquido = Math.max(0, subtotalAposVolume - valorDescontoCupom);
+
+        const frete = subtotalBruto === 0
             ? 0
-            : (subtotalComDesconto >= CONFIG_SITE_SR.limiteFreteGratis ? 0 : CONFIG_SITE_SR.valorFretePadrao);
-        const totalFinal = subtotalComDesconto + frete;
-        return { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal };
+            : (retiradaNaLojaAtiva || subtotalLiquido >= CONFIG_SITE_SR.limiteFreteGratis ? 0 : CONFIG_SITE_SR.valorFretePadrao);
+
+        const totalFinal = subtotalLiquido + frete;
+        return {
+            totalUnidades,
+            subtotal: subtotalBruto,
+            descontoVolume,
+            valorDesconto: valorDescontoCupom,
+            subtotalComDesconto: subtotalLiquido,
+            frete,
+            totalFinal
+        };
     }
 
     function obterEstoqueCarrinho(nomeProduto) {
@@ -780,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (productsList && typeof window.reRenderizarCarrinhoSemReload !== 'function') {
             if (carrinho.length === 0) {
-                productsList.innerHTML = '<p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio.</p>';
+                productsList.innerHTML = '<p class="empty-cart-msg" style="color: #ffffff; text-align: center;">Seu carrinho está vazio. <a href="produtos.html" style="color:#ffca28; text-decoration:underline;">Ir para a vitrine</a></p>';
             } else {
                 productsList.innerHTML = '';
 
@@ -860,7 +1149,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function atualizarResumo(itens) {
         if (!priceBreakdown) return;
 
-        const { subtotal, valorDesconto, subtotalComDesconto, frete, totalFinal } = calcularTotaisCarrinho(itens);
+        const {
+            totalUnidades,
+            subtotal,
+            descontoVolume,
+            valorDesconto,
+            subtotalComDesconto,
+            frete,
+            totalFinal
+        } = calcularTotaisCarrinho(itens);
+
         let breakdownHTML = '';
 
         if (itens.length === 0) {
@@ -873,12 +1171,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        if (descontoAtual > 0 && subtotal > 0) {
-            breakdownHTML += `<p class="price-item" style="color: #00ff88;">- Desconto (${Math.round(descontoAtual * 100)}%): R$ ${formatarBRLSiteSR(valorDesconto)}</p>`;
+        if (descontoVolume > 0) {
+            breakdownHTML += `<p class="price-item" style="color: #ffca28;">- Desconto Volume (${totalUnidades} itens): R$ ${formatarBRLSiteSR(descontoVolume)}</p>`;
+        }
+
+        if (descontoCupomPerc > 0 && subtotal > 0) {
+            breakdownHTML += `<p class="price-item" style="color: #00ff88;">- Desconto (${Math.round(descontoCupomPerc * 100)}%): R$ ${formatarBRLSiteSR(valorDesconto)}</p>`;
         }
 
         if (itens.length > 0) {
-            if (frete === 0) {
+            if (retiradaNaLojaAtiva) {
+                breakdownHTML += `<p class="price-item" style="color: #00e676;">Retirada na Loja: GRÁTIS (R$ 0,00)</p>`;
+            } else if (frete === 0) {
                 breakdownHTML += `<p class="price-item" style="color: #00e676;">Frete: GRÁTIS (R$ 0,00)</p>`;
             } else {
                 breakdownHTML += `<p class="price-item" style="color: #ffca28;">Frete: + R$ ${formatarBRLSiteSR(CONFIG_SITE_SR.valorFretePadrao)}</p>`;
@@ -898,10 +1202,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (avisoFrete) {
             if (subtotal === 0) {
                 avisoFrete.style.display = 'none';
+            } else if (retiradaNaLojaAtiva) {
+                avisoFrete.style.display = 'block';
+                avisoFrete.style.color = '#00e676';
+                avisoFrete.innerHTML = '🏬 Retirada na Loja selecionada — <strong>Frete Grátis</strong>!';
             } else if (subtotalComDesconto >= CONFIG_SITE_SR.limiteFreteGratis) {
                 avisoFrete.style.display = 'block';
                 avisoFrete.style.color = '#00e676';
-                avisoFrete.innerHTML = '🚚 Parabéns! Você ganhou <strong>Frete Grátis</strong>!';
+                avisoFrete.innerHTML = '🚚 Parabéns! Você ganhou <strong>Frete Grátis</strong> (acima de R$ 150,00)!';
             } else {
                 const falta = formatarBRLSiteSR(CONFIG_SITE_SR.limiteFreteGratis - subtotalComDesconto);
                 avisoFrete.style.display = 'block';
@@ -951,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const selectCartao = document.getElementById('select-cartao-uso');
                 const idx = selectCartao ? parseInt(selectCartao.value, 10) : 0;
                 const cartaoEscolhido = cartoesSalvos[idx] || cartoesSalvos[0];
-                const labelTipo = metodo === 'debito' ? 'Débito' : 'Crédito Parcelado';
+                const labelTipo = metodo === 'debito' ? 'Débito' : 'Crédito em até 12x sem juros';
                 descricaoPagamento = `${labelTipo} (${cartaoEscolhido.numeroMascarado})`;
             }
 
@@ -965,17 +1273,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            const clienteObj = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.clienteLogado, {});
+            const cpfAtual = String(clienteObj?.cpf || '').replace(/\D/g, '');
             const pedidosSalvos = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.pedidos, []);
             const pedidos = Array.isArray(pedidosSalvos) ? pedidosSalvos : [];
             const proximoNumero = pedidos.length > 0
                 ? Math.max(...pedidos.map((p) => Number(p.numeroPedido) || 1000)) + 1
                 : 1001;
 
+            const cepDigitado = document.getElementById('input-cep-sr')?.value.trim() || '';
+
             pedidos.push({
                 numeroPedido: proximoNumero,
                 clienteEmail: usuarioAtual,
+                clienteCpf: cpfAtual,
                 data: new Date().toLocaleDateString('pt-BR'),
-                status: 'Pedido Confirmado',
+                timestamp: Date.now(),
+                status: retiradaNaLojaAtiva ? 'Pronto para Retirada na Loja' : 'Pedido Confirmado',
+                modalidadeEntrega: retiradaNaLojaAtiva ? 'Retirada na Loja (até 15 km)' : 'Entrega Padrão',
+                cep: cepDigitado,
                 cartaoUsado: descricaoPagamento,
                 enderecoEntrega: `${rua} - ${cidade}/${estado}`,
                 cupom: cupomAtivo || null,
@@ -983,8 +1299,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 itens: carrinho
             });
 
+            if (cupomAtivo === 'SHADOW26') {
+                const usados = lerJsonSeguroSR(CONFIG_SITE_SR.chaves.cuponsUsados, []);
+                const listaUsados = Array.isArray(usados) ? usados : [];
+                listaUsados.push({ cupom: 'SHADOW26', email: usuarioAtual, cpf: cpfAtual, data: new Date().toLocaleDateString('pt-BR') });
+                localStorage.setItem(CONFIG_SITE_SR.chaves.cuponsUsados, JSON.stringify(listaUsados));
+            }
+
             localStorage.setItem(CONFIG_SITE_SR.chaves.pedidos, JSON.stringify(pedidos));
             localStorage.removeItem(CONFIG_SITE_SR.chaves.carrinho);
+
+            window.adicionarNotificacaoSR(
+                `Pedido #${proximoNumero} confirmado`,
+                `Seu pedido no valor de R$ ${formatarBRLSiteSR(totalFinal)} foi registrado com sucesso.`,
+                'pedido'
+            );
 
             exibirAvisoSite(
                 `Pagamento confirmado com sucesso! Pedido <strong>#${proximoNumero}</strong> registrado.`,
@@ -1002,6 +1331,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.promessaEstoqueSR.then(() => renderizarCarrinho());
     }
 });
+
+// =========================================================
+// CADASTRO E GERENCIAMENTO DE CARTÕES
+// =========================================================
 
 const inputNumero = document.getElementById('numero');
 const inputTitular = document.getElementById('titular');
@@ -1162,7 +1495,7 @@ if (form) {
         resNumero.textContent = inputNumero.value;
         resTitular.textContent = inputTitular.value;
         resValidade.textContent = inputValidade.value;
-        resCvv.textContent = inputCvv.value;
+        resCvv.textContent = '•••';
         resEndereco.textContent = inputEndereco.value;
 
         if (modal) modal.showModal();
@@ -1181,6 +1514,7 @@ if (btnConfirmar) {
         const numeroLimpo = inputNumero.value.replace(/\s/g, '');
         const tipoCartaoTexto = cartoes.length === 0 ? 'Cartão Principal' : 'Cartão Secundário';
 
+        // RNF05: não persiste número completo do cartão nem CVV
         cartoes.push({
             numeroMascarado: '**** **** **** ' + numeroLimpo.slice(-4),
             final: numeroLimpo.slice(-4),

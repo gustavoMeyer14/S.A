@@ -24,7 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'kisuke urahara',
         'renji abarai',
         'rukia kuchiki',
-        'toshiro hitsugaya'
+        'toshiro hitsugaya',
+        'levi ackerman',
+        'maomao',
+        'satoru gojo',
+        'greninja',
+        'snorlax'
     ];
 
     injetarEstilosVitrine();
@@ -42,7 +47,7 @@ function injetarEstilosVitrine() {
         .btn-favorito-card {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             width: 36px !important;
             height: 36px !important;
             border-radius: 50% !important;
@@ -70,7 +75,7 @@ function injetarEstilosVitrine() {
             font-size: 11px;
             padding: 3px 9px;
             border-radius: 20px;
-            margin: 5px auto;
+            margin: 4px auto;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
@@ -80,7 +85,7 @@ function injetarEstilosVitrine() {
             border: 1px solid #C62828;
             border-radius: 14px;
             padding: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .form-comentario-html h3 {
             color: #ffca28;
@@ -118,6 +123,11 @@ function injetarEstilosVitrine() {
             resize: vertical;
             margin-bottom: 10px;
         }
+        .acoes-comentario-sr {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
         .btn-enviar-comentario {
             background: #C62828;
             color: #ffffff;
@@ -132,6 +142,21 @@ function injetarEstilosVitrine() {
         .btn-enviar-comentario:hover {
             background: #000000;
             box-shadow: 0 4px 14px rgba(198, 40, 40, 0.6);
+        }
+        .btn-limpar-comentario {
+            background: #262626;
+            color: #ffffff;
+            border: 1px solid #ffca28;
+            border-radius: 12px;
+            padding: 9px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .btn-limpar-comentario:hover {
+            background: #ffca28;
+            color: #111111;
         }
         .aviso-nao-logado {
             background: #1a1a1a;
@@ -324,6 +349,13 @@ function processarCardsVitrine(produtosOriginais) {
                 } else {
                     lista.push({ nome: nomeProduto, preco: precoNum, imagem: imagemProduto });
                     btnFav.innerHTML = '❤️';
+                    if (typeof window.adicionarNotificacaoSR === 'function') {
+                        window.adicionarNotificacaoSR(
+                            `Favorito salvo: ${nomeProduto}`,
+                            `Fique de olho em cupons como SHADOW26 e GEEK15 para esta figure!`,
+                            'promo'
+                        );
+                    }
                 }
                 salvarFavoritos(lista);
             });
@@ -375,8 +407,8 @@ function inicializarComentariosHTML() {
 
         if (!container.querySelector('.lista-novos-comentarios')) {
             container.innerHTML = `
-                <h3 style="color:#ffffff; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:8px;">
-                    💬 Avaliações e Comentários (${nomeProdutoSeguro})
+                <h3 class="titulo-avaliacoes-sr" style="color:#ffffff; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:8px;">
+                    💬 Avaliações e Comentários (${nomeProdutoSeguro}) <span class="media-avaliacoes-sr" style="color:#ffca28; font-size:16px;"></span>
                 </h3>
                 <form class="form-comentario-html">
                     <div class="form-comentario-linha">
@@ -391,7 +423,10 @@ function inicializarComentariosHTML() {
                         <span style="font-size:13px; color:#bbb;">Comentando como <strong style="color:#ffca28;">${rotuloAutorSeguro}</strong></span>
                     </div>
                     <textarea placeholder="Conte o que achou dos detalhes, pintura e acabamento desta figure..." required></textarea>
-                    <button type="submit" class="btn-enviar-comentario">Publicar Avaliação</button>
+                    <div class="acoes-comentario-sr">
+                        <button type="submit" class="btn-enviar-comentario">Enviar</button>
+                        <button type="button" class="btn-limpar-comentario">Limpar</button>
+                    </div>
                 </form>
                 <div class="aviso-nao-logado">
                     Quer avaliar esta figure? <a href="cliente.html">Faça login</a> ou <a href="cadastro.html">cadastre-se</a> para comentar!
@@ -404,6 +439,7 @@ function inicializarComentariosHTML() {
         const form = container.querySelector('.form-comentario-html');
         const aviso = container.querySelector('.aviso-nao-logado');
         const lista = container.querySelector('.lista-novos-comentarios');
+        const mediaEl = container.querySelector('.media-avaliacoes-sr');
 
         if (!estaLogado || !usuarioAtual) {
             if (form) form.style.display = 'none';
@@ -423,9 +459,21 @@ function inicializarComentariosHTML() {
             return salvos;
         }
 
+        function atualizarMedia(salvos) {
+            if (!mediaEl) return;
+            if (!Array.isArray(salvos) || salvos.length === 0) {
+                mediaEl.textContent = '';
+                return;
+            }
+            const soma = salvos.reduce((acc, item) => acc + (Number(item.nota) || 5), 0);
+            const media = (soma / salvos.length).toFixed(1).replace('.', ',');
+            mediaEl.textContent = `• ★ ${media} (${salvos.length} avaliações)`;
+        }
+
         function renderizar() {
             if (!lista) return;
             const salvos = obterListaComentarios();
+            atualizarMedia(salvos);
             lista.innerHTML = '';
 
             if (salvos.length === 0) {
@@ -471,6 +519,17 @@ function inicializarComentariosHTML() {
 
         if (form && estaLogado && usuarioAtual && form.dataset.listenerAtivo !== 'true') {
             form.dataset.listenerAtivo = 'true';
+
+            const btnLimpar = form.querySelector('.btn-limpar-comentario');
+            if (btnLimpar) {
+                btnLimpar.addEventListener('click', () => {
+                    const textarea = form.querySelector('textarea');
+                    const selectNota = form.querySelector('select');
+                    if (textarea) textarea.value = '';
+                    if (selectNota) selectNota.value = '5';
+                });
+            }
+
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const textarea = form.querySelector('textarea');
