@@ -1,6 +1,6 @@
 /* shadow-realm-requisitos-sr.js */
 // =========================================================
-// PACOTE COMPLETO DE REQUISITOS (RF04, RF06-RF08, RN02-RN06, RNF06)
+// PACOTE COMPLETO TURBINADO (RF04, RF06, RF07, RF08, RN02-RN06, RNF06)
 // SHADOW REALM STORE
 // =========================================================
 
@@ -17,10 +17,19 @@
         carrinho: 'carrinhoShadowRealm'
     };
 
+    const ETAPAS_RASTREIO = [
+        'Pagamento Aprovado',
+        'Em Separação & Embalagem Reforçada',
+        'Coletado pela Transportadora',
+        'Em Trânsito para a Região de Entrega',
+        'Saiu para Entrega / Pronto para Retirada',
+        'Entregue'
+    ];
+
     function lerJSON(chave, fallback) {
         try {
             const raw = localStorage.getItem(chave);
-            if (!raw) return fallback;
+            if (raw === null || raw === '') return fallback;
             return JSON.parse(raw);
         } catch {
             return fallback;
@@ -31,7 +40,7 @@
         try {
             localStorage.setItem(chave, JSON.stringify(valor));
         } catch {
-            // Ignora erro de quota
+            // Ignora erro de quota do navegador
         }
     }
 
@@ -52,11 +61,30 @@
     }
 
     function getUsuarioEmail() {
-        return (localStorage.getItem(CHAVES_SR.usuarioAtual) || 'visitante').trim().toLowerCase();
+        const atual = (localStorage.getItem(CHAVES_SR.usuarioAtual) || '').trim().toLowerCase();
+        if (atual) return atual;
+        const cliente = lerJSON(CHAVES_SR.clienteLogado, null);
+        if (cliente && cliente.email) return String(cliente.email).trim().toLowerCase();
+        return 'visitante';
     }
 
     function getUsuarioNome() {
-        return (localStorage.getItem(CHAVES_SR.usuarioNome) || 'Cliente Shadow Realm').trim();
+        const nome = (localStorage.getItem(CHAVES_SR.usuarioNome) || '').trim();
+        if (nome) return nome;
+        const cliente = lerJSON(CHAVES_SR.clienteLogado, null);
+        if (cliente && cliente.nome) return String(cliente.nome).trim();
+        return 'Cliente Shadow Realm';
+    }
+
+    function normalizarTimestamp(valor, fallbackSeq = 1) {
+        if (typeof valor === 'number' && Number.isFinite(valor) && valor > 0) return valor;
+        if (typeof valor === 'string' && valor.trim() !== '') {
+            const num = Number(valor);
+            if (Number.isFinite(num) && num > 0) return num;
+            const parsed = Date.parse(valor);
+            if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+        }
+        return fallbackSeq * 1000;
     }
 
     // ---------------------------------------------------------
@@ -64,17 +92,20 @@
     // ---------------------------------------------------------
     window.srNotificar = function (titulo, mensagem, tipo = 'info') {
         const lista = lerJSON(CHAVES_SR.notificacoes, []);
+        const arr = Array.isArray(lista) ? lista : [];
+        const agora = Date.now();
         const nova = {
-            id: `n_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            id: `n_${agora}_${Math.random().toString(36).slice(2, 6)}`,
             usuarioEmail: getUsuarioEmail(),
-            titulo,
-            mensagem,
+            titulo: String(titulo || 'Aviso Shadow Realm'),
+            mensagem: String(mensagem || ''),
             tipo,
             lida: false,
-            dataHora: new Date().toLocaleString('pt-BR')
+            timestamp: agora,
+            dataHora: new Date(agora).toLocaleString('pt-BR')
         };
-        lista.unshift(nova);
-        salvarJSON(CHAVES_SR.notificacoes, lista.slice(0, 60));
+        arr.unshift(nova);
+        salvarJSON(CHAVES_SR.notificacoes, arr.slice(0, 80));
         window.dispatchEvent(new CustomEvent('sr:notificacoes-atualizadas', { detail: nova }));
         return nova;
     };
@@ -84,45 +115,66 @@
     // ---------------------------------------------------------
     window.srRegistrarPesquisa = function (termo, meta = {}) {
         const limpo = String(termo || '').trim();
-        if (!limpo && !meta.categoria && !meta.preco) return;
+        const categoria = meta.categoria || 'Todos';
+        const preco = meta.preco || 'todos';
+        if (!limpo && categoria === 'Todos' && preco === 'todos') return;
+
         const lista = lerJSON(CHAVES_SR.pesquisas, []);
-        lista.push({
-            id: `p_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+        const arr = Array.isArray(lista) ? lista : [];
+        const agora = Date.now();
+
+        const ultimo = arr[arr.length - 1];
+        const rotulo = limpo || `Filtro: ${categoria}`;
+        if (ultimo && ultimo.termo === rotulo && ultimo.categoria === categoria && (agora - (ultimo.timestamp || 0)) < 1500) {
+            return;
+        }
+
+        arr.push({
+            id: `p_${agora}_${Math.random().toString(36).slice(2, 6)}`,
             usuarioEmail: getUsuarioEmail(),
-            termo: limpo || '(Filtro aplicado)',
-            categoria: meta.categoria || 'Todos',
-            preco: meta.preco || 'todos',
-            timestamp: Date.now(),
-            dataHora: new Date().toLocaleString('pt-BR')
+            termo: rotulo,
+            categoria,
+            preco,
+            timestamp: agora,
+            dataHora: new Date(agora).toLocaleString('pt-BR')
         });
-        salvarJSON(CHAVES_SR.pesquisas, lista.slice(-120));
+        salvarJSON(CHAVES_SR.pesquisas, arr.slice(-150));
+        window.dispatchEvent(new CustomEvent('sr:historico-atualizado', { detail: { tipo: 'pesquisa' } }));
     };
 
     window.srListarPesquisas = function (ordem = 'recentes') {
         const email = getUsuarioEmail();
-        const lista = lerJSON(CHAVES_SR.pesquisas, []).filter(
-            (item) => !item.usuarioEmail || item.usuarioEmail === email || item.usuarioEmail === 'visitante'
-        );
-        return lista.sort((a, b) =>
-            ordem === 'antigas'
-                ? (Number(a.timestamp) || 0) - (Number(b.timestamp) || 0)
-                : (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)
-        );
+        const raw = lerJSON(CHAVES_SR.pesquisas, []);
+        const lista = (Array.isArray(raw) ? raw : []).filter((item) => {
+            if (!item || !item.termo) return false;
+            if (!item.usuarioEmail || email === 'visitante') return true;
+            const itemEmail = String(item.usuarioEmail).toLowerCase();
+            return itemEmail === email || itemEmail === 'visitante';
+        });
+
+        return lista
+            .map((item, idx) => ({
+                ...item,
+                _ts: normalizarTimestamp(item.timestamp, idx + 1)
+            }))
+            .sort((a, b) => (ordem === 'antigas' ? a._ts - b._ts : b._ts - a._ts));
     };
 
     window.srListarCompras = function (ordem = 'recentes') {
         const email = getUsuarioEmail();
-        const pedidos = lerJSON(CHAVES_SR.pedidos, []).filter(
-            (p) => !p.clienteEmail || String(p.clienteEmail).toLowerCase() === email || email === 'visitante'
-        );
+        const raw = lerJSON(CHAVES_SR.pedidos, []);
+        const pedidos = (Array.isArray(raw) ? raw : []).filter((p) => {
+            if (!p) return false;
+            if (!p.clienteEmail || email === 'visitante') return true;
+            return String(p.clienteEmail).toLowerCase() === email;
+        });
+
         return pedidos
             .map((p, idx) => ({
                 ...p,
-                _ts: Number(p.timestamp) || (Number(p.numeroPedido) || idx + 1) * 1000
+                _ts: normalizarTimestamp(p.timestamp, Number(p.numeroPedido) || (idx + 1))
             }))
-            .sort((a, b) =>
-                ordem === 'antigas' ? a._ts - b._ts : b._ts - a._ts
-            );
+            .sort((a, b) => (ordem === 'antigas' ? a._ts - b._ts : b._ts - a._ts));
     };
 
     // ---------------------------------------------------------
@@ -131,6 +183,8 @@
     window.srCriarReclamacao = function ({ pedidoNumero = '', categoria = 'Pedido / Entrega', descricao = '' }) {
         const protocolo = `SR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
         const lista = lerJSON(CHAVES_SR.reclamacoes, []);
+        const arr = Array.isArray(lista) ? lista : [];
+        const agora = Date.now();
         const ticket = {
             protocolo,
             usuarioEmail: getUsuarioEmail(),
@@ -139,11 +193,11 @@
             categoria,
             descricao: String(descricao || '').trim(),
             status: 'Aberto',
-            timestamp: Date.now(),
-            dataHora: new Date().toLocaleString('pt-BR')
+            timestamp: agora,
+            dataHora: new Date(agora).toLocaleString('pt-BR')
         };
-        lista.unshift(ticket);
-        salvarJSON(CHAVES_SR.reclamacoes, lista);
+        arr.unshift(ticket);
+        salvarJSON(CHAVES_SR.reclamacoes, arr);
         window.srNotificar(
             `Protocolo ${protocolo} criado`,
             `Sua ocorrência sobre "${categoria}" foi aberta e será acompanhada pela equipe.`,
@@ -155,15 +209,6 @@
     // ---------------------------------------------------------
     // RF08 / HU07: RASTREAMENTO DE COMPRA EM TEMPO REAL
     // ---------------------------------------------------------
-    const ETAPAS_RASTREIO = [
-        'Pagamento Aprovado',
-        'Em Separação & Embalagem Reforçada',
-        'Coletado pela Transportadora',
-        'Em Trânsito para a Região de Entrega',
-        'Saiu para Entrega / Pronto para Retirada',
-        'Entregue'
-    ];
-
     window.srObterEtapasRastreio = function (pedido) {
         const atualIdx = Math.min(
             ETAPAS_RASTREIO.length - 1,
@@ -179,27 +224,87 @@
 
     window.srAvancarRastreioPedido = function (numeroPedido) {
         const pedidos = lerJSON(CHAVES_SR.pedidos, []);
-        const idxPedido = pedidos.findIndex((p) => String(p.numeroPedido) === String(numeroPedido));
+        const arr = Array.isArray(pedidos) ? pedidos : [];
+        const idxPedido = arr.findIndex((p) => String(p.numeroPedido) === String(numeroPedido));
         if (idxPedido === -1) return null;
 
-        const pedido = pedidos[idxPedido];
+        const pedido = arr[idxPedido];
         const proxEtapa = Math.min(ETAPAS_RASTREIO.length - 1, (Number(pedido.etapaRastreio ?? 0) + 1));
         pedido.etapaRastreio = proxEtapa;
         pedido.status = ETAPAS_RASTREIO[proxEtapa];
         pedido.ultimaAtualizacaoRastreio = new Date().toLocaleString('pt-BR');
-        pedidos[idxPedido] = pedido;
-        salvarJSON(CHAVES_SR.pedidos, pedidos);
+        arr[idxPedido] = pedido;
+        salvarJSON(CHAVES_SR.pedidos, arr);
 
         window.srNotificar(
             `Pedido #${pedido.numeroPedido} atualizado`,
             `Novo status de rastreamento: ${pedido.status}.`,
             'rastreio'
         );
+        window.dispatchEvent(new CustomEvent('sr:historico-atualizado', { detail: { tipo: 'pedido' } }));
         return pedido;
     };
 
     // ---------------------------------------------------------
-    // ESTILOS & MODAIS DO USUÁRIO (HISTÓRICO E RECLAMAÇÕES)
+    // CAPTURA AUTOMÁTICA DE PESQUISAS E FILTROS
+    // ---------------------------------------------------------
+    function conectarCapturadoresBusca() {
+        const inputBusca = document.getElementById('barraPesquisa');
+        const btnBusca = document.getElementById('enviarPesquisa');
+        const selCat = document.getElementById('filtroCategoria');
+        const selPreco = document.getElementById('filtroPreco');
+
+        let debounceBusca = null;
+
+        if (inputBusca && !inputBusca.dataset.srBuscaLigada) {
+            inputBusca.dataset.srBuscaLigada = '1';
+            inputBusca.addEventListener('input', () => {
+                clearTimeout(debounceBusca);
+                debounceBusca = setTimeout(() => {
+                    const termo = inputBusca.value.trim();
+                    if (termo.length >= 2) {
+                        window.srRegistrarPesquisa(termo, {
+                            categoria: selCat ? selCat.value : 'Todos',
+                            preco: selPreco ? selPreco.value : 'todos'
+                        });
+                    }
+                }, 500);
+            });
+
+            inputBusca.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && inputBusca.value.trim()) {
+                    window.srRegistrarPesquisa(inputBusca.value.trim(), {
+                        categoria: selCat ? selCat.value : 'Todos',
+                        preco: selPreco ? selPreco.value : 'todos'
+                    });
+                }
+            });
+        }
+
+        if (btnBusca && !btnBusca.dataset.srBuscaLigada) {
+            btnBusca.dataset.srBuscaLigada = '1';
+            btnBusca.addEventListener('click', () => {
+                const termo = inputBusca ? inputBusca.value.trim() : '';
+                window.srRegistrarPesquisa(termo || 'Catálogo geral', {
+                    categoria: selCat ? selCat.value : 'Todos',
+                    preco: selPreco ? selPreco.value : 'todos'
+                });
+            });
+        }
+
+        if (selCat && !selCat.dataset.srBuscaLigada) {
+            selCat.dataset.srBuscaLigada = '1';
+            selCat.addEventListener('change', () => {
+                window.srRegistrarPesquisa(inputBusca ? inputBusca.value.trim() : '', {
+                    categoria: selCat.value,
+                    preco: selPreco ? selPreco.value : 'todos'
+                });
+            });
+        }
+    }
+
+    // ---------------------------------------------------------
+    // ESTILOS & MODAIS (RF04, RF07, RF08, RNF06)
     // ---------------------------------------------------------
     function injetarEstilosEModais() {
         if (!document.getElementById('sr-estilos-requisitos')) {
@@ -217,7 +322,7 @@
                     transform: translate(-50%, -50%) !important;
                     margin: 0 !important;
                     width: 92vw;
-                    max-width: 720px;
+                    max-width: 740px;
                     max-height: 85vh;
                     overflow-y: auto;
                     background: #171717;
@@ -225,7 +330,7 @@
                     border: 2px solid #C62828;
                     border-radius: 18px;
                     padding: 24px;
-                    z-index: 99999;
+                    z-index: 100000;
                     text-align: left;
                 }
                 .sr-dialog-req::backdrop {
@@ -258,6 +363,27 @@
                     padding: 12px 14px;
                     margin-bottom: 10px;
                 }
+                .sr-rastreio-step {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 8px 12px;
+                    border-radius: 10px;
+                    background: #202020;
+                    border: 1px solid #383838;
+                    margin-bottom: 8px;
+                    font-size: 14px;
+                }
+                .sr-rastreio-step.concluida {
+                    border-color: #00e676;
+                    color: #e8fff1;
+                }
+                .sr-rastreio-step.atual {
+                    border-color: #ffca28;
+                    background: #2b2410;
+                    color: #ffca28;
+                    font-weight: 700;
+                }
                 .sr-form-reclamacao {
                     display: flex;
                     flex-direction: column;
@@ -284,6 +410,11 @@
                     padding: 10px 18px;
                     font-weight: 700;
                     cursor: pointer;
+                }
+                .sr-btn-acao.sec {
+                    background: #262626;
+                    border-color: #ffca28;
+                    color: #ffca28;
                 }
                 @media (max-width: 600px) {
                     header {
@@ -364,12 +495,15 @@
             dlgHist.id = 'sr-modal-historico';
             dlgHist.className = 'sr-dialog-req';
             dlgHist.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #C62828; padding-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; border-bottom:1px solid #C62828; padding-bottom:10px;">
                     <h2 style="margin:0; font-size:22px;">🕒 Histórico de Compras e Pesquisas</h2>
-                    <select id="sr-ordem-hist" style="width:auto; margin:0; padding:6px 12px; border-radius:10px; background:#222; color:#ffca28; border:1px solid #C62828;">
-                        <option value="recentes">Mais recentes</option>
-                        <option value="antigas">Mais antigas</option>
-                    </select>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label for="sr-ordem-hist" style="font-size:13px; color:#ddd;">Ordenação:</label>
+                        <select id="sr-ordem-hist" style="width:auto; margin:0; padding:6px 12px; border-radius:10px; background:#222; color:#ffca28; border:1px solid #C62828; cursor:pointer;">
+                            <option value="recentes">Mais recentes</option>
+                            <option value="antigas">Mais antigas</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="sr-tabs-hist">
                     <button type="button" class="sr-tab-btn ativo" id="sr-tab-compras">🛍️ Compras</button>
@@ -383,6 +517,7 @@
             document.body.appendChild(dlgHist);
 
             let abaAtiva = 'compras';
+
             const renderHist = () => {
                 const ordem = document.getElementById('sr-ordem-hist')?.value || 'recentes';
                 const box = document.getElementById('sr-conteudo-historico');
@@ -391,55 +526,165 @@
                 if (abaAtiva === 'compras') {
                     const compras = window.srListarCompras(ordem);
                     if (!compras.length) {
-                        box.innerHTML = '<p style="color:#bbb;">Nenhuma compra registrada para esta conta.</p>';
+                        box.innerHTML = '<p style="color:#bbb;">Nenhuma compra registrada até o momento.</p>';
                         return;
                     }
-                    box.innerHTML = compras.map((c) => `
-                        <div class="sr-card-hist">
-                            <strong>Pedido #${esc(c.numeroPedido)}</strong> • <span style="color:#ffca28;">${esc(c.status || 'Confirmado')}</span>
-                            <p style="margin:4px 0; font-size:14px;">Data: ${esc(c.data || '-')} • Total: <strong>R$ ${fmtBRL(c.total)}</strong></p>
-                            <small style="color:#aaa;">Itens: ${esc((c.itens || []).map((i) => `${i.nome} (${i.quantidade}x)`).join(', '))}</small>
-                        </div>
-                    `).join('');
+                    box.innerHTML = compras.map((c) => {
+                        const num = c.numeroPedido ?? '-';
+                        return `
+                            <div class="sr-card-hist">
+                                <div style="display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+                                    <strong>Pedido #${esc(num)}</strong>
+                                    <span style="color:#ffca28;">${esc(c.status || 'Confirmado')}</span>
+                                </div>
+                                <p style="margin:4px 0; font-size:14px;">Data: ${esc(c.data || c.dataHora || '-')} • Total: <strong>R$ ${fmtBRL(c.total)}</strong></p>
+                                <small style="color:#aaa; display:block; margin-bottom:8px;">Itens: ${esc((c.itens || []).map((i) => `${i.nome} (${i.quantidade}x)`).join(', ') || 'Itens da compra')}</small>
+                                <button type="button" class="sr-btn-acao sec sr-btn-abrir-rastreio" data-pedido-rastreio="${esc(num)}" style="padding:6px 12px; font-size:12px;">
+                                    📍 Rastrear Pedido
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+
+                    box.querySelectorAll('.sr-btn-abrir-rastreio').forEach((btn) => {
+                        btn.addEventListener('click', () => {
+                            window.srAbrirModalRastreio(btn.getAttribute('data-pedido-rastreio'));
+                        });
+                    });
                 } else {
                     const buscas = window.srListarPesquisas(ordem);
                     if (!buscas.length) {
-                        box.innerHTML = '<p style="color:#bbb;">Nenhuma pesquisa registrada ainda.</p>';
+                        box.innerHTML = '<p style="color:#bbb;">Nenhuma pesquisa registrada ainda. Use a barra de pesquisa ou filtros para registrar.</p>';
                         return;
                     }
                     box.innerHTML = buscas.map((b) => `
                         <div class="sr-card-hist">
-                            <strong>Termo: "${esc(b.termo)}"</strong>
-                            <p style="margin:4px 0; font-size:13px; color:#ddd;">Anime: ${esc(b.categoria)} • Faixa: ${esc(b.preco)}</p>
-                            <small style="color:#999;">${esc(b.dataHora)}</small>
+                            <div style="display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+                                <strong>Termo: "${esc(b.termo)}"</strong>
+                                <small style="color:#ffca28;">${esc(b.dataHora || '-')}</small>
+                            </div>
+                            <p style="margin:4px 0 0 0; font-size:13px; color:#ddd;">Categoria: ${esc(b.categoria || 'Todos')} • Faixa de preço: ${esc(b.preco || 'todos')}</p>
                         </div>
                     `).join('');
                 }
             };
 
-            document.getElementById('sr-tab-compras')?.addEventListener('click', (e) => {
+            const btnCompras = document.getElementById('sr-tab-compras');
+            const btnPesquisas = document.getElementById('sr-tab-pesquisas');
+            const selOrdem = document.getElementById('sr-ordem-hist');
+            const btnFechar = document.getElementById('sr-fechar-historico');
+
+            btnCompras?.addEventListener('click', () => {
                 abaAtiva = 'compras';
-                e.target.classList.add('ativo');
-                document.getElementById('sr-tab-pesquisas')?.classList.remove('ativo');
+                btnCompras.classList.add('ativo');
+                btnPesquisas?.classList.remove('ativo');
                 renderHist();
             });
 
-            document.getElementById('sr-tab-pesquisas')?.addEventListener('click', (e) => {
+            btnPesquisas?.addEventListener('click', () => {
                 abaAtiva = 'pesquisas';
-                e.target.classList.add('ativo');
-                document.getElementById('sr-tab-compras')?.classList.remove('ativo');
+                btnPesquisas.classList.add('ativo');
+                btnCompras?.classList.remove('ativo');
                 renderHist();
             });
 
-            document.getElementById('sr-ordem-hist')?.addEventListener('change', renderHist);
-            document.getElementById('sr-fechar-historico')?.addEventListener('click', () => dlgHist.close());
+            selOrdem?.addEventListener('change', renderHist);
+            btnFechar?.addEventListener('click', () => {
+                if (dlgHist.open) dlgHist.close();
+            });
 
-            window.srAbrirModalHistorico = function () {
-                abaAtiva = 'compras';
-                document.getElementById('sr-tab-compras')?.classList.add('ativo');
-                document.getElementById('sr-tab-pesquisas')?.classList.remove('ativo');
+            dlgHist.addEventListener('click', (e) => {
+                if (e.target === dlgHist) dlgHist.close();
+            });
+
+            window.addEventListener('sr:historico-atualizado', () => {
+                if (dlgHist.open) renderHist();
+            });
+
+            window.srAbrirModalHistorico = function (abaInicial = 'compras') {
+                abaAtiva = abaInicial === 'pesquisas' ? 'pesquisas' : 'compras';
+                if (abaAtiva === 'pesquisas') {
+                    btnPesquisas?.classList.add('ativo');
+                    btnCompras?.classList.remove('ativo');
+                } else {
+                    btnCompras?.classList.add('ativo');
+                    btnPesquisas?.classList.remove('ativo');
+                }
                 renderHist();
                 if (!dlgHist.open) dlgHist.showModal();
+            };
+        }
+
+        if (!document.getElementById('sr-modal-rastreio')) {
+            const dlgRast = document.createElement('dialog');
+            dlgRast.id = 'sr-modal-rastreio';
+            dlgRast.className = 'sr-dialog-req';
+            dlgRast.innerHTML = `
+                <h2 style="margin:0 0 12px 0; font-size:22px; border-bottom:1px solid #C62828; padding-bottom:10px;">📍 Rastreamento de Compra</h2>
+                <div id="sr-conteudo-rastreio"></div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+                    <button type="button" class="sr-btn-acao" id="sr-fechar-rastreio">Fechar</button>
+                </div>
+            `;
+            document.body.appendChild(dlgRast);
+
+            let pedidoAtualRastreio = null;
+
+            const renderRastreio = () => {
+                const alvo = document.getElementById('sr-conteudo-rastreio');
+                if (!alvo) return;
+
+                const pedidos = window.srListarCompras('recentes');
+                const pedido = pedidos.find((p) => String(p.numeroPedido) === String(pedidoAtualRastreio)) || pedidos[0];
+
+                if (!pedido) {
+                    alvo.innerHTML = '<p style="color:#bbb;">Nenhum pedido disponível para rastreamento.</p>';
+                    return;
+                }
+
+                pedidoAtualRastreio = pedido.numeroPedido;
+                const etapas = window.srObterEtapasRastreio(pedido);
+                const isFinal = etapas[etapas.length - 1]?.concluida;
+
+                alvo.innerHTML = `
+                    <div class="sr-card-hist">
+                        <strong>Pedido #${esc(pedido.numeroPedido)}</strong> • Status atual: <span style="color:#ffca28;">${esc(pedido.status || etapas.find((e) => e.atual)?.titulo || 'Em processamento')}</span>
+                        <p style="margin:4px 0 0 0; font-size:13px; color:#ccc;">Destino: ${esc(pedido.enderecoEntrega || 'Endereço cadastrado')} ${pedido.cep ? `(${esc(pedido.cep)})` : ''}</p>
+                        ${pedido.ultimaAtualizacaoRastreio ? `<small style="color:#999;">Atualizado em: ${esc(pedido.ultimaAtualizacaoRastreio)}</small>` : ''}
+                    </div>
+                    <div style="margin:12px 0;">
+                        ${etapas.map((et) => `
+                            <div class="sr-rastreio-step ${et.concluida ? 'concluida' : ''} ${et.atual ? 'atual' : ''}">
+                                <span>${et.concluida ? '✔' : '○'}</span>
+                                <span>${esc(et.titulo)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button type="button" class="sr-btn-acao sec" id="sr-btn-avancar-rastreio" ${isFinal ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                            ${isFinal ? 'Entrega Concluída' : 'Simular Próxima Etapa (Notifica Cliente)'}
+                        </button>
+                    </div>
+                `;
+
+                document.getElementById('sr-btn-avancar-rastreio')?.addEventListener('click', () => {
+                    window.srAvancarRastreioPedido(pedidoAtualRastreio);
+                    renderRastreio();
+                });
+            };
+
+            document.getElementById('sr-fechar-rastreio')?.addEventListener('click', () => {
+                if (dlgRast.open) dlgRast.close();
+            });
+
+            dlgRast.addEventListener('click', (e) => {
+                if (e.target === dlgRast) dlgRast.close();
+            });
+
+            window.srAbrirModalRastreio = function (numeroPedido = null) {
+                pedidoAtualRastreio = numeroPedido;
+                renderRastreio();
+                if (!dlgRast.open) dlgRast.showModal();
             };
         }
 
@@ -477,7 +722,8 @@
 
             const renderTickets = () => {
                 const email = getUsuarioEmail();
-                const lista = lerJSON(CHAVES_SR.reclamacoes, []).filter(
+                const raw = lerJSON(CHAVES_SR.reclamacoes, []);
+                const lista = (Array.isArray(raw) ? raw : []).filter(
                     (t) => !t.usuarioEmail || t.usuarioEmail === email || email === 'visitante'
                 );
                 const alvo = document.getElementById('sr-lista-reclamacoes');
@@ -518,7 +764,11 @@
             document.getElementById('sr-fechar-reclamacao')?.addEventListener('click', () => {
                 const resEl = document.getElementById('sr-rec-resultado');
                 if (resEl) resEl.innerHTML = '';
-                dlgRec.close();
+                if (dlgRec.open) dlgRec.close();
+            });
+
+            dlgRec.addEventListener('click', (e) => {
+                if (e.target === dlgRec) dlgRec.close();
             });
 
             window.srAbrirModalReclamacao = function (pedidoInicial = '') {
@@ -538,8 +788,8 @@
                 aHist.textContent = '🕒 Histórico';
                 aHist.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (typeof fechaModalCliente === 'function') fechaModalCliente();
-                    window.srAbrirModalHistorico();
+                    if (typeof window.fechaModalCliente === 'function') window.fechaModalCliente();
+                    window.srAbrirModalHistorico('compras');
                 });
                 navUsuario.appendChild(aHist);
             }
@@ -550,7 +800,7 @@
                 aRec.textContent = '🛠️ Reclamações';
                 aRec.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (typeof fechaModalCliente === 'function') fechaModalCliente();
+                    if (typeof window.fechaModalCliente === 'function') window.fechaModalCliente();
                     window.srAbrirModalReclamacao();
                 });
                 navUsuario.appendChild(aRec);
@@ -558,5 +808,18 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', injetarEstilosEModais);
+    function iniciarTudoSR() {
+        injetarEstilosEModais();
+        conectarCapturadoresBusca();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciarTudoSR);
+    } else {
+        iniciarTudoSR();
+    }
+
+    // Garante ligação mesmo se elementos forem renderizados de forma assíncrona
+    setTimeout(iniciarTudoSR, 400);
+    setTimeout(iniciarTudoSR, 1200);
 })();
