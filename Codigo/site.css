@@ -196,19 +196,23 @@ footer a:hover {
   height: 78px;
   padding: 0;
   margin: 0;
-  background: none;
-  border: none;
+  background: rgba(18, 12, 12, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .link:hover,
 .botaoUsuario:hover {
-  transform: scale(1.15);
+  transform: scale(1.06);
+  background: rgba(34, 18, 14, 0.85);
+  border-color: #ffca28;
+  box-shadow: 0 0 0 1px rgba(255, 202, 40, 0.35);
 }
 
 .link img {
@@ -313,13 +317,14 @@ footer a:hover {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .nav-usuario a:hover {
-  scale: 105%;
-  transition: 0.3s;
-  background-color: #151515;
-  box-shadow: 0 10px 25px #C62828;
+  transform: scale(1.03);
+  background-color: #111111;
+  border-color: #ffca28;
+  box-shadow: 0 0 18px rgba(198, 40, 40, 0.55);
 }
 
 .botaoFecharCliente {
@@ -1863,18 +1868,22 @@ dialog .btn-fechar {
 /* 5. Bolinha de Quantidade no Carrinho do Header */
 .shopee-cart-badge {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 4px;
+  right: 6px;
   background-color: #ffca28;
   color: #000000;
   font-weight: bold;
-  font-size: 13px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  font-size: 16px;
+  min-width: 20px;
+  width: auto;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 999px;
   align-items: center;
   justify-content: center;
   border: 2px solid #000000;
+  line-height: 1;
+  z-index: 2;
 }
 
 /* 6. Notificação Toast */
@@ -1955,14 +1964,14 @@ dialog .btn-comprar-agora:hover {
 .nav .botaoUsuario::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: -34px;
+  bottom: -36px;
   left: 50%;
   transform: translateX(-50%) translateY(-4px);
-  background-color: #C62828;
+  background-color: #151515;
   color: #ffffff;
   border: 1px solid #C62828;
-  padding: 5px 12px;
-  border-radius: 10px;
+  padding: 5px 14px;
+  border-radius: 12px;
   font-size: 13px;
   font-weight: bold;
   white-space: nowrap;
@@ -2398,46 +2407,4 @@ dialog .btn-comprar-agora:hover {
   .adminCrudBusca {
     width: 100%;
   }
-}
-
-/* ==========================================================================
-   SCROLLBAR GLOBAL ESTILIZADA (PADRÃO VERMELHO SHADOW REALM)
-   ========================================================================== */
-
-/* Suporte para Firefox e navegadores modernos */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #C62828 #0e0e0e;
-}
-
-/* Suporte para Chrome, Edge, Opera e Safari */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0e0e0e;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #C62828;
-  border-radius: 10px;
-  border: 2px solid #0e0e0e;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #ff2a2a;
-}
-
-/* Remove as setas superior e inferior (igual à segunda imagem) */
-::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-::-webkit-scrollbar-corner {
-  background: #0e0e0e;
 }
